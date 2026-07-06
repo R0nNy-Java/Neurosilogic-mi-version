@@ -1,4 +1,4 @@
-package rrparedes.model;
+package com.rrparedes.model;
 
 import java.util.Collection;
 import java.util.HashMap;

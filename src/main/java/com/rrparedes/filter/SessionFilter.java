@@ -1,4 +1,4 @@
-package rrparedes.filter;
+package com.rrparedes.filter;
 
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;

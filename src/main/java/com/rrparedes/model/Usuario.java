@@ -1,4 +1,4 @@
-package rrparedes.model;
+package com.rrparedes.model;
 
 /**
  * NURSELOGIC - Modelo de Usuario

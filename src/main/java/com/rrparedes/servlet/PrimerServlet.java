@@ -1,4 +1,4 @@
-package rrparedes.servlet;
+package com.rrparedes.servlet;
 
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;

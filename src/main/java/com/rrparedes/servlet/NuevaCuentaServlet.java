@@ -1,4 +1,4 @@
-package rrparedes.servlet;
+package com.rrparedes.servlet;
 
 import com.rrparedes.model.UserStore;
 import com.rrparedes.model.Usuario;
