@@ -51,9 +51,9 @@
     #login-screen {
       min-height: 100vh;
       display: grid;
-      grid-template-columns: 1.05fr 1fr;
+      grid-template-columns: 2fr 1fr;
     }
-    @media (max-width: 820px) {
+    @media (max-width: 900px) {
       #login-screen { grid-template-columns: 1fr; }
       .brand-panel  { min-height: 220px; }
     }
@@ -126,18 +126,56 @@
       z-index: 1;
     }
 
-    /* Icono central grande del panel */
+    /* ── Zona central animada ── */
     .brand-center-icon {
       flex: 1;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
+      gap: 24px;
       position: relative;
       z-index: 1;
     }
-    .brand-center-icon i {
-      font-size: 6rem;
-      color: rgba(255,255,255,0.18);
+
+    /* Corazón pulsante */
+    .heart-icon {
+      font-size: 5.5rem;
+      color: rgba(255,255,255,0.85);
+      animation: heartbeat 1.3s ease-in-out infinite;
+      filter: drop-shadow(0 0 18px rgba(195,69,61,0.55));
+      display: block;
+      line-height: 1;
+    }
+    @keyframes heartbeat {
+      0%   { transform: scale(1);    }
+      14%  { transform: scale(1.18); }
+      28%  { transform: scale(1);    }
+      42%  { transform: scale(1.12); }
+      56%  { transform: scale(1);    }
+      100% { transform: scale(1);    }
+    }
+
+    /* Línea de EKG / ritmo cardíaco */
+    .ekg-wrap {
+      width: 90%;
+      max-width: 320px;
+      overflow: hidden;
+    }
+    .ekg-svg { width: 200%; display: block; }
+    .ekg-line {
+      fill: none;
+      stroke: rgba(255,255,255,0.70);
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 420;
+      stroke-dashoffset: 0;
+      animation: ekgMove 2s linear infinite;
+    }
+    @keyframes ekgMove {
+      from { stroke-dashoffset: 420; }
+      to   { stroke-dashoffset: 0;   }
     }
 
     .brand-foot {
@@ -165,12 +203,12 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 40px 32px;
+      padding: 28px 22px;
       background: var(--surface);
     }
     .form-card {
       width: 100%;
-      max-width: 400px;
+      max-width: 100%;
       animation: slideUp 0.45s ease both;
     }
     @keyframes slideUp {
@@ -184,12 +222,12 @@
       font-family: 'Space Grotesk', sans-serif;
       font-weight: 700;
       color: var(--ink);
-      margin-bottom: 4px;
+      margin-bottom: 5px;
     }
     .form-card .form-subtitle {
-      font-size: 13.5px;
+      font-size: 13px;
       color: var(--muted);
-      margin-bottom: 28px;
+      margin-bottom: 24px;
     }
 
     /* ── Alertas ── */
@@ -219,31 +257,31 @@
     }
 
     /* ── Grupos de formulario ── */
-    .nl-form-group { margin-bottom: 18px; }
+    .nl-form-group { margin-bottom: 20px; }
     .nl-label {
       display: block;
-      font-size: 11.5px;
+      font-size: 12px;
       font-weight: 600;
       color: var(--muted);
       text-transform: uppercase;
       letter-spacing: 0.6px;
-      margin-bottom: 7px;
+      margin-bottom: 8px;
     }
     .nl-input-wrapper { position: relative; }
     .nl-input-icon {
       position: absolute;
-      left: 14px; top: 50%;
+      left: 15px; top: 50%;
       transform: translateY(-50%);
       color: var(--muted);
-      font-size: 1rem;
+      font-size: 1.1rem;
       pointer-events: none;
     }
     .nl-input {
       width: 100%;
-      padding: 12px 14px 12px 42px;
+      padding: 14px 16px 14px 46px;
       border: 1.5px solid var(--line);
       border-radius: var(--radius);
-      font-size: 0.93rem;
+      font-size: 1rem;
       font-family: 'Inter', sans-serif;
       color: var(--ink);
       background: #fafffe;
@@ -260,16 +298,16 @@
     /* ── Botón de acceso ── */
     .nl-btn-submit {
       width: 100%;
-      padding: 13px;
+      padding: 15px;
       background: linear-gradient(135deg, var(--brand), var(--brand-light));
       color: #fff;
       border: none;
       border-radius: var(--radius);
-      font-size: 0.97rem;
+      font-size: 1rem;
       font-weight: 600;
       font-family: 'Inter', sans-serif;
       cursor: pointer;
-      margin-top: 6px;
+      margin-top: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -287,20 +325,20 @@
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
       gap: 8px;
-      margin-top: 20px;
+      margin-top: 22px;
     }
     .nl-link-btn {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 5px;
-      padding: 12px 8px;
+      gap: 6px;
+      padding: 14px 8px;
       border-radius: var(--radius);
       border: 1.5px solid var(--line);
       background: #fafffe;
       text-decoration: none;
       color: var(--muted);
-      font-size: 0.72rem;
+      font-size: 0.75rem;
       font-weight: 600;
       text-align: center;
       line-height: 1.3;
@@ -311,7 +349,7 @@
       background: var(--brand-soft);
       color: var(--brand);
     }
-    .nl-link-btn i { font-size: 1.15rem; }
+    .nl-link-btn i { font-size: 1.3rem; }
 
     /* ── Footer de la tarjeta ── */
     .form-footer {
@@ -349,7 +387,50 @@
       </div>
 
       <div class="brand-center-icon">
-        <i class="bi bi-heart-pulse-fill"></i>
+        <!-- Corazón con latido -->
+        <i class="bi bi-heart-pulse-fill heart-icon"></i>
+
+        <!-- Línea de ritmo cardíaco EKG -->
+        <div class="ekg-wrap">
+          <svg class="ekg-svg" viewBox="0 0 420 60" xmlns="http://www.w3.org/2000/svg">
+            <polyline class="ekg-line"
+              points="
+                0,30
+                30,30
+                50,30
+                60,10
+                70,50
+                80,10
+                90,30
+                110,30
+                120,30
+                140,30
+                150,30
+                160,10
+                170,50
+                180,10
+                190,30
+                210,30
+                220,30
+                240,30
+                250,30
+                260,10
+                270,50
+                280,10
+                290,30
+                310,30
+                320,30
+                340,30
+                350,30
+                360,10
+                370,50
+                380,10
+                390,30
+                420,30
+              "
+            />
+          </svg>
+        </div>
       </div>
 
       <div class="brand-foot">
