@@ -9,548 +9,179 @@
   <title>NURSELOGIC | Iniciar Sesion</title>
 
   <link href="${pageContext.request.contextPath}/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="${pageContext.request.contextPath}/css/nurselogic.css" rel="stylesheet"/>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
-
-  <style>
-    /* ── Variables ── */
-    :root {
-      --bg:           #F6F8F7;
-      --surface:      #FFFFFF;
-      --ink:          #152322;
-      --muted:        #5C6B68;
-      --line:         #E1E7E4;
-      --brand:        #145C54;
-      --brand-dark:   #0C332F;
-      --brand-soft:   #E6F0EE;
-      --brand-light:  #2a9d8a;
-      --rojo:         #C3453D;
-      --rojo-soft:    #FBEAE8;
-      --verde:        #3C7A5C;
-      --verde-soft:   #E8F3EC;
-      --radius:       10px;
-    }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      min-height: 100vh;
-      background: var(--bg);
-      color: var(--ink);
-      -webkit-font-smoothing: antialiased;
-    }
-
-    h1, h2, h3, .brand-font { font-family: 'Space Grotesk', sans-serif; }
-    .mono { font-family: 'IBM Plex Mono', monospace; }
-
-    /* ══════════════════════════════════════════
-       LOGIN – Split Panel Layout
-    ══════════════════════════════════════════ */
-    #login-screen {
-      min-height: 100vh;
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-    }
-    @media (max-width: 900px) {
-      #login-screen { grid-template-columns: 1fr; }
-      .brand-panel  { min-height: 220px; }
-    }
-
-    /* ── Panel izquierdo (marca) ── */
-    .brand-panel {
-      background: linear-gradient(160deg, var(--brand-dark), var(--brand) 75%);
-      color: #EFF6F4;
-      padding: 56px 48px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      position: relative;
-      overflow: hidden;
-    }
-    /* Decoración de círculos de fondo */
-    .brand-panel::before {
-      content: '';
-      position: absolute;
-      width: 380px; height: 380px;
-      top: -120px; right: -120px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.05);
-      pointer-events: none;
-    }
-    .brand-panel::after {
-      content: '';
-      position: absolute;
-      width: 260px; height: 260px;
-      bottom: -80px; left: -80px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.04);
-      pointer-events: none;
-    }
-
-    /* Logo / marca */
-    .brand-mark {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      position: relative;
-      z-index: 1;
-    }
-    .brand-mark .dot {
-      width: 10px; height: 10px;
-      border-radius: 50%;
-      background: var(--rojo);
-      box-shadow: 0 0 0 5px rgba(195,69,61,.25);
-      animation: pulse 2.4s infinite ease-in-out;
-    }
-    @keyframes pulse {
-      0%,100% { box-shadow: 0 0 0 4px rgba(195,69,61,.22); }
-      50%      { box-shadow: 0 0 0 9px rgba(195,69,61,.08); }
-    }
-    .brand-mark span {
-      font-size: 22px;
-      font-weight: 700;
-      letter-spacing: .03em;
-      font-family: 'Space Grotesk', sans-serif;
-      color: #fff;
-    }
-
-    .brand-tagline {
-      max-width: 340px;
-      margin-top: 20px;
-      color: #CFE3DE;
-      font-size: 15px;
-      line-height: 1.6;
-      position: relative;
-      z-index: 1;
-    }
-
-    /* ── Zona central animada ── */
-    .brand-center-icon {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 24px;
-      position: relative;
-      z-index: 1;
-    }
-
-    /* Corazón pulsante */
-    .heart-icon {
-      font-size: 5.5rem;
-      color: rgba(255,255,255,0.85);
-      animation: heartbeat 1.3s ease-in-out infinite;
-      filter: drop-shadow(0 0 18px rgba(195,69,61,0.55));
-      display: block;
-      line-height: 1;
-    }
-    @keyframes heartbeat {
-      0%   { transform: scale(1);    }
-      14%  { transform: scale(1.18); }
-      28%  { transform: scale(1);    }
-      42%  { transform: scale(1.12); }
-      56%  { transform: scale(1);    }
-      100% { transform: scale(1);    }
-    }
-
-    /* Línea de EKG / ritmo cardíaco */
-    .ekg-wrap {
-      width: 90%;
-      max-width: 320px;
-      overflow: hidden;
-    }
-    .ekg-svg { width: 200%; display: block; }
-    .ekg-line {
-      fill: none;
-      stroke: rgba(255,255,255,0.70);
-      stroke-width: 2.5;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      stroke-dasharray: 420;
-      stroke-dashoffset: 0;
-      animation: ekgMove 2s linear infinite;
-    }
-    @keyframes ekgMove {
-      from { stroke-dashoffset: 420; }
-      to   { stroke-dashoffset: 0;   }
-    }
-
-    .brand-foot {
-      display: flex;
-      gap: 28px;
-      border-top: 1px solid rgba(255,255,255,.14);
-      padding-top: 18px;
-      position: relative;
-      z-index: 1;
-    }
-    .brand-foot .stat b {
-      display: block;
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 18px;
-    }
-    .brand-foot .stat span {
-      font-size: 11px;
-      color: #9FC4BC;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-    }
-
-    /* ── Panel derecho (formulario) ── */
-    .form-panel {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 28px 22px;
-      background: var(--surface);
-    }
-    .form-card {
-      width: 100%;
-      max-width: 100%;
-      animation: slideUp 0.45s ease both;
-    }
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(24px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Título del formulario */
-    .form-card h2 {
-      font-size: 24px;
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 700;
-      color: var(--ink);
-      margin-bottom: 5px;
-    }
-    .form-card .form-subtitle {
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 24px;
-    }
-
-    /* ── Alertas ── */
-    .nl-alert-error {
-      background: var(--rojo-soft);
-      border: 1px solid #EFC9C5;
-      border-radius: var(--radius);
-      color: var(--rojo);
-      font-size: 0.82rem;
-      padding: 10px 14px;
-      margin-bottom: 18px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .nl-alert-success {
-      background: var(--brand-soft);
-      border: 1px solid #b2ddd6;
-      border-radius: var(--radius);
-      color: var(--brand);
-      font-size: 0.82rem;
-      padding: 10px 14px;
-      margin-bottom: 18px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    /* ── Grupos de formulario ── */
-    .nl-form-group { margin-bottom: 20px; }
-    .nl-label {
-      display: block;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-      margin-bottom: 8px;
-    }
-    .nl-input-wrapper { position: relative; }
-    .nl-input-icon {
-      position: absolute;
-      left: 15px; top: 50%;
-      transform: translateY(-50%);
-      color: var(--muted);
-      font-size: 1.1rem;
-      pointer-events: none;
-    }
-    .nl-input {
-      width: 100%;
-      padding: 14px 16px 14px 46px;
-      border: 1.5px solid var(--line);
-      border-radius: var(--radius);
-      font-size: 1rem;
-      font-family: 'Inter', sans-serif;
-      color: var(--ink);
-      background: #fafffe;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .nl-input:focus {
-      border-color: var(--brand-light);
-      box-shadow: 0 0 0 3px rgba(42,157,138,0.15);
-      background: #fff;
-    }
-    .nl-input::placeholder { color: #aac5c0; }
-
-    /* ── Botón de acceso ── */
-    .nl-btn-submit {
-      width: 100%;
-      padding: 15px;
-      background: linear-gradient(135deg, var(--brand), var(--brand-light));
-      color: #fff;
-      border: none;
-      border-radius: var(--radius);
-      font-size: 1rem;
-      font-weight: 600;
-      font-family: 'Inter', sans-serif;
-      cursor: pointer;
-      margin-top: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: transform 0.15s, box-shadow 0.15s;
-    }
-    .nl-btn-submit:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(20,92,84,0.40);
-    }
-    .nl-btn-submit:active { transform: translateY(0); box-shadow: none; }
-
-    /* ── Acciones secundarias (grid de 3 botones) ── */
-    .nl-links-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 8px;
-      margin-top: 22px;
-    }
-    .nl-link-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      padding: 14px 8px;
-      border-radius: var(--radius);
-      border: 1.5px solid var(--line);
-      background: #fafffe;
-      text-decoration: none;
-      color: var(--muted);
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-align: center;
-      line-height: 1.3;
-      transition: border-color 0.18s, background 0.18s, color 0.18s;
-    }
-    .nl-link-btn:hover {
-      border-color: var(--brand-light);
-      background: var(--brand-soft);
-      color: var(--brand);
-    }
-    .nl-link-btn i { font-size: 1.3rem; }
-
-    /* ── Footer de la tarjeta ── */
-    .form-footer {
-      background: var(--brand-soft);
-      border-top: 1px solid var(--line);
-      padding: 12px 16px;
-      text-align: center;
-      border-radius: 0 0 var(--radius) var(--radius);
-      margin-top: 28px;
-    }
-    .form-footer p {
-      font-size: 0.75rem;
-      color: var(--muted);
-    }
-    .form-footer span { font-weight: 600; color: var(--brand); }
-  </style>
 </head>
 
-<body>
+<body style="font-family:'Inter',sans-serif;">
 
-  <div id="login-screen">
+  <div class="container-fluid p-0">
+    <div class="row g-0 min-vh-100">
 
-    <!-- ══ PANEL IZQUIERDO – MARCA ══ -->
-    <div class="brand-panel">
-      <div>
-        <div class="brand-mark">
-          <span class="dot"></span>
-          <span class="brand-font">NURSELOGIC</span>
-        </div>
-        <p class="brand-tagline">
-          Lógica clínica y cálculos seguros para enfermería.
-          Autenticación con roles diferenciados y trazabilidad
-          completa de cada acceso.
-        </p>
-      </div>
+      <!-- ══ PANEL IZQUIERDO – MARCA (solo desktop) ══ -->
+      <div class="col-lg-8 d-none d-lg-flex flex-column bg-brand-gradient text-white p-5">
 
-      <div class="brand-center-icon">
-        <!-- Corazón con latido -->
-        <i class="bi bi-heart-pulse-fill heart-icon"></i>
-
-        <!-- Línea de ritmo cardíaco EKG -->
-        <div class="ekg-wrap">
-          <svg class="ekg-svg" viewBox="0 0 420 60" xmlns="http://www.w3.org/2000/svg">
-            <polyline class="ekg-line"
-              points="
-                0,30
-                30,30
-                50,30
-                60,10
-                70,50
-                80,10
-                90,30
-                110,30
-                120,30
-                140,30
-                150,30
-                160,10
-                170,50
-                180,10
-                190,30
-                210,30
-                220,30
-                240,30
-                250,30
-                260,10
-                270,50
-                280,10
-                290,30
-                310,30
-                320,30
-                340,30
-                350,30
-                360,10
-                370,50
-                380,10
-                390,30
-                420,30
-              "
-            />
-          </svg>
-        </div>
-      </div>
-
-      <div class="brand-foot">
-        <div class="stat">
-          <b>24/7</b>
-          <span>Disponibilidad</span>
-        </div>
-        <div class="stat">
-          <b>SSL</b>
-          <span>Conexión segura</span>
-        </div>
-        <div class="stat">
-          <b>v1.0</b>
-          <span>Sistema</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- ══ PANEL DERECHO – FORMULARIO ══ -->
-    <div class="form-panel">
-      <div class="form-card">
-
-        <h2>Iniciar sesión</h2>
-        <p class="form-subtitle">Acceso al Sistema de Gestión Clínica</p>
-
-        <%-- Mensaje de éxito (desde redirect: logout, nueva cuenta, cambio pass) --%>
-        <%
-          String successMsg = request.getParameter("msg");
-          String errorMsg   = (String) request.getAttribute("errorMsg");
-          if (successMsg != null && !successMsg.trim().isEmpty()) {
-        %>
-        <div class="nl-alert-success">
-          <i class="bi bi-check-circle-fill"></i> <%= successMsg %>
-        </div>
-        <% } %>
-
-        <%-- Mensaje de error del LoginServlet --%>
-        <% if (errorMsg != null && !errorMsg.isEmpty()) { %>
-        <div class="nl-alert-error">
-          <i class="bi bi-exclamation-circle-fill"></i> <%= errorMsg %>
-        </div>
-        <% } %>
-
-        <%-- FORMULARIO → LoginServlet --%>
-        <form id="formLogin"
-              action="${pageContext.request.contextPath}/LoginServlet"
-              method="POST"
-              novalidate>
-
-          <!-- Nombre de Usuario -->
-          <div class="nl-form-group">
-            <label class="nl-label" for="NombreUsuario">Nombre de Usuario</label>
-            <div class="nl-input-wrapper">
-              <i class="bi bi-person nl-input-icon"></i>
-              <input type="text" id="NombreUsuario" name="NombreUsuario"
-                     class="nl-input" placeholder="Ingrese su usuario"
-                     autocomplete="username" required/>
-            </div>
+        <!-- Marca superior -->
+        <div>
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <span class="rounded-circle bg-danger flex-shrink-0"
+                  style="width:10px;height:10px;box-shadow:0 0 0 5px rgba(195,69,61,.25);">
+            </span>
+            <span class="fw-bold fs-5 text-white" style="font-family:'Space Grotesk',sans-serif;letter-spacing:.03em;">
+              NURSELOGIC
+            </span>
           </div>
-
-          <!-- Contraseña -->
-          <div class="nl-form-group">
-            <label class="nl-label" for="Contrasena">Contraseña</label>
-            <div class="nl-input-wrapper">
-              <i class="bi bi-lock nl-input-icon"></i>
-              <input type="password" id="Contrasena" name="Contrasena"
-                     class="nl-input" placeholder="Ingrese su contraseña"
-                     autocomplete="current-password" required/>
-            </div>
-          </div>
-
-          <!-- Botón de acceso -->
-          <button type="submit" id="btnIngresar" class="nl-btn-submit">
-            <i class="bi bi-box-arrow-in-right"></i>
-            Ingresar al Sistema
-          </button>
-
-        </form>
-
-        <!-- ══ ACCIONES SECUNDARIAS ══ -->
-        <div class="nl-links-grid">
-
-          <%-- 1. Registrar Usuario --%>
-          <a href="${pageContext.request.contextPath}/NuevaCuentaServlet"
-             id="linkRegistrar" class="nl-link-btn">
-            <i class="bi bi-person-plus-fill"></i>
-            Registrar Usuario
-          </a>
-
-          <%-- 2. Olvidé mi Contraseña --%>
-          <a href="${pageContext.request.contextPath}/OlvidoContrasenaServlet"
-             id="linkOlvido" class="nl-link-btn">
-            <i class="bi bi-key-fill"></i>
-            Olvidé mi Contraseña
-          </a>
-
-          <%-- 3. Recuperar Usuario --%>
-          <a href="${pageContext.request.contextPath}/RecuperarUsuarioServlet"
-             id="linkRecuperar" class="nl-link-btn">
-            <i class="bi bi-person-exclamation"></i>
-            Recuperar Usuario
-          </a>
-
-        </div>
-
-        <!-- ══ FOOTER ══ -->
-        <div class="form-footer">
-          <p>
-            <i class="bi bi-shield-lock-fill me-1"></i>
-            Acceso restringido &middot; Solo personal autorizado &middot;
-            <span>NURSELOGIC v1.0</span>
+          <p class="mb-0" style="max-width:340px;line-height:1.65;font-size:.95rem;color:#CFE3DE;">
+            Lógica clínica y cálculos seguros para enfermería.
+            Autenticación con roles diferenciados y trazabilidad
+            completa de cada acceso.
           </p>
         </div>
 
-      </div><!-- /.form-card -->
-    </div><!-- /.form-panel -->
+        <!-- Centro: corazón + EKG -->
+        <div class="flex-grow-1 d-flex flex-column align-items-center justify-content-center gap-4">
+          <i class="bi bi-heart-pulse-fill heart-beat"
+             style="font-size:5.5rem;color:rgba(255,255,255,.85);display:block;line-height:1;"></i>
+          <div class="ekg-wrap">
+            <svg class="ekg-svg" viewBox="0 0 420 60" xmlns="http://www.w3.org/2000/svg">
+              <polyline class="ekg-line"
+                points="0,30 30,30 50,30 60,10 70,50 80,10 90,30 110,30 120,30
+                        140,30 150,30 160,10 170,50 180,10 190,30 210,30 220,30
+                        240,30 250,30 260,10 270,50 280,10 290,30 310,30 320,30
+                        340,30 350,30 360,10 370,50 380,10 390,30 420,30"/>
+            </svg>
+          </div>
+        </div>
 
-  </div><!-- /#login-screen -->
+        <!-- Footer con estadísticas -->
+        <div class="d-flex gap-4 border-top border-white border-opacity-25 pt-3">
+          <div>
+            <strong class="d-block font-monospace fs-5">24/7</strong>
+            <small class="text-uppercase" style="font-size:.7rem;color:#9FC4BC;letter-spacing:.08em;">Disponibilidad</small>
+          </div>
+          <div>
+            <strong class="d-block font-monospace fs-5">SSL</strong>
+            <small class="text-uppercase" style="font-size:.7rem;color:#9FC4BC;letter-spacing:.08em;">Conexión segura</small>
+          </div>
+          <div>
+            <strong class="d-block font-monospace fs-5">v1.0</strong>
+            <small class="text-uppercase" style="font-size:.7rem;color:#9FC4BC;letter-spacing:.08em;">Sistema</small>
+          </div>
+        </div>
+
+      </div><!-- /.col-lg-8 brand panel -->
+
+
+      <!-- ══ PANEL DERECHO – FORMULARIO ══ -->
+      <div class="col-12 col-lg-4 d-flex align-items-center justify-content-center bg-white p-4">
+        <div class="w-100">
+
+          <h2 class="fw-bold mb-1" style="font-family:'Space Grotesk',sans-serif;">Iniciar sesión</h2>
+          <p class="text-muted small mb-4">Acceso al Sistema de Gestión Clínica</p>
+
+          <%-- Mensaje de éxito (logout, nueva cuenta, cambio pass) --%>
+          <%
+            String successMsg = request.getParameter("msg");
+            String errorMsg   = (String) request.getAttribute("errorMsg");
+            if (successMsg != null && !successMsg.trim().isEmpty()) {
+          %>
+          <div class="alert alert-success d-flex align-items-center gap-2 py-2 small" role="alert">
+            <i class="bi bi-check-circle-fill flex-shrink-0"></i><%= successMsg %>
+          </div>
+          <% } %>
+
+          <%-- Mensaje de error del LoginServlet --%>
+          <% if (errorMsg != null && !errorMsg.isEmpty()) { %>
+          <div class="alert alert-danger d-flex align-items-center gap-2 py-2 small" role="alert">
+            <i class="bi bi-exclamation-circle-fill flex-shrink-0"></i><%= errorMsg %>
+          </div>
+          <% } %>
+
+          <%-- FORMULARIO → LoginServlet --%>
+          <form id="formLogin"
+                action="${pageContext.request.contextPath}/LoginServlet"
+                method="POST" novalidate>
+
+            <!-- Nombre de Usuario -->
+            <label class="form-label small fw-semibold text-uppercase text-muted" for="NombreUsuario"
+                   style="letter-spacing:.6px;">Nombre de Usuario</label>
+            <div class="input-group mb-3">
+              <span class="input-group-text"><i class="bi bi-person"></i></span>
+              <input type="text" id="NombreUsuario" name="NombreUsuario"
+                     class="form-control" placeholder="Ingrese su usuario"
+                     autocomplete="username" required/>
+            </div>
+
+            <!-- Contraseña -->
+            <label class="form-label small fw-semibold text-uppercase text-muted" for="Contrasena"
+                   style="letter-spacing:.6px;">Contraseña</label>
+            <div class="input-group mb-3">
+              <span class="input-group-text"><i class="bi bi-lock"></i></span>
+              <input type="password" id="Contrasena" name="Contrasena"
+                     class="form-control" placeholder="Ingrese su contraseña"
+                     autocomplete="current-password" required/>
+            </div>
+
+            <!-- Botón principal -->
+            <button type="submit" id="btnIngresar"
+                    class="btn btn-success w-100 py-3 fw-semibold d-flex align-items-center justify-content-center gap-2 mt-1">
+              <i class="bi bi-box-arrow-in-right"></i>Ingresar al Sistema
+            </button>
+
+          </form>
+
+          <!-- ══ ACCIONES SECUNDARIAS (3 botones) ══ -->
+          <div class="row g-2 mt-3">
+
+            <%-- 1. Registrar Usuario --%>
+            <div class="col-4">
+              <a href="${pageContext.request.contextPath}/NuevaCuentaServlet"
+                 id="linkRegistrar"
+                 class="btn btn-outline-secondary btn-sm w-100 py-3 d-flex flex-column align-items-center gap-1 text-muted text-decoration-none">
+                <i class="bi bi-person-plus-fill fs-5"></i>
+                <span style="font-size:.72rem;font-weight:600;line-height:1.3;">Registrar Usuario</span>
+              </a>
+            </div>
+
+            <%-- 2. Olvidé mi Contraseña --%>
+            <div class="col-4">
+              <a href="${pageContext.request.contextPath}/OlvidoContrasenaServlet"
+                 id="linkOlvido"
+                 class="btn btn-outline-secondary btn-sm w-100 py-3 d-flex flex-column align-items-center gap-1 text-muted text-decoration-none">
+                <i class="bi bi-key-fill fs-5"></i>
+                <span style="font-size:.72rem;font-weight:600;line-height:1.3;">Olvidé mi Contraseña</span>
+              </a>
+            </div>
+
+            <%-- 3. Recuperar Usuario --%>
+            <div class="col-4">
+              <a href="${pageContext.request.contextPath}/RecuperarUsuarioServlet"
+                 id="linkRecuperar"
+                 class="btn btn-outline-secondary btn-sm w-100 py-3 d-flex flex-column align-items-center gap-1 text-muted text-decoration-none">
+                <i class="bi bi-person-exclamation fs-5"></i>
+                <span style="font-size:.72rem;font-weight:600;line-height:1.3;">Recuperar Usuario</span>
+              </a>
+            </div>
+
+          </div><!-- /.row acciones -->
+
+          <!-- ══ FOOTER ══ -->
+          <div class="bg-success bg-opacity-10 rounded-3 p-3 mt-4 text-center">
+            <p class="text-muted small mb-0">
+              <i class="bi bi-shield-lock-fill me-1"></i>
+              Acceso restringido &middot; Solo personal autorizado &middot;
+              <strong class="text-success">NURSELOGIC v1.0</strong>
+            </p>
+          </div>
+
+        </div><!-- /.w-100 -->
+      </div><!-- /.col form panel -->
+
+    </div><!-- /.row -->
+  </div><!-- /.container-fluid -->
 
   <script src="${pageContext.request.contextPath}/js/bootstrap.bundle.min.js"></script>
-
 </body>
 </html>

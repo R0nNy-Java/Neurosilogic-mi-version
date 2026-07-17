@@ -3,140 +3,127 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+  <meta name="description" content="NURSELOGIC - Recuperacion de Acceso"/>
   <title>NURSELOGIC | Olvidé mi Contraseña</title>
+
   <link href="${pageContext.request.contextPath}/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="${pageContext.request.contextPath}/css/nurselogic.css" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
-  <style>
-    :root { --nl-primary:#1a6b5e; --nl-primary-dark:#134f45; --nl-primary-light:#2a9d8a; --nl-accent:#e9f5f3; --nl-text:#1e2d2b; --nl-muted:#6c8c87; --nl-border:#d0e8e4; }
-    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
-    body { font-family:'Inter',sans-serif; min-height:100vh; background:linear-gradient(135deg,#0d4038 0%,#1a6b5e 60%,#2a9d8a 100%); display:flex; align-items:center; justify-content:center; padding:20px; }
-    body::before { content:''; position:fixed; width:500px; height:500px; top:-150px; right:-150px; border-radius:50%; background:rgba(255,255,255,0.06); pointer-events:none; }
-
-    .nl-card { background:#fff; border-radius:20px; box-shadow:0 25px 60px rgba(0,0,0,0.35); width:100%; max-width:440px; overflow:hidden; animation:slideUp 0.45s ease both; }
-    @keyframes slideUp { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
-
-    .nl-card-header { background:linear-gradient(135deg,#134f45,#2a9d8a); padding:30px 38px 22px; text-align:center; }
-    .nl-brand-icon { width:62px; height:62px; background:rgba(255,255,255,0.18); border:2px solid rgba(255,255,255,0.3); border-radius:50%; display:inline-flex; align-items:center; justify-content:center; margin-bottom:12px; }
-    .nl-brand-icon i { font-size:1.7rem; color:#fff; }
-    .nl-brand-name { font-size:1.5rem; font-weight:700; color:#fff; letter-spacing:1.5px; }
-    .nl-brand-sub  { font-size:0.76rem; color:rgba(255,255,255,0.72); margin-top:3px; }
-
-    .nl-card-body { padding:28px 38px 24px; }
-    .nl-section-title { font-size:0.95rem; font-weight:600; color:var(--nl-text); text-align:center; margin-bottom:6px; }
-    .nl-section-desc  { font-size:0.8rem; color:var(--nl-muted); text-align:center; margin-bottom:20px; line-height:1.5; }
-
-    .nl-alert-error   { background:#fff1f1; border:1px solid #f5c6c6; border-radius:10px; color:#a02020; font-size:0.82rem; padding:10px 14px; margin-bottom:16px; display:flex; align-items:center; gap:8px; }
-    .nl-alert-success { background:#e9f5f3; border:1px solid #b2ddd6; border-radius:10px; color:#145c50; font-size:0.82rem; padding:10px 14px; margin-bottom:16px; display:flex; align-items:flex-start; gap:8px; flex-direction:column; }
-    .nl-alert-success strong { font-size:0.88rem; }
-
-    /* Caja de resultado exitoso */
-    .nl-result-box { background:var(--nl-accent); border:2px solid var(--nl-border); border-radius:12px; padding:18px 20px; margin-bottom:18px; text-align:center; }
-    .nl-result-label { font-size:0.72rem; font-weight:700; color:var(--nl-muted); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:6px; }
-    .nl-result-value { font-size:1.5rem; font-weight:700; color:var(--nl-primary); letter-spacing:1px; font-family:monospace; }
-    .nl-result-note  { font-size:0.76rem; color:var(--nl-muted); margin-top:8px; }
-
-    .nl-form-group { margin-bottom:16px; }
-    .nl-label { display:block; font-size:0.76rem; font-weight:600; color:var(--nl-muted); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:6px; }
-    .nl-input-wrapper { position:relative; }
-    .nl-input-icon { position:absolute; left:13px; top:50%; transform:translateY(-50%); color:var(--nl-muted); font-size:0.95rem; pointer-events:none; }
-    .nl-input { width:100%; padding:11px 13px 11px 40px; border:1.5px solid var(--nl-border); border-radius:10px; font-size:0.91rem; font-family:'Inter',sans-serif; color:var(--nl-text); background:#fafffe; outline:none; transition:border-color 0.2s,box-shadow 0.2s; }
-    .nl-input:focus { border-color:var(--nl-primary-light); box-shadow:0 0 0 3px rgba(42,157,138,0.15); background:#fff; }
-    .nl-input::placeholder { color:#aac5c0; }
-
-    .nl-btn-submit { width:100%; padding:13px; background:linear-gradient(135deg,#1a6b5e,#2a9d8a); color:#fff; border:none; border-radius:10px; font-size:0.95rem; font-weight:600; font-family:'Inter',sans-serif; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:transform 0.15s,box-shadow 0.15s; }
-    .nl-btn-submit:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(26,107,94,0.4); }
-
-    .nl-card-footer { background:var(--nl-accent); border-top:1px solid var(--nl-border); padding:12px 38px; text-align:center; }
-    .nl-footer-text { font-size:0.78rem; color:var(--nl-muted); }
-    .nl-footer-text a { color:var(--nl-primary); font-weight:600; text-decoration:none; }
-    .nl-footer-text a:hover { text-decoration:underline; }
-  </style>
 </head>
-<body>
-  <div class="nl-card">
 
-    <div class="nl-card-header">
-      <div class="nl-brand-icon"><i class="bi bi-key-fill"></i></div>
-      <div class="nl-brand-name">NURSELOGIC</div>
-      <div class="nl-brand-sub">Recuperacion de Acceso</div>
+<body class="min-vh-100 d-flex align-items-center justify-content-center bg-brand-gradient py-4"
+      style="font-family:'Inter',sans-serif;">
+
+  <div class="card border-0 shadow-lg overflow-hidden w-100 mx-3" style="max-width:440px;border-radius:1.25rem;">
+
+    <!-- ══ HEADER ══ -->
+    <div class="card-header bg-brand-gradient text-white text-center py-4 border-0">
+      <div class="rounded-circle bg-white bg-opacity-25 border border-white border-opacity-50
+                  d-inline-flex align-items-center justify-content-center mb-3"
+           style="width:64px;height:64px;">
+        <i class="bi bi-key-fill fs-3 text-white"></i>
+      </div>
+      <h1 class="fs-4 fw-bold mb-0 text-white">NURSELOGIC</h1>
+      <p class="text-white-50 small mb-0">Recuperación de Acceso</p>
     </div>
 
-    <div class="nl-card-body">
-      <p class="nl-section-title">Olvidé mi Contraseña</p>
-      <p class="nl-section-desc">Ingrese su usuario y correo registrado.<br/>Se le asignará una contraseña temporal.</p>
+    <!-- ══ CUERPO ══ -->
+    <div class="card-body p-4">
 
-      <%-- Resultado exitoso --%>
       <%
-        Boolean exitoso = (Boolean) request.getAttribute("exitoso");
-        String  usuarioR = (String) request.getAttribute("usuarioRecuperado");
-        String  passTemp = (String) request.getAttribute("contrasenaTemp");
-        String  errorMsg = (String) request.getAttribute("errorMsg");
+        Boolean exitoso  = (Boolean) request.getAttribute("exitoso");
+        String  usuarioR = (String)  request.getAttribute("usuarioRecuperado");
+        String  passTemp = (String)  request.getAttribute("contrasenaTemp");
+        String  errorMsg = (String)  request.getAttribute("errorMsg");
 
         if (Boolean.TRUE.equals(exitoso)) {
       %>
-      <div class="nl-result-box">
-        <div class="nl-result-label">&#10003; Contraseña temporal asignada</div>
-        <div class="nl-result-value"><%= passTemp %></div>
-        <div class="nl-result-note">
-          Usuario: <strong><%= usuarioR %></strong><br/>
-          Ingrese al sistema con esta contraseña y cámbiela inmediatamente desde
-          <em>Seguridad &rarr; Cambiar Contraseña</em>.
+      <!-- ── Resultado exitoso ── -->
+      <div class="text-center mb-3">
+        <i class="bi bi-check-circle-fill text-success fs-1 d-block mb-2"></i>
+        <h6 class="fw-bold mb-1">Contraseña temporal asignada</h6>
+        <p class="text-muted small mb-3">
+          Usuario: <strong><%= usuarioR %></strong>
+        </p>
+        <div class="bg-success bg-opacity-10 border border-success border-opacity-25 rounded-3 p-3 mb-3">
+          <p class="text-muted small text-uppercase fw-semibold mb-1" style="font-size:.7rem;letter-spacing:.6px;">
+            Tu nueva contraseña temporal
+          </p>
+          <code class="fs-4 fw-bold text-success"><%= passTemp %></code>
         </div>
+        <p class="text-muted small">
+          Ingresa con esta contraseña y cámbiala desde<br/>
+          <em>Seguridad → Cambiar Contraseña</em>.
+        </p>
+        <a href="${pageContext.request.contextPath}/login.jsp"
+           id="linkIrLogin"
+           class="btn btn-success w-100 py-3 fw-semibold d-flex align-items-center justify-content-center gap-2 text-decoration-none">
+          <i class="bi bi-box-arrow-in-right"></i>Ir al Inicio de Sesión
+        </a>
       </div>
-      <a href="${pageContext.request.contextPath}/login.jsp" class="nl-btn-submit" style="text-decoration:none;margin-top:0;">
-        <i class="bi bi-box-arrow-in-right"></i> Ir al Inicio de Sesion
-      </a>
+
       <% } else { %>
 
-      <%-- Mensaje de error --%>
+      <h6 class="text-center fw-semibold mb-1">Olvidé mi Contraseña</h6>
+      <p class="text-center text-muted small mb-4">
+        Ingrese su usuario y correo registrado.<br/>
+        Se le asignará una contraseña temporal.
+      </p>
+
       <% if (errorMsg != null && !errorMsg.isEmpty()) { %>
-      <div class="nl-alert-error"><i class="bi bi-exclamation-circle-fill"></i><%= errorMsg %></div>
+      <div class="alert alert-danger d-flex align-items-center gap-2 py-2 small" role="alert">
+        <i class="bi bi-exclamation-circle-fill flex-shrink-0"></i><%= errorMsg %>
+      </div>
       <% } %>
 
-      <%-- Formulario → OlvidoContrasenaServlet --%>
       <form id="formOlvido"
             action="${pageContext.request.contextPath}/OlvidoContrasenaServlet"
             method="POST" novalidate>
 
-        <div class="nl-form-group">
-          <label class="nl-label" for="NombreUsuario">Nombre de Usuario</label>
-          <div class="nl-input-wrapper">
-            <i class="bi bi-person nl-input-icon"></i>
-            <input type="text" id="NombreUsuario" name="NombreUsuario" class="nl-input"
-                   placeholder="Su nombre de usuario" required/>
-          </div>
+        <label class="form-label small fw-semibold text-uppercase text-muted" for="NombreUsuario"
+               style="letter-spacing:.6px;">Nombre de Usuario</label>
+        <div class="input-group mb-3">
+          <span class="input-group-text"><i class="bi bi-person"></i></span>
+          <input type="text" id="NombreUsuario" name="NombreUsuario"
+                 class="form-control" placeholder="Su nombre de usuario" required/>
         </div>
 
-        <div class="nl-form-group">
-          <label class="nl-label" for="Email">Correo Electronico Registrado</label>
-          <div class="nl-input-wrapper">
-            <i class="bi bi-envelope nl-input-icon"></i>
-            <input type="email" id="Email" name="Email" class="nl-input"
-                   placeholder="correo@nurselogic.ec" required/>
-          </div>
+        <label class="form-label small fw-semibold text-uppercase text-muted" for="Email"
+               style="letter-spacing:.6px;">Correo Electrónico Registrado</label>
+        <div class="input-group mb-4">
+          <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+          <input type="email" id="Email" name="Email"
+                 class="form-control" placeholder="correo@nurselogic.ec" required/>
         </div>
 
-        <button type="submit" id="btnRecuperar" class="nl-btn-submit">
-          <i class="bi bi-send-fill"></i> Recuperar Contraseña
+        <button type="submit" id="btnRecuperar"
+                class="btn btn-success w-100 py-3 fw-semibold d-flex align-items-center justify-content-center gap-2">
+          <i class="bi bi-send-fill"></i>Recuperar Contraseña
         </button>
+
       </form>
       <% } %>
-    </div>
+    </div><!-- /.card-body -->
 
-    <div class="nl-card-footer">
-      <p class="nl-footer-text">
-        <a href="${pageContext.request.contextPath}/login.jsp" id="linkVolverLogin">
-          &larr; Volver al inicio de sesion
+    <!-- ══ FOOTER ══ -->
+    <div class="card-footer bg-success bg-opacity-10 text-center border-0 py-3">
+      <p class="text-muted small mb-0">
+        <a href="${pageContext.request.contextPath}/login.jsp" id="linkVolverLogin"
+           class="text-success fw-semibold text-decoration-none">
+          ← Volver al inicio de sesión
         </a>
         &nbsp;&middot;&nbsp;
-        <a href="${pageContext.request.contextPath}/RecuperarUsuarioServlet" id="linkRecupUsuario">
+        <a href="${pageContext.request.contextPath}/RecuperarUsuarioServlet" id="linkRecupUsuario"
+           class="text-success fw-semibold text-decoration-none">
           Recuperar usuario
         </a>
       </p>
     </div>
-  </div>
+
+  </div><!-- /.card -->
 
   <script src="${pageContext.request.contextPath}/js/bootstrap.bundle.min.js"></script>
 </body>
