@@ -1,0 +1,80 @@
+/* ════════════════════════════════════════════════════════════
+   NurseLogic · Bootstrap 5 — Token overrides + utilidades
+   ────────────────────────────────────────────────────────────
+   Regla: SOLO sobreescribe variables de color Bootstrap,
+   agrega animaciones únicas y clases mínimas sin equivalente
+   nativo. Cero CSS de layout propio.
+   ════════════════════════════════════════════════════════════ */
+
+/* ── Paleta de color principal ── */
+:root {
+  --bs-success:       #1a6b5e;
+  --bs-success-rgb:   26, 107, 94;
+  --bs-body-bg:       #f0f7f6;
+  --nl-sidebar:       #0f3831;
+  --nl-topbar:        #134f45;
+}
+
+/* ── Sidebar oscuro ── */
+.nl-sidebar { background-color: #0f3831; }
+
+/* ── Gradiente de marca (login panel, card-headers, topbar) ── */
+.bg-brand-gradient { background: linear-gradient(135deg, #134f45 0%, #2a9d8a 100%) !important; }
+
+/* ── Fix: offcanvas-lg sobreescribe background-color en lg+ ── */
+@media (min-width: 992px) {
+  .offcanvas-lg.nl-sidebar { background-color: #0f3831 !important; }
+}
+
+/* ── Links de navegación del sidebar ── */
+.nl-nav-link {
+  color: rgba(255, 255, 255, .65);
+  border-radius: .5rem;
+  transition: background .18s, color .18s;
+  text-decoration: none;
+}
+.nl-nav-link:hover,
+.nl-nav-link.active { background: #1a6b5e; color: #fff !important; }
+
+/* ── Fondos de íconos en stat-cards ── */
+.icon-teal   { background: #e9f5f3; color: #1a6b5e; }
+.icon-blue   { background: #ebf8ff; color: #2b6cb0; }
+.icon-amber  { background: #fffaf0; color: #c05621; }
+.icon-red    { background: #fff5f5; color: #c53030; }
+.icon-violet { background: #faf5ff; color: #6b46c1; }
+.icon-green  { background: #f0fff4; color: #276749; }
+
+/* ── Animación: corazón pulsante (panel de marca del login) ── */
+.heart-beat {
+  animation: heartbeat 1.3s ease-in-out infinite;
+  filter: drop-shadow(0 0 18px rgba(195, 69, 61, .55));
+}
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1);    }
+  14%       { transform: scale(1.18); }
+  28%       { transform: scale(1);    }
+  42%       { transform: scale(1.12); }
+  56%       { transform: scale(1);    }
+}
+
+/* ── Animación: trazado EKG (panel de marca del login) ── */
+.ekg-wrap { width: 90%; max-width: 320px; overflow: hidden; }
+.ekg-svg  { width: 200%; display: block; }
+.ekg-line {
+  fill: none;
+  stroke: rgba(255, 255, 255, .70);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 420;
+  stroke-dashoffset: 0;
+  animation: ekgMove 2s linear infinite;
+}
+@keyframes ekgMove {
+  from { stroke-dashoffset: 420; }
+  to   { stroke-dashoffset: 0;   }
+}
+
+/* ── Indicadores de requisitos de contraseña ── */
+.req-ok   { color: #2a9d8a !important; }
+.req-fail { color: #aac5c0 !important; }
