@@ -1,5 +1,11 @@
 package com.rrparedes.servlet;
 
+import com.rrparedes.config.JPAUtil;
+import com.rrparedes.dao.PacienteDAO;
+import com.rrparedes.model.Antecedente;
+import com.rrparedes.model.Paciente;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -8,13 +14,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 /**
  * NURSELOGIC – RegistroPacienteServlet
  *
- * Procesa el formulario de Apertura de Ficha Clínica (registro_paciente.jsp).
- * Valida los datos demográficos obligatorios y almacena en sesión
- * (pendiente de integración con BD en Fase 2).
+ * Procesa el formulario de Apertura de Ficha Clínica (registro_paciente.jsp)
+ * y persiste el paciente y sus antecedentes directamente en MySQL usando JPA (PacienteDAO).
  */
 @WebServlet("/RegistroPacienteServlet")
 public class RegistroPacienteServlet extends HttpServlet {
@@ -39,6 +45,8 @@ public class RegistroPacienteServlet extends HttpServlet {
         String edadStr              = request.getParameter("Edad");
         String sexo                 = request.getParameter("Sexo");
         String[] antecedentes       = request.getParameterValues("Antecedentes");
+        String glicemiaStr          = request.getParameter("GlicemiaInicial");
+        String otrosTexto           = request.getParameter("OtrosAntecedentesTexto");
         String sintomasActuales     = request.getParameter("SintomasActuales");
         String alergias             = request.getParameter("Alergias");
         String dispositivosMedicos  = request.getParameter("DispositivosMedicos");
@@ -76,18 +84,62 @@ public class RegistroPacienteServlet extends HttpServlet {
             return;
         }
 
-        // 5. TODO (Fase 2): Persistir en base de datos mediante PacienteDAO
-        //    PacienteDAO.guardar(new Paciente(nombres, apellidos, cedula, edad, sexo, ...));
+        try {
+            // 5. Persistir en la base de datos MySQL mediante PacienteDAO
+            Paciente paciente = new Paciente(
+                nombres.trim(),
+                apellidos.trim(),
+                cedula.trim(),
+                edad,
+                sexo.trim(),
+                sintomasActuales != null ? sintomasActuales.trim() : "",
+                alergias != null ? alergias.trim() : "",
+                dispositivosMedicos != null ? dispositivosMedicos.trim() : "",
+                "A"
+            );
 
-        // 6. Preparar datos de confirmación para la vista
-        request.setAttribute("nombrePaciente",  nombres.trim() + " " + apellidos.trim());
-        request.setAttribute("cedula",          cedula.trim());
-        request.setAttribute("registroExitoso", true);
+            PacienteDAO pacienteDAO = new PacienteDAO();
+            pacienteDAO.guardar(paciente);
 
-        // Por ahora, reenviar al mismo formulario con mensaje de éxito
-        request.setAttribute("successMsg",
-            "✔ Ficha clínica registrada correctamente para: "
-            + nombres.trim() + " " + apellidos.trim());
+            // 6. Guardar antecedentes clínicos asociados
+            if (antecedentes != null && antecedentes.length > 0) {
+                EntityManager em = JPAUtil.getEntityManager();
+                EntityTransaction tx = em.getTransaction();
+                try {
+                    tx.begin();
+                    for (String ant : antecedentes) {
+                        String detalle = ant;
+                        if ("DIABETES".equalsIgnoreCase(ant) && !estaVacio(glicemiaStr)) {
+                            detalle = "DIABETES (Glicemia: " + glicemiaStr.trim() + " mg/dL)";
+                        } else if ("OTROS".equalsIgnoreCase(ant) && !estaVacio(otrosTexto)) {
+                            detalle = "OTROS: " + otrosTexto.trim();
+                        }
+                        Antecedente a = new Antecedente(paciente, detalle, LocalDateTime.now());
+                        em.persist(a);
+                    }
+                    tx.commit();
+                } catch (Exception ex) {
+                    if (tx.isActive()) tx.rollback();
+                    ex.printStackTrace();
+                } finally {
+                    em.close();
+                }
+            }
+
+            // 7. Preparar respuesta exitosa
+            request.setAttribute("nombrePaciente", nombres.trim() + " " + apellidos.trim());
+            request.setAttribute("cedula", cedula.trim());
+            request.setAttribute("registroExitoso", true);
+            request.setAttribute("successMsg",
+                "✔ Ficha clínica registrada en la Base de Datos correctamente para: "
+                + nombres.trim() + " " + apellidos.trim());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("errorMsg",
+                "❌ Error al guardar en la Base de Datos: " + e.getMessage());
+        }
+
         request.getRequestDispatcher("/registro_paciente.jsp").forward(request, response);
     }
 

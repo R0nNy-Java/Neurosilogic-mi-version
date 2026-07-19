@@ -8,991 +8,321 @@
   <meta name="description" content="NURSELOGIC - Apertura de Ficha Clinica"/>
   <title>NURSELOGIC | Apertura de Ficha Clinica</title>
 
-  <!-- Bootstrap 5 CSS (local) -->
+  <!-- Bootstrap 5 CSS (local) y Nurselogic CSS -->
   <link href="${pageContext.request.contextPath}/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="${pageContext.request.contextPath}/css/nurselogic.css" rel="stylesheet"/>
 
   <!-- Google Fonts: Inter -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 
   <!-- Bootstrap Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
-
-  <style>
-    /* =================================================
-       NURSELOGIC – REGISTRO PACIENTE (Dashtreme Clean)
-       ================================================= */
-    :root {
-      --nl-primary:       #1a6b5e;
-      --nl-primary-dark:  #134f45;
-      --nl-primary-light: #2a9d8a;
-      --nl-accent:        #e9f5f3;
-      --nl-text:          #1e2d2b;
-      --nl-muted:         #6c8c87;
-      --nl-border:        #d0e8e4;
-      --nl-sidebar-bg:    #0f3831;
-      --nl-sidebar-hover: #1a6b5e;
-      --nl-topbar-bg:     #134f45;
-      --nl-body-bg:       #f0f7f6;
-      --nl-white:         #ffffff;
-      --sidebar-width:    240px;
-    }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: var(--nl-body-bg);
-      color: var(--nl-text);
-      min-height: 100vh;
-    }
-
-    /* =============================================
-       SIDEBAR
-       ============================================= */
-    #nl-sidebar {
-      position: fixed;
-      top: 0; left: 0;
-      width: var(--sidebar-width);
-      height: 100vh;
-      background: var(--nl-sidebar-bg);
-      display: flex;
-      flex-direction: column;
-      z-index: 1000;
-      transition: width 0.25s ease;
-      overflow-x: hidden;
-    }
-
-    /* Brand */
-    .nl-sidebar-brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 22px 20px;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-      text-decoration: none;
-    }
-
-    .nl-sidebar-brand-icon {
-      width: 38px; height: 38px;
-      background: var(--nl-primary-light);
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .nl-sidebar-brand-icon i { font-size: 1.1rem; color: #fff; }
-
-    .nl-sidebar-brand-text {
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: #fff;
-      letter-spacing: 1px;
-    }
-
-    .nl-sidebar-brand-sub {
-      font-size: 0.62rem;
-      color: rgba(255,255,255,0.5);
-      letter-spacing: 0.3px;
-    }
-
-    /* Nav section label */
-    .nl-nav-label {
-      font-size: 0.65rem;
-      font-weight: 600;
-      color: rgba(255,255,255,0.35);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      padding: 18px 20px 6px;
-    }
-
-    /* Nav items */
-    .nl-nav {
-      list-style: none;
-      padding: 8px 12px;
-      flex: 1;
-    }
-
-    .nl-nav li { margin-bottom: 4px; }
-
-    .nl-nav a {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 11px 14px;
-      border-radius: 10px;
-      text-decoration: none;
-      color: rgba(255,255,255,0.7);
-      font-size: 0.88rem;
-      font-weight: 500;
-      transition: background 0.18s, color 0.18s;
-    }
-
-    .nl-nav a:hover {
-      background: var(--nl-sidebar-hover);
-      color: #fff;
-    }
-
-    .nl-nav a.active {
-      background: var(--nl-primary-light);
-      color: #fff;
-      font-weight: 600;
-      box-shadow: 0 4px 12px rgba(42,157,138,0.35);
-    }
-
-    .nl-nav a i { font-size: 1rem; flex-shrink: 0; }
-
-    /* Sidebar footer */
-    .nl-sidebar-footer {
-      padding: 16px 20px;
-      border-top: 1px solid rgba(255,255,255,0.08);
-    }
-
-    .nl-sidebar-user {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-    }
-
-    .nl-sidebar-avatar {
-      width: 34px; height: 34px;
-      background: var(--nl-primary-light);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .nl-sidebar-avatar i { font-size: 0.95rem; color: #fff; }
-
-    .nl-sidebar-username {
-      font-size: 0.83rem;
-      font-weight: 600;
-      color: rgba(255,255,255,0.85);
-    }
-
-    .nl-sidebar-role {
-      font-size: 0.68rem;
-      color: rgba(255,255,255,0.45);
-    }
-
-    /* =============================================
-       TOPBAR
-       ============================================= */
-    #nl-topbar {
-      position: fixed;
-      top: 0;
-      left: var(--sidebar-width);
-      right: 0;
-      height: 62px;
-      background: var(--nl-topbar-bg);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 28px;
-      z-index: 999;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    }
-
-    .nl-topbar-left {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    /* Toggle button (mobile) */
-    #nl-sidebar-toggle {
-      background: none;
-      border: none;
-      color: rgba(255,255,255,0.75);
-      font-size: 1.3rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      padding: 4px 8px;
-      border-radius: 8px;
-      transition: background 0.15s;
-    }
-
-    #nl-sidebar-toggle:hover { background: rgba(255,255,255,0.1); }
-
-    .nl-topbar-breadcrumb {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.83rem;
-      color: rgba(255,255,255,0.6);
-    }
-
-    .nl-topbar-breadcrumb span.current {
-      color: rgba(255,255,255,0.9);
-      font-weight: 600;
-    }
-
-    .nl-topbar-right {
-      display: flex;
-      align-items: center;
-      gap: 18px;
-    }
-
-    .nl-topbar-datetime {
-      font-size: 0.8rem;
-      color: rgba(255,255,255,0.6);
-    }
-
-    /* Logout button */
-    .nl-btn-logout {
-      background: rgba(255,255,255,0.12);
-      border: 1px solid rgba(255,255,255,0.2);
-      color: rgba(255,255,255,0.85);
-      font-size: 0.82rem;
-      font-family: 'Inter', sans-serif;
-      padding: 7px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: background 0.15s;
-      text-decoration: none;
-    }
-
-    .nl-btn-logout:hover {
-      background: rgba(255,255,255,0.22);
-      color: #fff;
-    }
-
-    /* =============================================
-       MAIN CONTENT WRAPPER
-       ============================================= */
-    #nl-content {
-      margin-left: var(--sidebar-width);
-      padding-top: 62px;
-      min-height: 100vh;
-    }
-
-    .nl-page-inner {
-      padding: 28px 30px 40px;
-    }
-
-    /* =============================================
-       PAGE HEADER
-       ============================================= */
-    .nl-page-header {
-      margin-bottom: 24px;
-    }
-
-    .nl-page-title {
-      font-size: 1.4rem;
-      font-weight: 700;
-      color: var(--nl-text);
-    }
-
-    .nl-page-subtitle {
-      font-size: 0.83rem;
-      color: var(--nl-muted);
-      margin-top: 4px;
-    }
-
-    /* =============================================
-       FORM CARD
-       ============================================= */
-    .nl-card {
-      background: var(--nl-white);
-      border-radius: 14px;
-      box-shadow: 0 2px 16px rgba(26,107,94,0.09);
-      overflow: hidden;
-    }
-
-    /* Card header */
-    .nl-card-head {
-      background: linear-gradient(135deg, var(--nl-primary-dark), var(--nl-primary-light));
-      padding: 20px 28px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .nl-card-head-icon {
-      width: 44px; height: 44px;
-      background: rgba(255,255,255,0.18);
-      border: 1.5px solid rgba(255,255,255,0.3);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .nl-card-head-icon i { font-size: 1.3rem; color: #fff; }
-
-    .nl-card-head-title {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: #fff;
-    }
-
-    .nl-card-head-sub {
-      font-size: 0.78rem;
-      color: rgba(255,255,255,0.7);
-      margin-top: 2px;
-    }
-
-    /* Card body */
-    .nl-card-body {
-      padding: 30px 28px;
-    }
-
-    /* Section separator */
-    .nl-section-sep {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin: 28px 0 18px;
-    }
-
-    .nl-section-sep:first-child { margin-top: 0; }
-
-    .nl-section-sep-icon {
-      width: 32px; height: 32px;
-      background: var(--nl-accent);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .nl-section-sep-icon i { font-size: 0.95rem; color: var(--nl-primary); }
-
-    .nl-section-sep-label {
-      font-size: 0.78rem;
-      font-weight: 700;
-      color: var(--nl-primary);
-      text-transform: uppercase;
-      letter-spacing: 0.7px;
-    }
-
-    .nl-section-sep-line {
-      flex: 1;
-      height: 1px;
-      background: var(--nl-border);
-    }
-
-    /* =============================================
-       FORM CONTROLS (ergonometria para guantes)
-       ============================================= */
-    .nl-form-label {
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--nl-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 7px;
-      display: block;
-    }
-
-    .nl-form-control {
-      width: 100%;
-      padding: 13px 15px;
-      border: 1.5px solid var(--nl-border);
-      border-radius: 10px;
-      font-size: 0.95rem;
-      font-family: 'Inter', sans-serif;
-      color: var(--nl-text);
-      background: #fafffe;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-
-    .nl-form-control:focus {
-      border-color: var(--nl-primary-light);
-      box-shadow: 0 0 0 3px rgba(42,157,138,0.15);
-      background: #fff;
-    }
-
-    .nl-form-control::placeholder { color: #aac5c0; }
-
-    .nl-select {
-      -webkit-appearance: none;
-      appearance: none;
-      cursor: pointer;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236c8c87' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 14px center;
-      padding-right: 40px;
-    }
-
-    .nl-textarea {
-      resize: vertical;
-      min-height: 90px;
-    }
-
-    /* ---- Checkboxes (grandes para guantes) ---- */
-    .nl-checks-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-
-    .nl-check-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: #fafffe;
-      border: 1.5px solid var(--nl-border);
-      border-radius: 10px;
-      padding: 12px 18px;
-      cursor: pointer;
-      transition: border-color 0.18s, background 0.18s;
-      min-width: 160px;
-      flex: 1;
-    }
-
-    .nl-check-item:hover {
-      border-color: var(--nl-primary-light);
-      background: var(--nl-accent);
-    }
-
-    .nl-check-item input[type="checkbox"] {
-      width: 20px; height: 20px;
-      accent-color: var(--nl-primary);
-      cursor: pointer;
-      flex-shrink: 0;
-    }
-
-    .nl-check-item label {
-      font-size: 0.9rem;
-      font-weight: 500;
-      color: var(--nl-text);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 7px;
-    }
-
-    .nl-check-item label i { color: var(--nl-muted); font-size: 0.95rem; }
-
-    /* =============================================
-       ACTION BUTTONS (grandes, ergonomicos)
-       ============================================= */
-    .nl-btn-actions {
-      display: flex;
-      gap: 16px;
-      margin-top: 32px;
-      flex-wrap: wrap;
-    }
-
-    .nl-btn {
-      padding: 16px 36px;
-      border-radius: 12px;
-      font-size: 1rem;
-      font-weight: 600;
-      font-family: 'Inter', sans-serif;
-      cursor: pointer;
-      border: none;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
-      min-height: 54px; /* ergonomia guantes */
-    }
-
-    .nl-btn:hover { transform: translateY(-2px); }
-    .nl-btn:active { transform: translateY(0); }
-
-    .nl-btn-primary {
-      background: linear-gradient(135deg, var(--nl-primary), var(--nl-primary-light));
-      color: #fff;
-      flex: 2;
-      justify-content: center;
-      box-shadow: 0 4px 16px rgba(26,107,94,0.3);
-    }
-
-    .nl-btn-primary:hover { box-shadow: 0 8px 24px rgba(26,107,94,0.45); }
-
-    .nl-btn-secondary {
-      background: #fff;
-      color: var(--nl-muted);
-      border: 1.5px solid var(--nl-border);
-      flex: 1;
-      justify-content: center;
-    }
-
-    .nl-btn-secondary:hover {
-      background: #f5fffe;
-      border-color: var(--nl-primary-light);
-      color: var(--nl-primary);
-      box-shadow: 0 4px 12px rgba(26,107,94,0.1);
-    }
-
-    /* =============================================
-       FOOTER CARD
-       ============================================= */
-    .nl-card-footer-bar {
-      background: var(--nl-accent);
-      border-top: 1px solid var(--nl-border);
-      padding: 12px 28px;
-      font-size: 0.78rem;
-      color: var(--nl-muted);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    /* =============================================
-       PAGE FOOTER
-       ============================================= */
-    .nl-page-footer {
-      text-align: center;
-      margin-top: 28px;
-      font-size: 0.78rem;
-      color: var(--nl-muted);
-    }
-
-    /* =============================================
-       RESPONSIVE: colapso sidebar movil
-       ============================================= */
-    @media (max-width: 768px) {
-      :root { --sidebar-width: 0px; }
-
-      #nl-sidebar {
-        transform: translateX(-240px);
-        width: 240px;
-      }
-
-      #nl-sidebar.open {
-        transform: translateX(0);
-        width: 240px;
-      }
-
-      #nl-content { margin-left: 0; }
-      #nl-topbar  { left: 0; }
-
-      .nl-page-inner { padding: 20px 16px 30px; }
-    }
-  </style>
 </head>
 
-<body>
+<body class="bg-light" style="font-family: 'Inter', sans-serif;">
 
-  <!-- =============================================
-       SIDEBAR
-       ============================================= -->
-  <nav id="nl-sidebar">
-
-    <!-- Brand -->
-    <a href="${pageContext.request.contextPath}/DashboardServlet" class="nl-sidebar-brand">
-      <div class="nl-sidebar-brand-icon">
-        <i class="bi bi-heart-pulse-fill"></i>
-      </div>
-      <div>
-        <div class="nl-sidebar-brand-text">NURSELOGIC</div>
-        <div class="nl-sidebar-brand-sub">Gestion Clinica</div>
-      </div>
-    </a>
-
-    <!-- Nav label -->
-    <div class="nl-nav-label">Navegacion Principal</div>
-
-    <!-- Nav items -->
-    <ul class="nl-nav">
-
-      <li>
-        <a href="${pageContext.request.contextPath}/DashboardServlet" id="nav-dashboard">
-          <i class="bi bi-grid-1x2-fill"></i>
-          <span>Dashboard</span>
-        </a>
-      </li>
-
-      <li>
-        <a href="${pageContext.request.contextPath}/PacientesServlet" id="nav-pacientes" class="active">
-          <i class="bi bi-person-vcard-fill"></i>
-          <span>Pacientes</span>
-        </a>
-      </li>
-
-      <li>
-        <a href="${pageContext.request.contextPath}/SignosVitalesServlet" id="nav-signos">
-          <i class="bi bi-activity"></i>
-          <span>Signos Vitales</span>
-        </a>
-      </li>
-
-    </ul>
-
-    <!-- User info -->
-    <div class="nl-sidebar-footer">
-      <div class="nl-sidebar-user">
-        <div class="nl-sidebar-avatar">
-          <i class="bi bi-person-fill"></i>
-        </div>
-        <div>
-          <%
-            String nombreSesion = (session != null) ? (String) session.getAttribute("nombreCompleto") : null;
-            if (nombreSesion == null && session != null) nombreSesion = (String) session.getAttribute("usuario");
-            String rolSesion = (session != null) ? (String) session.getAttribute("rol") : "";
-          %>
-          <div class="nl-sidebar-username"><%= nombreSesion != null ? nombreSesion : "Usuario" %></div>
-          <div class="nl-sidebar-role"><%= rolSesion != null ? rolSesion : "Sesion activa" %></div>
-        </div>
-      </div>
+  <!-- OFFCANVAS SIDEBAR (móvil) -->
+  <div class="offcanvas offcanvas-start nl-sidebar text-white" id="sidebarMobile" style="width:240px;" tabindex="-1">
+    <div class="offcanvas-header border-bottom border-white border-opacity-10 py-3">
+      <span class="fw-bold text-white">NURSELOGIC</span>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
     </div>
-
-  </nav><!-- /#nl-sidebar -->
-
-
-  <!-- =============================================
-       TOPBAR
-       ============================================= -->
-  <header id="nl-topbar">
-
-    <div class="nl-topbar-left">
-      <!-- Toggle sidebar (movil) -->
-      <button id="nl-sidebar-toggle" aria-label="Abrir menu">
-        <i class="bi bi-list"></i>
-      </button>
-
-      <!-- Breadcrumb -->
-      <div class="nl-topbar-breadcrumb">
-        <i class="bi bi-house-fill"></i>
-        <span>/</span>
-        <span>Pacientes</span>
-        <span>/</span>
-        <span class="current">Nueva Ficha</span>
+    <div class="offcanvas-body d-flex flex-column p-0">
+      <div class="px-4 py-3">
+        <small class="fw-bold text-uppercase" style="color:rgba(255,255,255,.3);font-size:.65rem;letter-spacing:1px;">Navegación Principal</small>
       </div>
+      <ul class="nav flex-column px-2 flex-grow-1">
+        <li class="nav-item">
+          <a href="${pageContext.request.contextPath}/DashboardServlet" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+            <i class="bi bi-grid-1x2-fill"></i>Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="${pageContext.request.contextPath}/PacientesServlet" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3 active">
+            <i class="bi bi-person-vcard-fill"></i>Pacientes
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="${pageContext.request.contextPath}/SignosVitalesServlet" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+            <i class="bi bi-activity"></i>Signos Vitales
+          </a>
+        </li>
+      </ul>
     </div>
+  </div>
 
-    <div class="nl-topbar-right">
-      <!-- Fecha/hora (mostrada via JS) -->
-      <span class="nl-topbar-datetime" id="nl-datetime"></span>
+  <div class="container-fluid p-0">
+    <div class="row g-0 min-vh-100">
 
-      <!-- Cerrar sesion -->
-      <a href="${pageContext.request.contextPath}/LogoutServlet"
-         id="btnLogout"
-         class="nl-btn-logout">
-        <i class="bi bi-box-arrow-right"></i>
-        Salir
-      </a>
-    </div>
-
-  </header><!-- /#nl-topbar -->
-
-
-  <!-- =============================================
-       MAIN CONTENT
-       ============================================= -->
-  <main id="nl-content">
-    <div class="nl-page-inner">
-
-      <!-- Page header -->
-      <div class="nl-page-header">
-        <h1 class="nl-page-title">
-          <i class="bi bi-file-earmark-medical-fill me-2" style="color: var(--nl-primary);"></i>
-          Apertura de Ficha Clinica
-        </h1>
-        <p class="nl-page-subtitle">
-          Registro de nuevo paciente en el sistema NURSELOGIC
-        </p>
-      </div>
-
-      <!-- ============================================
-           FORM CARD
-           ============================================ -->
-      <div class="nl-card">
-
-        <!-- Card header -->
-        <div class="nl-card-head">
-          <div class="nl-card-head-icon">
-            <i class="bi bi-clipboard2-pulse-fill"></i>
+      <!-- SIDEBAR DESKTOP -->
+      <nav class="col-auto d-none d-lg-flex flex-column nl-sidebar text-white p-0" id="nl-sidebar" style="width:240px;min-height:100vh;position:sticky;top:0;height:100vh;overflow-y:auto;">
+        <a href="${pageContext.request.contextPath}/DashboardServlet" class="d-flex align-items-center gap-3 p-4 text-white text-decoration-none border-bottom border-white border-opacity-10">
+          <div class="rounded-3 bg-success p-2 flex-shrink-0">
+            <i class="bi bi-heart-pulse-fill text-white fs-5"></i>
           </div>
           <div>
-            <div class="nl-card-head-title">Formulario de Registro</div>
-            <div class="nl-card-head-sub">Complete todos los campos requeridos (*)</div>
+            <div class="fw-bold small text-white" style="letter-spacing:1px;">NURSELOGIC</div>
+            <div style="font-size:.62rem;" class="text-white-50">Gestión Clínica</div>
           </div>
+        </a>
+
+        <div class="px-4 py-3">
+          <small class="fw-bold text-uppercase" style="color:rgba(255,255,255,.3);font-size:.65rem;letter-spacing:1px;">Navegación Principal</small>
         </div>
 
-        <!-- Card body - FORM -->
-        <div class="nl-card-body">
+        <ul class="nav flex-column px-2 flex-grow-1">
+          <li class="nav-item">
+            <a href="${pageContext.request.contextPath}/DashboardServlet" id="nav-dashboard" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+              <i class="bi bi-grid-1x2-fill"></i><span>Dashboard</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="${pageContext.request.contextPath}/PacientesServlet" id="nav-pacientes" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3 active">
+              <i class="bi bi-person-vcard-fill"></i><span>Pacientes</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="${pageContext.request.contextPath}/SignosVitalesServlet" id="nav-signos" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+              <i class="bi bi-activity"></i><span>Signos Vitales</span>
+            </a>
+          </li>
+        </ul>
 
-          <%-- ====================================================
-               Mensajes de respuesta del RegistroPacienteServlet
-               ==================================================== --%>
-          <%
-            String successMsg = (String) request.getAttribute("successMsg");
-            String errorMsg   = (String) request.getAttribute("errorMsg");
-          %>
-          <% if (successMsg != null && !successMsg.isEmpty()) { %>
-          <div style="background:#e9f5f3;border:1px solid #b2ddd6;border-radius:10px;color:#145c50;font-size:0.85rem;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;gap:10px;">
-            <i class="bi bi-check-circle-fill" style="font-size:1.1rem;"></i>
-            <strong><%= successMsg %></strong>
+        <div class="border-top border-white border-opacity-10 p-3 mt-auto">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <div class="rounded-circle bg-success d-flex align-items-center justify-content-center flex-shrink-0" style="width:36px;height:36px;">
+              <i class="bi bi-person-fill text-white small"></i>
+            </div>
+            <div class="overflow-hidden">
+              <%
+                String nombreSesion = (session != null) ? (String) session.getAttribute("nombreCompleto") : null;
+                if (nombreSesion == null && session != null) nombreSesion = (String) session.getAttribute("usuario");
+                String rolSesion = (session != null) ? (String) session.getAttribute("rol") : "";
+              %>
+              <div class="text-white small fw-semibold text-truncate"><%= nombreSesion != null ? nombreSesion : "Usuario" %></div>
+              <div style="font-size:.7rem;" class="text-white-50"><%= rolSesion != null ? rolSesion : "Sesion activa" %></div>
+            </div>
           </div>
-          <% } %>
-          <% if (errorMsg != null && !errorMsg.isEmpty()) { %>
-          <div style="background:#fff1f1;border:1px solid #f5c6c6;border-radius:10px;color:#a02020;font-size:0.85rem;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;gap:10px;">
-            <i class="bi bi-exclamation-circle-fill" style="font-size:1.1rem;"></i>
-            <strong><%= errorMsg %></strong>
+        </div>
+      </nav>
+
+      <!-- CONTENIDO PRINCIPAL -->
+      <div class="col">
+        <!-- Topbar móvil -->
+        <nav class="navbar navbar-dark bg-brand-gradient d-lg-none shadow-sm px-3">
+          <div class="container-fluid px-0">
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMobile">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <span class="navbar-brand fw-bold mb-0">NURSELOGIC</span>
           </div>
-          <% } %>
+        </nav>
 
-          <form id="formRegistroPaciente"
-                action="${pageContext.request.contextPath}/RegistroPacienteServlet"
-                method="POST"
-                novalidate>
+        <!-- Topbar desktop -->
+        <header class="navbar navbar-dark bg-brand-gradient d-none d-lg-flex shadow-sm px-4" style="min-height:62px;">
+          <div class="small text-white-50 d-flex align-items-center gap-2">
+            <i class="bi bi-house-fill"></i><span>/</span><span>Pacientes</span><span>/</span>
+            <span class="text-white fw-semibold">Nueva Ficha</span>
+          </div>
+          <div class="d-flex align-items-center gap-3 ms-auto">
+            <span class="text-white-50 small" id="nl-datetime"></span>
+            <a href="${pageContext.request.contextPath}/LogoutServlet" id="btnLogout" class="btn btn-outline-light btn-sm d-flex align-items-center gap-1">
+              <i class="bi bi-box-arrow-right"></i>Salir
+            </a>
+          </div>
+        </header>
 
-            <!-- ══════════════════════════════════════════
-                 SECCION 1: DATOS DEMOGRAFICOS
-                 ══════════════════════════════════════════ -->
-            <div class="nl-section-sep">
-              <div class="nl-section-sep-icon">
-                <i class="bi bi-person-lines-fill"></i>
+        <main class="p-4">
+          <div class="mb-4">
+            <h1 class="h4 fw-bold d-flex align-items-center gap-2">
+              <i class="bi bi-file-earmark-medical-fill text-success"></i>Apertura de Ficha Clínica
+            </h1>
+            <p class="text-muted small mt-1">Registro de nuevo paciente en el sistema NURSELOGIC</p>
+          </div>
+
+          <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+            <div class="card-header bg-brand-gradient text-white p-4 border-0 d-flex align-items-center gap-3">
+              <div class="rounded-3 bg-white bg-opacity-25 p-2 d-flex align-items-center justify-content-center" style="width:44px;height:44px;">
+                <i class="bi bi-clipboard2-pulse-fill fs-4 text-white"></i>
               </div>
-              <span class="nl-section-sep-label">1. Datos Demograficos</span>
-              <div class="nl-section-sep-line"></div>
-            </div>
-
-            <!-- Fila: Nombres + Apellidos -->
-            <div class="row g-3 mb-3">
-              <div class="col-md-6">
-                <label class="nl-form-label" for="Nombres">
-                  Nombres *
-                </label>
-                <input
-                  type="text"
-                  id="Nombres"
-                  name="Nombres"
-                  class="nl-form-control"
-                  placeholder="Ej: Maria Elena"
-                  maxlength="80"
-                  required />
-              </div>
-              <div class="col-md-6">
-                <label class="nl-form-label" for="Apellidos">
-                  Apellidos *
-                </label>
-                <input
-                  type="text"
-                  id="Apellidos"
-                  name="Apellidos"
-                  class="nl-form-control"
-                  placeholder="Ej: Quishpe Toapanta"
-                  maxlength="80"
-                  required />
+              <div>
+                <h2 class="h5 fw-bold mb-0 text-white">Formulario de Registro</h2>
+                <p class="text-white-50 small mb-0">Complete todos los campos requeridos (*)</p>
               </div>
             </div>
 
-            <!-- Fila: Cedula + Edad + Sexo -->
-            <div class="row g-3">
-              <div class="col-md-4">
-                <label class="nl-form-label" for="Cedula">
-                  Cedula de Identidad *
-                </label>
-                <input
-                  type="text"
-                  id="Cedula"
-                  name="Cedula"
-                  class="nl-form-control"
-                  placeholder="10 digitos"
-                  maxlength="10"
-                  pattern="\d{10}"
-                  inputmode="numeric"
-                  required />
+            <div class="card-body p-4">
+              <%
+                String successMsg = (String) request.getAttribute("successMsg");
+                String errorMsg   = (String) request.getAttribute("errorMsg");
+              %>
+              <% if (successMsg != null && !successMsg.isEmpty()) { %>
+              <div class="alert alert-success d-flex align-items-center gap-2 py-2 small mb-4" role="alert">
+                <i class="bi bi-check-circle-fill flex-shrink-0"></i><strong><%= successMsg %></strong>
               </div>
-
-              <div class="col-md-4">
-                <label class="nl-form-label" for="Edad">
-                  Edad (anos) *
-                </label>
-                <input
-                  type="number"
-                  id="Edad"
-                  name="Edad"
-                  class="nl-form-control"
-                  placeholder="19 – 60"
-                  min="19"
-                  max="60"
-                  required />
+              <% } %>
+              <% if (errorMsg != null && !errorMsg.isEmpty()) { %>
+              <div class="alert alert-danger d-flex align-items-center gap-2 py-2 small mb-4" role="alert">
+                <i class="bi bi-exclamation-circle-fill flex-shrink-0"></i><strong><%= errorMsg %></strong>
               </div>
+              <% } %>
 
-              <div class="col-md-4">
-                <label class="nl-form-label" for="Sexo">
-                  Sexo *
-                </label>
-                <select id="Sexo" name="Sexo" class="nl-form-control nl-select" required>
-                  <option value="" disabled selected>-- Seleccione --</option>
-                  <option value="M">Masculino (H)</option>
-                  <option value="F">Femenino (M)</option>
-                </select>
-              </div>
-            </div>
-
-
-            <!-- ══════════════════════════════════════════
-                 SECCION 2: ANTECEDENTES CLINICOS
-                 ══════════════════════════════════════════ -->
-            <div class="nl-section-sep">
-              <div class="nl-section-sep-icon">
-                <i class="bi bi-journal-medical"></i>
-              </div>
-              <span class="nl-section-sep-label">2. Antecedentes Clinicos</span>
-              <div class="nl-section-sep-line"></div>
-            </div>
-
-            <div class="nl-checks-group">
-
-              <!-- Diabetes (trigger glicemia obligatoria) -->
-              <div class="nl-check-item">
-                <input type="checkbox" id="antDiabetes" name="Antecedentes" value="DIABETES"
-                       onchange="toggleGlicemia(this)"/>
-                <label for="antDiabetes">
-                  <i class="bi bi-droplet-fill"></i>
-                  Diabetes
-                </label>
-              </div>
-
-              <!-- Hipertension -->
-              <div class="nl-check-item">
-                <input type="checkbox" id="antHipertension" name="Antecedentes" value="HIPERTENSION"/>
-                <label for="antHipertension">
-                  <i class="bi bi-heart-fill"></i>
-                  Hipertension
-                </label>
-              </div>
-
-              <!-- Cancer -->
-              <div class="nl-check-item">
-                <input type="checkbox" id="antCancer" name="Antecedentes" value="CANCER"/>
-                <label for="antCancer">
-                  <i class="bi bi-bandaid-fill"></i>
-                  Cancer
-                </label>
-              </div>
-
-            </div><!-- /.nl-checks-group -->
-
-            <!-- Campo Glicemia (OBLIGATORIO si Diabetes esta marcado) -->
-            <div id="glicemiaSection" style="display:none; margin-top:14px;"
-                 class="row g-3">
-              <div class="col-md-6">
-                <div style="background:#fff8e1;border:2px solid #f6ad55;border-radius:12px;padding:16px;">
-                  <label class="nl-form-label" for="GlicemiaInicial" style="color:#c05621;font-size:0.82rem;">
-                    <i class="bi bi-exclamation-triangle-fill" style="margin-right:5px;"></i>
-                    Glicemia Inicial (mg/dL) * <em style="font-weight:400;">(Obligatorio por antecedente de Diabetes)</em>
-                  </label>
-                  <input type="number"
-                         id="GlicemiaInicial"
-                         name="GlicemiaInicial"
-                         class="nl-form-control"
-                         placeholder="Ej: 126 mg/dL"
-                         min="0" max="999" step="1"
-                         style="border-color:#f6ad55;"/>
+              <form id="formRegistroPaciente" action="${pageContext.request.contextPath}/RegistroPacienteServlet" method="POST" novalidate>
+                <!-- 1. DATOS DEMOGRÁFICOS -->
+                <div class="nl-sep">
+                  <div class="nl-sep-icon"><i class="bi bi-person-lines-fill"></i></div>
+                  <span class="nl-sep-label">1. Datos Demográficos</span>
+                  <div class="nl-sep-line"></div>
                 </div>
-              </div>
+
+                <div class="row g-3 mb-3">
+                  <div class="col-md-6">
+                    <label class="form-label small fw-semibold text-uppercase text-muted" for="Nombres">Nombres *</label>
+                    <input type="text" id="Nombres" name="Nombres" class="form-control py-2" placeholder="Ej: María Elena" maxlength="80" required />
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label small fw-semibold text-uppercase text-muted" for="Apellidos">Apellidos *</label>
+                    <input type="text" id="Apellidos" name="Apellidos" class="form-control py-2" placeholder="Ej: Quishpe Toapanta" maxlength="80" required />
+                  </div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                  <div class="col-md-4">
+                    <label class="form-label small fw-semibold text-uppercase text-muted" for="Cedula">Cédula de Identidad *</label>
+                    <input type="text" id="Cedula" name="Cedula" class="form-control py-2" placeholder="10 dígitos" maxlength="10" pattern="\d{10}" inputmode="numeric" required />
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label small fw-semibold text-uppercase text-muted" for="Edad">Edad (años) *</label>
+                    <input type="number" id="Edad" name="Edad" class="form-control py-2" placeholder="19 – 60" min="19" max="60" required />
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label small fw-semibold text-uppercase text-muted" for="Sexo">Sexo *</label>
+                    <select id="Sexo" name="Sexo" class="form-select py-2" required>
+                      <option value="" disabled selected>-- Seleccione --</option>
+                      <option value="M">Masculino (H)</option>
+                      <option value="F">Femenino (M)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- 2. ANTECEDENTES CLÍNICOS -->
+                <div class="nl-sep">
+                  <div class="nl-sep-icon"><i class="bi bi-journal-medical"></i></div>
+                  <span class="nl-sep-label">2. Antecedentes Clínicos</span>
+                  <div class="nl-sep-line"></div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                  <div class="col-md-3">
+                    <div class="form-check card p-3 border rounded-3 h-100">
+                      <input class="form-check-input" type="checkbox" id="antDiabetes" name="Antecedentes" value="DIABETES" onchange="toggleGlicemia(this)"/>
+                      <label class="form-check-label fw-semibold text-dark d-flex align-items-center gap-2" for="antDiabetes">
+                        <i class="bi bi-droplet-fill text-danger"></i> Diabetes
+                      </label>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-check card p-3 border rounded-3 h-100">
+                      <input class="form-check-input" type="checkbox" id="antHipertension" name="Antecedentes" value="HIPERTENSION"/>
+                      <label class="form-check-label fw-semibold text-dark d-flex align-items-center gap-2" for="antHipertension">
+                        <i class="bi bi-heart-fill text-danger"></i> Hipertensión
+                      </label>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-check card p-3 border rounded-3 h-100">
+                      <input class="form-check-input" type="checkbox" id="antCancer" name="Antecedentes" value="CANCER"/>
+                      <label class="form-check-label fw-semibold text-dark d-flex align-items-center gap-2" for="antCancer">
+                        <i class="bi bi-bandaid-fill text-primary"></i> Cáncer
+                      </label>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-check card p-3 border rounded-3 h-100">
+                      <input class="form-check-input" type="checkbox" id="antOtros" name="Antecedentes" value="OTROS" onchange="toggleOtrosAntecedentes(this)"/>
+                      <label class="form-check-label fw-semibold text-dark d-flex align-items-center gap-2" for="antOtros">
+                        <i class="bi bi-plus-circle-fill text-success"></i> Otros
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Campo dinámico Glicemia (por Diabetes) -->
+                <div id="glicemiaSection" style="display:none;" class="row g-3 mb-3 fade-in">
+                  <div class="col-md-6">
+                    <div class="alert alert-warning border border-warning rounded-3 p-3 mb-0">
+                      <label class="form-label small fw-bold text-danger text-uppercase mb-2" for="GlicemiaInicial">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i> Glicemia Inicial (mg/dL) * <span class="fw-normal text-muted">(Obligatorio por antecedente de Diabetes)</span>
+                      </label>
+                      <input type="number" id="GlicemiaInicial" name="GlicemiaInicial" class="form-control" placeholder="Ej: 126 mg/dL" min="0" max="999" step="1"/>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Campo dinámico Especificar Otros Antecedentes -->
+                <div id="otrosSection" style="display:none;" class="row g-3 mb-4 fade-in">
+                  <div class="col-md-12">
+                    <div class="alert alert-info border border-info rounded-3 p-3 mb-0">
+                      <label class="form-label small fw-bold text-success text-uppercase mb-2" for="OtrosAntecedentesTexto">
+                        <i class="bi bi-info-circle-fill me-1"></i> Especificar Otros Antecedentes Clínicos *
+                      </label>
+                      <input type="text" id="OtrosAntecedentesTexto" name="OtrosAntecedentesTexto" class="form-control" placeholder="Ej: Asma, Insuficiencia Renal Crónica, EPOC, Hipotiroidismo..."/>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 3. OBSERVACIONES CLÍNICAS -->
+                <div class="nl-sep">
+                  <div class="nl-sep-icon"><i class="bi bi-stethoscope"></i></div>
+                  <span class="nl-sep-label">3. Observaciones Clínicas</span>
+                  <div class="nl-sep-line"></div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                  <div class="col-12">
+                    <label class="form-label small fw-semibold text-uppercase text-muted" for="SintomasActuales">Síntomas Actuales</label>
+                    <textarea id="SintomasActuales" name="SintomasActuales" class="form-control" placeholder="Describa los síntomas que presenta el paciente al momento de la consulta..." rows="3"></textarea>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label small fw-semibold text-uppercase text-muted" for="Alergias">Alergias Conocidas</label>
+                    <textarea id="Alergias" name="Alergias" class="form-control" placeholder="Ej: Penicilina, látex, ibuprofeno..." rows="3"></textarea>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label small fw-semibold text-uppercase text-muted" for="DispositivosMedicos">Dispositivos Médicos</label>
+                    <textarea id="DispositivosMedicos" name="DispositivosMedicos" class="form-control" placeholder="Ej: Marcapasos, catéter, silla de ruedas..." rows="3"></textarea>
+                  </div>
+                </div>
+
+                <!-- BOTONES -->
+                <div class="d-flex gap-3">
+                  <button type="submit" id="btnGuardar" class="btn btn-success flex-grow-1 py-3 fw-semibold d-flex align-items-center justify-content-center gap-2">
+                    <i class="bi bi-floppy-fill"></i> Guardar Registro
+                  </button>
+                  <button type="button" id="btnCancelar" class="btn btn-outline-secondary py-3 fw-semibold">
+                    <i class="bi bi-x-circle"></i> Cancelar
+                  </button>
+                </div>
+              </form>
             </div>
 
-
-            <!-- ══════════════════════════════════════════
-                 SECCION 3: OBSERVACIONES CLINICAS
-                 ══════════════════════════════════════════ -->
-            <div class="nl-section-sep">
-              <div class="nl-section-sep-icon">
-                <i class="bi bi-stethoscope"></i>
-              </div>
-              <span class="nl-section-sep-label">3. Observaciones Clinicas</span>
-              <div class="nl-section-sep-line"></div>
+            <div class="card-footer bg-success bg-opacity-10 border-0 p-3 small text-muted">
+              <i class="bi bi-info-circle-fill me-1"></i>
+              Los campos marcados con (*) son obligatorios. Los datos ingresados quedan registrados con la fecha y hora del sistema: <strong id="nl-timestamp"></strong>
             </div>
+          </div>
 
-            <div class="row g-3">
-              <!-- Sintomas Actuales -->
-              <div class="col-md-12">
-                <label class="nl-form-label" for="SintomasActuales">
-                  Sintomas Actuales
-                </label>
-                <textarea
-                  id="SintomasActuales"
-                  name="SintomasActuales"
-                  class="nl-form-control nl-textarea"
-                  placeholder="Describa los sintomas que presenta el paciente al momento de la consulta..."
-                  rows="3"></textarea>
-              </div>
+          <footer class="text-center text-muted small mt-4">
+            &copy; 2025 NURSELOGIC &mdash; Sistema de Gestión Clínica &middot; Ecuador
+          </footer>
+        </main>
+      </div>
 
-              <!-- Alergias -->
-              <div class="col-md-6">
-                <label class="nl-form-label" for="Alergias">
-                  Alergias Conocidas
-                </label>
-                <textarea
-                  id="Alergias"
-                  name="Alergias"
-                  class="nl-form-control nl-textarea"
-                  placeholder="Ej: Penicilina, latex, ibuprofeno..."
-                  rows="3"></textarea>
-              </div>
+    </div>
+  </div>
 
-              <!-- Dispositivos Medicos -->
-              <div class="col-md-6">
-                <label class="nl-form-label" for="DispositivosMedicos">
-                  Dispositivos Medicos
-                </label>
-                <textarea
-                  id="DispositivosMedicos"
-                  name="DispositivosMedicos"
-                  class="nl-form-control nl-textarea"
-                  placeholder="Ej: Marcapasos, cateter, silla de ruedas..."
-                  rows="3"></textarea>
-              </div>
-            </div>
-
-
-            <!-- ══════════════════════════════════════════
-                 BOTONES DE ACCION
-                 ══════════════════════════════════════════ -->
-            <div class="nl-btn-actions">
-
-              <button type="submit" id="btnGuardar" class="nl-btn nl-btn-primary">
-                <i class="bi bi-floppy-fill"></i>
-                Guardar Registro
-              </button>
-
-              <button type="button"
-                      id="btnCancelar"
-                      class="nl-btn nl-btn-secondary"
-                      onclick="window.history.back();">
-                <i class="bi bi-x-circle"></i>
-                Cancelar
-              </button>
-
-            </div>
-
-          </form>
-        </div><!-- /.nl-card-body -->
-
-        <!-- Card footer note -->
-        <div class="nl-card-footer-bar">
-          <i class="bi bi-info-circle-fill"></i>
-          Los campos marcados con (*) son obligatorios. Los datos ingresados quedan registrados con la
-          fecha y hora del sistema: <strong id="nl-timestamp" style="margin-left:4px;"></strong>
-        </div>
-
-      </div><!-- /.nl-card -->
-
-      <!-- Page footer -->
-      <footer class="nl-page-footer">
-        &copy; 2025 NURSELOGIC &mdash; Sistema de Gestion Clinica &middot; Ecuador
-      </footer>
-
-    </div><!-- /.nl-page-inner -->
-  </main><!-- /#nl-content -->
-
-
-  <!-- Bootstrap 5 JS (local) -->
   <script src="${pageContext.request.contextPath}/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    /* ---- Reloj en topbar ---- */
     function updateTime() {
       const now = new Date();
       const opts = {
@@ -1008,30 +338,18 @@
     updateTime();
     setInterval(updateTime, 30000);
 
-    /* ---- Toggle sidebar (movil) ---- */
-    document.getElementById('nl-sidebar-toggle').addEventListener('click', function () {
-      document.getElementById('nl-sidebar').classList.toggle('open');
-    });
-
-    /* ---- Validacion basica de cedula ecuatoriana (10 digitos numericos) ---- */
     document.getElementById('Cedula').addEventListener('input', function () {
       this.value = this.value.replace(/\D/g, '').slice(0, 10);
     });
 
-    /* ---- Confirmacion antes de cancelar ---- */
     document.getElementById('btnCancelar').addEventListener('click', function (e) {
-      if (!confirm('Se perderan los datos no guardados. ¿Desea continuar?')) {
+      if (!confirm('Se perderán los datos no guardados. ¿Desea continuar?')) {
         e.stopPropagation();
       } else {
         window.history.back();
       }
     });
 
-    /* ====================================================
-       REGLA DE NEGOCIO: Diabetes → Glicemia OBLIGATORIA
-       Si el paciente tiene antecedente de Diabetes,
-       se debe ingresar el valor de glicemia inicial.
-       ==================================================== */
     function toggleGlicemia(checkbox) {
       const section  = document.getElementById('glicemiaSection');
       const inputGlic = document.getElementById('GlicemiaInicial');
@@ -1039,7 +357,6 @@
 
       if (diab) {
         section.style.display = 'block';
-        section.style.animation = 'fadeIn 0.3s ease';
         inputGlic.setAttribute('required', 'required');
         inputGlic.focus();
       } else {
@@ -1049,28 +366,48 @@
       }
     }
 
-    /* Validacion en submit: si Diabetes marcado y glicemia vacia → error */
+    function toggleOtrosAntecedentes(checkbox) {
+      const section = document.getElementById('otrosSection');
+      const inputOtros = document.getElementById('OtrosAntecedentesTexto');
+      const activo = checkbox.checked;
+
+      if (activo) {
+        section.style.display = 'block';
+        inputOtros.setAttribute('required', 'required');
+        inputOtros.focus();
+      } else {
+        section.style.display = 'none';
+        inputOtros.removeAttribute('required');
+        inputOtros.value = '';
+      }
+    }
+
     document.getElementById('formRegistroPaciente').addEventListener('submit', function (e) {
       const cbDiab   = document.getElementById('antDiabetes');
       const inputGlic = document.getElementById('GlicemiaInicial');
       if (cbDiab.checked && (!inputGlic.value || parseFloat(inputGlic.value) <= 0)) {
         e.preventDefault();
-        inputGlic.style.borderColor = '#e53e3e';
-        inputGlic.style.background  = '#fff5f5';
-        inputGlic.setCustomValidity(
-          'El valor de Glicemia es obligatorio cuando existe antecedente de Diabetes.');
+        inputGlic.classList.add('is-invalid');
+        inputGlic.setCustomValidity('El valor de Glicemia es obligatorio cuando existe antecedente de Diabetes.');
         inputGlic.reportValidity();
+        return;
       } else {
+        inputGlic.classList.remove('is-invalid');
         inputGlic.setCustomValidity('');
       }
+
+      const cbOtros = document.getElementById('antOtros');
+      const inputOtros = document.getElementById('OtrosAntecedentesTexto');
+      if (cbOtros.checked && (!inputOtros.value || inputOtros.value.trim() === '')) {
+        e.preventDefault();
+        inputOtros.classList.add('is-invalid');
+        inputOtros.setCustomValidity('Especifique los otros antecedentes clínicos.');
+        inputOtros.reportValidity();
+      } else {
+        inputOtros.classList.remove('is-invalid');
+        inputOtros.setCustomValidity('');
+      }
     });
-
-    /* Animacion fadeIn para la seccion de glicemia */
-    const style = document.createElement('style');
-    style.textContent = '@keyframes fadeIn { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }';
-    document.head.appendChild(style);
-
   </script>
-
 </body>
 </html>

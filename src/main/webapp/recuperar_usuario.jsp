@@ -6,67 +6,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
   <title>NURSELOGIC | Recuperar Usuario</title>
   <link href="${pageContext.request.contextPath}/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="${pageContext.request.contextPath}/css/nurselogic.css" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
-  <style>
-    :root { --nl-primary:#1a6b5e; --nl-primary-dark:#134f45; --nl-primary-light:#2a9d8a; --nl-accent:#e9f5f3; --nl-text:#1e2d2b; --nl-muted:#6c8c87; --nl-border:#d0e8e4; }
-    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
-    body { font-family:'Inter',sans-serif; min-height:100vh; background:linear-gradient(135deg,#0d4038 0%,#1a6b5e 60%,#2a9d8a 100%); display:flex; align-items:center; justify-content:center; padding:20px; }
-    body::before { content:''; position:fixed; width:500px; height:500px; top:-150px; right:-150px; border-radius:50%; background:rgba(255,255,255,0.06); pointer-events:none; }
-
-    .nl-card { background:#fff; border-radius:20px; box-shadow:0 25px 60px rgba(0,0,0,0.35); width:100%; max-width:440px; overflow:hidden; animation:slideUp 0.45s ease both; }
-    @keyframes slideUp { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
-
-    .nl-card-header { background:linear-gradient(135deg,#134f45,#2a9d8a); padding:30px 38px 22px; text-align:center; }
-    .nl-brand-icon { width:62px; height:62px; background:rgba(255,255,255,0.18); border:2px solid rgba(255,255,255,0.3); border-radius:50%; display:inline-flex; align-items:center; justify-content:center; margin-bottom:12px; }
-    .nl-brand-icon i { font-size:1.7rem; color:#fff; }
-    .nl-brand-name { font-size:1.5rem; font-weight:700; color:#fff; letter-spacing:1.5px; }
-    .nl-brand-sub  { font-size:0.76rem; color:rgba(255,255,255,0.72); margin-top:3px; }
-
-    .nl-card-body { padding:28px 38px 24px; }
-    .nl-section-title { font-size:0.95rem; font-weight:600; color:var(--nl-text); text-align:center; margin-bottom:6px; }
-    .nl-section-desc  { font-size:0.8rem; color:var(--nl-muted); text-align:center; margin-bottom:20px; line-height:1.5; }
-
-    .nl-alert-error { background:#fff1f1; border:1px solid #f5c6c6; border-radius:10px; color:#a02020; font-size:0.82rem; padding:10px 14px; margin-bottom:16px; display:flex; align-items:center; gap:8px; }
-
-    /* Resultado */
-    .nl-result-box { background:var(--nl-accent); border:2px solid var(--nl-border); border-radius:12px; padding:20px; margin-bottom:18px; text-align:center; }
-    .nl-result-label { font-size:0.72rem; font-weight:700; color:var(--nl-muted); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:6px; }
-    .nl-result-value { font-size:1.6rem; font-weight:700; color:var(--nl-primary); font-family:monospace; letter-spacing:1px; }
-    .nl-result-badge { display:inline-block; margin-top:10px; padding:4px 14px; border-radius:20px; font-size:0.76rem; font-weight:600; }
-    .badge-enfermero  { background:#d1f0e3; color:#155724; }
-    .badge-admin      { background:#cce5ff; color:#004085; }
-    .nl-result-note   { font-size:0.76rem; color:var(--nl-muted); margin-top:8px; }
-
-    .nl-form-group { margin-bottom:16px; }
-    .nl-label { display:block; font-size:0.76rem; font-weight:600; color:var(--nl-muted); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:6px; }
-    .nl-input-wrapper { position:relative; }
-    .nl-input-icon { position:absolute; left:13px; top:50%; transform:translateY(-50%); color:var(--nl-muted); font-size:0.95rem; pointer-events:none; }
-    .nl-input { width:100%; padding:11px 13px 11px 40px; border:1.5px solid var(--nl-border); border-radius:10px; font-size:0.91rem; font-family:'Inter',sans-serif; color:var(--nl-text); background:#fafffe; outline:none; transition:border-color 0.2s,box-shadow 0.2s; }
-    .nl-input:focus { border-color:var(--nl-primary-light); box-shadow:0 0 0 3px rgba(42,157,138,0.15); background:#fff; }
-    .nl-input::placeholder { color:#aac5c0; }
-
-    .nl-btn-submit { width:100%; padding:13px; background:linear-gradient(135deg,#1a6b5e,#2a9d8a); color:#fff; border:none; border-radius:10px; font-size:0.95rem; font-weight:600; font-family:'Inter',sans-serif; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:transform 0.15s,box-shadow 0.15s; }
-    .nl-btn-submit:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(26,107,94,0.4); }
-
-    .nl-card-footer { background:var(--nl-accent); border-top:1px solid var(--nl-border); padding:12px 38px; text-align:center; }
-    .nl-footer-text { font-size:0.78rem; color:var(--nl-muted); }
-    .nl-footer-text a { color:var(--nl-primary); font-weight:600; text-decoration:none; }
-    .nl-footer-text a:hover { text-decoration:underline; }
-  </style>
 </head>
-<body>
-  <div class="nl-card">
+<body class="min-vh-100 d-flex align-items-center justify-content-center bg-brand-gradient py-4" style="font-family:'Inter',sans-serif;">
 
-    <div class="nl-card-header">
-      <div class="nl-brand-icon"><i class="bi bi-person-exclamation"></i></div>
-      <div class="nl-brand-name">NURSELOGIC</div>
-      <div class="nl-brand-sub">Recuperacion de Cuenta</div>
+  <div class="card border-0 shadow-lg overflow-hidden w-100 mx-3" style="max-width:440px;border-radius:1.25rem;">
+
+    <!-- HEADER -->
+    <div class="card-header bg-brand-gradient text-white text-center py-4 border-0">
+      <div class="rounded-circle bg-white bg-opacity-25 border border-white border-opacity-50 d-inline-flex align-items-center justify-content-center mb-3" style="width:64px;height:64px;">
+        <i class="bi bi-person-exclamation fs-3 text-white"></i>
+      </div>
+      <h1 class="fs-4 fw-bold mb-0 text-white">NURSELOGIC</h1>
+      <p class="text-white-50 small mb-0">Recuperación de Cuenta</p>
     </div>
 
-    <div class="nl-card-body">
-      <p class="nl-section-title">Recuperar Nombre de Usuario</p>
-      <p class="nl-section-desc">Ingrese su nombre completo y el correo registrado.<br/>Le mostraremos su nombre de usuario.</p>
+    <!-- BODY -->
+    <div class="card-body p-4">
+      <h6 class="text-center fw-semibold mb-1">Recuperar Nombre de Usuario</h6>
+      <p class="text-center text-muted small mb-4">
+        Ingrese su nombre completo y el correo registrado.<br/>
+        Le mostraremos su nombre de usuario.
+      </p>
 
       <%
         Boolean exitoso  = (Boolean) request.getAttribute("exitoso");
@@ -76,66 +39,65 @@
 
         if (Boolean.TRUE.equals(exitoso)) {
       %>
-      <div class="nl-result-box">
-        <div class="nl-result-label">&#10003; Usuario encontrado</div>
-        <div class="nl-result-value"><%= usuarioR %></div>
+      <div class="bg-success bg-opacity-10 border border-success border-opacity-25 rounded-3 p-4 text-center mb-4">
+        <div class="small fw-bold text-success text-uppercase mb-1" style="letter-spacing:.6px;">✓ Usuario encontrado</div>
+        <div class="fs-3 fw-bold text-success font-monospace mb-2"><%= usuarioR %></div>
         <%
-          String badgeClass = "ADMINISTRADOR".equals(rolU) ? "badge-admin" : "badge-enfermero";
-          String rolLabel   = "ADMINISTRADOR".equals(rolU) ? "Administrador" : "Enfermero";
+          String badgeClass = "bg-warning text-dark";
+          String rolLabel   = "⏳ Rol Pendiente de Asignación";
+
+          if ("ADMINISTRADOR".equalsIgnoreCase(rolU)) {
+              badgeClass = "bg-primary text-white";
+              rolLabel   = "Administrador";
+          } else if ("ENFERMERO".equalsIgnoreCase(rolU)) {
+              badgeClass = "bg-success text-white";
+              rolLabel   = "Enfermero";
+          }
         %>
-        <div>
-          <span class="nl-result-badge <%= badgeClass %>"><%= rolLabel %></span>
-        </div>
-        <div class="nl-result-note">Este es su nombre de usuario registrado en el sistema.</div>
+        <span class="badge <%= badgeClass %> px-3 py-2 rounded-pill mb-2"><%= rolLabel %></span>
+        <div class="text-muted small mt-2">Este es su nombre de usuario registrado en el sistema.</div>
       </div>
-      <a href="${pageContext.request.contextPath}/login.jsp" class="nl-btn-submit" style="text-decoration:none;">
-        <i class="bi bi-box-arrow-in-right"></i> Ir al Inicio de Sesion
+      <a href="${pageContext.request.contextPath}/login.jsp" class="btn btn-success w-100 py-3 fw-semibold d-flex align-items-center justify-content-center gap-2">
+        <i class="bi bi-box-arrow-in-right"></i> Ir al Inicio de Sesión
       </a>
 
       <% } else { %>
 
       <% if (errorMsg != null && !errorMsg.isEmpty()) { %>
-      <div class="nl-alert-error"><i class="bi bi-exclamation-circle-fill"></i><%= errorMsg %></div>
+      <div class="alert alert-danger d-flex align-items-center gap-2 py-2 small" role="alert">
+        <i class="bi bi-exclamation-circle-fill flex-shrink-0"></i><%= errorMsg %>
+      </div>
       <% } %>
 
-      <%-- Formulario → RecuperarUsuarioServlet --%>
-      <form id="formRecuperar"
-            action="${pageContext.request.contextPath}/RecuperarUsuarioServlet"
-            method="POST" novalidate>
-
-        <div class="nl-form-group">
-          <label class="nl-label" for="NombreCompleto">Nombre Completo</label>
-          <div class="nl-input-wrapper">
-            <i class="bi bi-person-lines-fill nl-input-icon"></i>
-            <input type="text" id="NombreCompleto" name="NombreCompleto" class="nl-input"
-                   placeholder="Como fue registrado en el sistema" required/>
-          </div>
+      <form id="formRecuperar" action="${pageContext.request.contextPath}/RecuperarUsuarioServlet" method="POST" novalidate>
+        <label class="form-label small fw-semibold text-uppercase text-muted" for="NombreCompleto" style="letter-spacing:.6px;">Nombre Completo</label>
+        <div class="input-group mb-3">
+          <span class="input-group-text"><i class="bi bi-person-lines-fill"></i></span>
+          <input type="text" id="NombreCompleto" name="NombreCompleto" class="form-control" placeholder="Como fue registrado en el sistema" required/>
         </div>
 
-        <div class="nl-form-group">
-          <label class="nl-label" for="Email">Correo Electronico Registrado</label>
-          <div class="nl-input-wrapper">
-            <i class="bi bi-envelope nl-input-icon"></i>
-            <input type="email" id="Email" name="Email" class="nl-input"
-                   placeholder="correo@nurselogic.ec" required/>
-          </div>
+        <label class="form-label small fw-semibold text-uppercase text-muted" for="Email" style="letter-spacing:.6px;">Correo Electrónico Registrado</label>
+        <div class="input-group mb-4">
+          <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+          <input type="email" id="Email" name="Email" class="form-control" placeholder="correo@nurselogic.ec" required/>
         </div>
 
-        <button type="submit" id="btnRecuperar" class="nl-btn-submit">
+        <button type="submit" id="btnRecuperar" class="btn btn-success w-100 py-3 fw-semibold d-flex align-items-center justify-content-center gap-2">
           <i class="bi bi-search"></i> Buscar mi Usuario
         </button>
       </form>
       <% } %>
     </div>
 
-    <div class="nl-card-footer">
-      <p class="nl-footer-text">
-        <a href="${pageContext.request.contextPath}/login.jsp" id="linkVolverLogin">
-          &larr; Volver al inicio de sesion
+    <!-- FOOTER -->
+    <div class="card-footer bg-success bg-opacity-10 text-center border-0 py-3">
+      <p class="text-muted small mb-0">
+        <a href="${pageContext.request.contextPath}/login.jsp" id="linkVolverLogin" class="text-success fw-semibold text-decoration-none">
+          ← Volver al inicio de sesión
         </a>
         &nbsp;&middot;&nbsp;
-        <a href="${pageContext.request.contextPath}/OlvidoContrasenaServlet" id="linkOlvido">
-          Olvide mi contrasena
+        <a href="${pageContext.request.contextPath}/OlvidoContrasenaServlet" id="linkOlvido" class="text-success fw-semibold text-decoration-none">
+          Olvidé mi contraseña
         </a>
       </p>
     </div>

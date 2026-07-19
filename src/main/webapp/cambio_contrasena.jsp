@@ -8,268 +8,243 @@
   <title>NURSELOGIC | Cambio de Contraseña</title>
 
   <link href="${pageContext.request.contextPath}/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="${pageContext.request.contextPath}/css/nurselogic.css" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
-
-  <style>
-    :root {
-      --nl-primary:#1a6b5e; --nl-primary-dark:#134f45; --nl-primary-light:#2a9d8a;
-      --nl-accent:#e9f5f3; --nl-text:#1e2d2b; --nl-muted:#6c8c87; --nl-border:#d0e8e4;
-      --nl-sidebar-bg:#0f3831; --nl-topbar-bg:#134f45; --nl-body-bg:#f0f7f6;
-      --sidebar-width:240px;
-    }
-    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
-    body { font-family:'Inter',sans-serif; background:var(--nl-body-bg); min-height:100vh; }
-
-    /* SIDEBAR */
-    #nl-sidebar { position:fixed; top:0; left:0; width:var(--sidebar-width); height:100vh; background:var(--nl-sidebar-bg); display:flex; flex-direction:column; z-index:1000; }
-    .nl-sidebar-brand { display:flex; align-items:center; gap:12px; padding:22px 20px; border-bottom:1px solid rgba(255,255,255,0.1); text-decoration:none; }
-    .nl-sidebar-brand-icon { width:38px; height:38px; background:var(--nl-primary-light); border-radius:10px; display:flex; align-items:center; justify-content:center; }
-    .nl-sidebar-brand-icon i { font-size:1.1rem; color:#fff; }
-    .nl-sidebar-brand-text { font-size:1.05rem; font-weight:700; color:#fff; letter-spacing:1px; }
-    .nl-sidebar-brand-sub  { font-size:0.62rem; color:rgba(255,255,255,0.5); }
-    .nl-nav-label { font-size:0.65rem; font-weight:600; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:1px; padding:18px 20px 6px; }
-    .nl-nav { list-style:none; padding:8px 12px; flex:1; }
-    .nl-nav li { margin-bottom:4px; }
-    .nl-nav a { display:flex; align-items:center; gap:12px; padding:11px 14px; border-radius:10px; text-decoration:none; color:rgba(255,255,255,0.7); font-size:0.88rem; font-weight:500; transition:background 0.18s; }
-    .nl-nav a:hover { background:var(--nl-primary); color:#fff; }
-    .nl-nav a i { font-size:1rem; }
-
-    /* TOPBAR */
-    #nl-topbar { position:fixed; top:0; left:var(--sidebar-width); right:0; height:62px; background:var(--nl-topbar-bg); display:flex; align-items:center; justify-content:space-between; padding:0 28px; z-index:999; box-shadow:0 2px 10px rgba(0,0,0,0.2); }
-    .nl-topbar-breadcrumb { font-size:0.83rem; color:rgba(255,255,255,0.6); display:flex; align-items:center; gap:6px; }
-    .nl-topbar-breadcrumb span.current { color:rgba(255,255,255,0.9); font-weight:600; }
-    .nl-topbar-right { display:flex; align-items:center; gap:14px; }
-    .nl-btn-logout { background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); color:rgba(255,255,255,0.85); font-size:0.82rem; font-family:'Inter',sans-serif; padding:7px 16px; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:6px; text-decoration:none; transition:background 0.15s; }
-    .nl-btn-logout:hover { background:rgba(255,255,255,0.22); color:#fff; }
-
-    /* CONTENT */
-    #nl-content { margin-left:var(--sidebar-width); padding-top:62px; }
-    .nl-page-inner { padding:28px 30px 40px; }
-
-    /* PAGE HEADER */
-    .nl-page-header { margin-bottom:24px; }
-    .nl-page-title   { font-size:1.35rem; font-weight:700; color:var(--nl-text); }
-    .nl-page-subtitle { font-size:0.82rem; color:var(--nl-muted); margin-top:4px; }
-
-    /* FORM CARD */
-    .nl-card { background:#fff; border-radius:14px; max-width:520px; box-shadow:0 2px 16px rgba(26,107,94,0.09); overflow:hidden; }
-    .nl-card-head { background:linear-gradient(135deg,#134f45,#2a9d8a); padding:20px 28px; display:flex; align-items:center; gap:14px; }
-    .nl-card-head-icon { width:44px; height:44px; background:rgba(255,255,255,0.18); border:1.5px solid rgba(255,255,255,0.3); border-radius:12px; display:flex; align-items:center; justify-content:center; }
-    .nl-card-head-icon i { font-size:1.3rem; color:#fff; }
-    .nl-card-head-title { font-size:1.1rem; font-weight:700; color:#fff; }
-    .nl-card-head-sub   { font-size:0.78rem; color:rgba(255,255,255,0.7); margin-top:2px; }
-    .nl-card-body { padding:28px; }
-
-    /* FORM CONTROLS */
-    .nl-form-group { margin-bottom:18px; }
-    .nl-form-label { display:block; font-size:0.78rem; font-weight:600; color:var(--nl-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:7px; }
-    .nl-input-wrapper { position:relative; }
-    .nl-input-icon { position:absolute; left:14px; top:50%; transform:translateY(-50%); color:var(--nl-muted); font-size:1rem; pointer-events:none; }
-    .nl-form-control {
-      width:100%; padding:12px 14px 12px 42px;
-      border:1.5px solid var(--nl-border); border-radius:10px;
-      font-size:0.93rem; font-family:'Inter',sans-serif; color:var(--nl-text);
-      background:#fafffe; outline:none; transition:border-color 0.2s,box-shadow 0.2s;
-    }
-    .nl-form-control:focus { border-color:var(--nl-primary-light); box-shadow:0 0 0 3px rgba(42,157,138,0.15); background:#fff; }
-    .nl-form-control::placeholder { color:#aac5c0; }
-
-    /* Alerts */
-    .nl-alert-error { background:#fff1f1; border:1px solid #f5c6c6; border-radius:10px; color:#a02020; font-size:0.82rem; padding:10px 14px; margin-bottom:18px; display:flex; align-items:center; gap:8px; }
-    .nl-alert-info  { background:#e9f5f3; border:1px solid #b2ddd6; border-radius:10px; color:#145c50; font-size:0.82rem; padding:10px 14px; margin-bottom:18px; display:flex; align-items:center; gap:8px; }
-
-    /* Separador de sección */
-    .nl-sep { display:flex; align-items:center; gap:10px; margin-bottom:18px; }
-    .nl-sep-icon { width:30px; height:30px; background:var(--nl-accent); border-radius:8px; display:flex; align-items:center; justify-content:center; }
-    .nl-sep-icon i { font-size:0.88rem; color:var(--nl-primary); }
-    .nl-sep-label { font-size:0.75rem; font-weight:700; color:var(--nl-primary); text-transform:uppercase; letter-spacing:0.7px; }
-    .nl-sep-line { flex:1; height:1px; background:var(--nl-border); }
-
-    /* Botones */
-    .nl-btn-actions { display:flex; gap:14px; margin-top:24px; }
-    .nl-btn { padding:14px 28px; border-radius:10px; font-size:0.95rem; font-weight:600; font-family:'Inter',sans-serif; cursor:pointer; border:none; display:flex; align-items:center; gap:8px; transition:transform 0.15s,box-shadow 0.15s; }
-    .nl-btn:hover { transform:translateY(-2px); }
-    .nl-btn-primary { background:linear-gradient(135deg,#1a6b5e,#2a9d8a); color:#fff; flex:2; justify-content:center; box-shadow:0 4px 14px rgba(26,107,94,0.25); }
-    .nl-btn-primary:hover { box-shadow:0 8px 22px rgba(26,107,94,0.4); }
-    .nl-btn-secondary { background:#fff; color:var(--nl-muted); border:1.5px solid var(--nl-border); flex:1; justify-content:center; }
-    .nl-btn-secondary:hover { background:var(--nl-accent); border-color:var(--nl-primary-light); color:var(--nl-primary); }
-
-    /* Nota de seguridad */
-    .nl-security-note { background:var(--nl-accent); border-radius:10px; padding:12px 16px; margin-top:20px; font-size:0.8rem; color:var(--nl-muted); display:flex; align-items:flex-start; gap:8px; }
-    .nl-security-note i { color:var(--nl-primary); margin-top:2px; flex-shrink:0; }
-
-    /* Requisitos de contraseña */
-    .nl-req-list { list-style:none; margin-top:10px; }
-    .nl-req-list li { font-size:0.77rem; color:var(--nl-muted); display:flex; align-items:center; gap:6px; margin-bottom:3px; }
-    .nl-req-list li i { font-size:0.75rem; }
-    .nl-req-ok   { color:#2a9d8a !important; }
-    .nl-req-fail { color:#aac5c0 !important; }
-  </style>
 </head>
-<body>
+<body class="bg-light" style="font-family:'Inter',sans-serif;">
 
-  <!-- SIDEBAR -->
-  <nav id="nl-sidebar">
-    <a href="${pageContext.request.contextPath}/index.jsp" class="nl-sidebar-brand">
-      <div class="nl-sidebar-brand-icon"><i class="bi bi-heart-pulse-fill"></i></div>
-      <div><div class="nl-sidebar-brand-text">NURSELOGIC</div><div class="nl-sidebar-brand-sub">Gestion Clinica</div></div>
-    </a>
-    <div class="nl-nav-label">Navegacion Principal</div>
-    <ul class="nl-nav">
-      <li><a href="${pageContext.request.contextPath}/index.jsp"><i class="bi bi-grid-1x2-fill"></i><span>Dashboard</span></a></li>
-      <li><a href="${pageContext.request.contextPath}/PacientesServlet"><i class="bi bi-person-vcard-fill"></i><span>Pacientes</span></a></li>
-      <li><a href="${pageContext.request.contextPath}/SignosVitalesServlet"><i class="bi bi-activity"></i><span>Signos Vitales</span></a></li>
-    </ul>
-  </nav>
-
-  <!-- TOPBAR -->
-  <header id="nl-topbar">
-    <div class="nl-topbar-breadcrumb">
-      <i class="bi bi-house-fill"></i><span>/</span><span>Seguridad</span><span>/</span>
-      <span class="current">Cambio de Contraseña</span>
+  <!-- OFFCANVAS SIDEBAR (móvil) -->
+  <div class="offcanvas offcanvas-start nl-sidebar text-white" id="sidebarMobile" style="width:240px;" tabindex="-1">
+    <div class="offcanvas-header border-bottom border-white border-opacity-10 py-3">
+      <span class="fw-bold text-white">NURSELOGIC</span>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
     </div>
-    <div class="nl-topbar-right">
-      <%-- Nombre del usuario en sesión --%>
-      <%
-        String nombreSesion = (session != null) ? (String) session.getAttribute("nombreCompleto") : "";
-        if (nombreSesion == null) nombreSesion = (String) session.getAttribute("usuario");
-      %>
-      <span style="font-size:0.82rem;color:rgba(255,255,255,0.7);">
-        <i class="bi bi-person-circle me-1"></i><%= nombreSesion != null ? nombreSesion : "" %>
-      </span>
-      <a href="${pageContext.request.contextPath}/LogoutServlet" id="btnLogout" class="nl-btn-logout">
-        <i class="bi bi-box-arrow-right"></i>Salir
-      </a>
-    </div>
-  </header>
-
-  <!-- CONTENT -->
-  <main id="nl-content">
-    <div class="nl-page-inner">
-
-      <!-- Page header -->
-      <div class="nl-page-header">
-        <h1 class="nl-page-title">
-          <i class="bi bi-shield-lock-fill me-2" style="color:var(--nl-primary);"></i>
-          Cambio de Contraseña
-        </h1>
-        <p class="nl-page-subtitle">Actualice su contraseña de acceso al sistema NURSELOGIC</p>
+    <div class="offcanvas-body d-flex flex-column p-0">
+      <div class="px-4 py-3">
+        <small class="fw-bold text-uppercase" style="color:rgba(255,255,255,.3);font-size:.65rem;letter-spacing:1px;">Navegación Principal</small>
       </div>
+      <ul class="nav flex-column px-2 flex-grow-1">
+        <li class="nav-item">
+          <a href="${pageContext.request.contextPath}/index.jsp" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+            <i class="bi bi-grid-1x2-fill"></i>Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="${pageContext.request.contextPath}/PacientesServlet" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+            <i class="bi bi-person-vcard-fill"></i>Pacientes
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="${pageContext.request.contextPath}/SignosVitalesServlet" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+            <i class="bi bi-activity"></i>Signos Vitales
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
 
-      <!-- FORM CARD -->
-      <div class="nl-card">
-        <div class="nl-card-head">
-          <div class="nl-card-head-icon"><i class="bi bi-key-fill"></i></div>
+  <div class="container-fluid p-0">
+    <div class="row g-0 min-vh-100">
+
+      <!-- SIDEBAR DESKTOP -->
+      <nav class="col-auto d-none d-lg-flex flex-column nl-sidebar text-white p-0" id="nl-sidebar" style="width:240px;min-height:100vh;position:sticky;top:0;height:100vh;overflow-y:auto;">
+        <a href="${pageContext.request.contextPath}/index.jsp" class="d-flex align-items-center gap-3 p-4 text-white text-decoration-none border-bottom border-white border-opacity-10">
+          <div class="rounded-3 bg-success p-2 flex-shrink-0">
+            <i class="bi bi-heart-pulse-fill text-white fs-5"></i>
+          </div>
           <div>
-            <div class="nl-card-head-title">Nueva Contraseña</div>
-            <div class="nl-card-head-sub">
-              Usuario: <strong>
-              <%= session != null && session.getAttribute("usuario") != null
-                  ? session.getAttribute("usuario").toString().toUpperCase() : "" %>
-              </strong>
-            </div>
+            <div class="fw-bold small text-white" style="letter-spacing:1px;">NURSELOGIC</div>
+            <div style="font-size:.62rem;" class="text-white-50">Gestión Clínica</div>
           </div>
+        </a>
+        <div class="px-4 py-3">
+          <small class="fw-bold text-uppercase" style="color:rgba(255,255,255,.3);font-size:.65rem;letter-spacing:1px;">Navegación Principal</small>
         </div>
-        <div class="nl-card-body">
+        <ul class="nav flex-column px-2 flex-grow-1">
+          <li class="nav-item">
+            <a href="${pageContext.request.contextPath}/index.jsp" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+              <i class="bi bi-grid-1x2-fill"></i><span>Dashboard</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="${pageContext.request.contextPath}/PacientesServlet" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+              <i class="bi bi-person-vcard-fill"></i><span>Pacientes</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="${pageContext.request.contextPath}/SignosVitalesServlet" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+              <i class="bi bi-activity"></i><span>Signos Vitales</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
 
-          <%-- Mensajes de error --%>
-          <%
-            String errorMsg = (String) request.getAttribute("errorMsg");
-            if (errorMsg != null && !errorMsg.isEmpty()) {
-          %>
-          <div class="nl-alert-error">
-            <i class="bi bi-exclamation-circle-fill"></i><%= errorMsg %>
+      <!-- CONTENIDO PRINCIPAL -->
+      <div class="col">
+        <!-- Topbar móvil -->
+        <nav class="navbar navbar-dark bg-brand-gradient d-lg-none shadow-sm px-3">
+          <div class="container-fluid px-0">
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMobile">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <span class="navbar-brand fw-bold mb-0">NURSELOGIC</span>
           </div>
-          <% } %>
+        </nav>
 
-          <form id="formCambioPass"
-                action="${pageContext.request.contextPath}/CambioContrasenaServlet"
-                method="POST" novalidate>
+        <!-- Topbar desktop -->
+        <header class="navbar navbar-dark bg-brand-gradient d-none d-lg-flex shadow-sm px-4" style="min-height:62px;">
+          <div class="small text-white-50 d-flex align-items-center gap-2">
+            <i class="bi bi-house-fill"></i><span>/</span><span>Seguridad</span><span>/</span>
+            <span class="text-white fw-semibold">Cambio de Contraseña</span>
+          </div>
+          <div class="d-flex align-items-center gap-3 ms-auto">
+            <%
+              String nombreSesion = (session != null) ? (String) session.getAttribute("nombreCompleto") : "";
+              if (nombreSesion == null) nombreSesion = (String) session.getAttribute("usuario");
+            %>
+            <span class="text-white-50 small d-flex align-items-center gap-1">
+              <i class="bi bi-person-circle"></i><%= nombreSesion != null ? nombreSesion : "" %>
+            </span>
+            <a href="${pageContext.request.contextPath}/LogoutServlet" id="btnLogout" class="btn btn-outline-light btn-sm d-flex align-items-center gap-1">
+              <i class="bi bi-box-arrow-right"></i>Salir
+            </a>
+          </div>
+        </header>
 
-            <!-- Sección: Verificación -->
-            <div class="nl-sep">
-              <div class="nl-sep-icon"><i class="bi bi-check-circle-fill"></i></div>
-              <span class="nl-sep-label">Verificación</span>
-              <div class="nl-sep-line"></div>
-            </div>
-
-            <!-- Contraseña Actual -->
-            <div class="nl-form-group">
-              <label class="nl-form-label" for="ContrasenaActual">Contraseña Actual *</label>
-              <div class="nl-input-wrapper">
-                <i class="bi bi-lock nl-input-icon"></i>
-                <input type="password" id="ContrasenaActual" name="ContrasenaActual"
-                       class="nl-form-control" placeholder="Ingrese su contraseña actual" required/>
-              </div>
-            </div>
-
-            <!-- Sección: Nueva Contraseña -->
-            <div class="nl-sep" style="margin-top:22px;">
-              <div class="nl-sep-icon"><i class="bi bi-shield-plus"></i></div>
-              <span class="nl-sep-label">Nueva Contraseña</span>
-              <div class="nl-sep-line"></div>
-            </div>
-
-            <!-- Nueva Contraseña -->
-            <div class="nl-form-group">
-              <label class="nl-form-label" for="NuevaContrasena">Nueva Contraseña *</label>
-              <div class="nl-input-wrapper">
-                <i class="bi bi-lock-fill nl-input-icon"></i>
-                <input type="password" id="NuevaContrasena" name="NuevaContrasena"
-                       class="nl-form-control" placeholder="Mínimo 6 caracteres"
-                       minlength="6" required/>
-              </div>
-              <!-- Indicador de requisitos -->
-              <ul class="nl-req-list" id="reqList">
-                <li id="req-len" class="nl-req-fail">
-                  <i class="bi bi-circle"></i> Mínimo 6 caracteres
-                </li>
-                <li id="req-dif" class="nl-req-fail">
-                  <i class="bi bi-circle"></i> Distinta a la contraseña actual
-                </li>
-              </ul>
-            </div>
-
-            <!-- Confirmar Nueva Contraseña -->
-            <div class="nl-form-group">
-              <label class="nl-form-label" for="ConfirmarContrasena">Confirmar Nueva Contraseña *</label>
-              <div class="nl-input-wrapper">
-                <i class="bi bi-lock-fill nl-input-icon"></i>
-                <input type="password" id="ConfirmarContrasena" name="ConfirmarContrasena"
-                       class="nl-form-control" placeholder="Repita la nueva contraseña" required/>
-              </div>
-              <p id="matchMsg" style="font-size:0.77rem;margin-top:4px;color:#aac5c0;"></p>
-            </div>
-
-            <!-- Botones -->
-            <div class="nl-btn-actions">
-              <button type="submit" id="btnGuardar" class="nl-btn nl-btn-primary">
-                <i class="bi bi-floppy-fill"></i> Guardar Cambio
-              </button>
-              <button type="button" id="btnCancelar" class="nl-btn nl-btn-secondary"
-                      onclick="window.history.back();">
-                <i class="bi bi-x-circle"></i> Cancelar
-              </button>
-            </div>
-
-          </form>
-
-          <!-- Nota de seguridad -->
-          <div class="nl-security-note">
-            <i class="bi bi-info-circle-fill"></i>
-            <span>Al guardar la nueva contraseña, su sesión actual se cerrará automáticamente y
-            deberá iniciar sesión nuevamente con sus nuevas credenciales.</span>
+        <main class="p-4">
+          <div class="mb-4">
+            <h1 class="h4 fw-bold d-flex align-items-center gap-2">
+              <i class="bi bi-shield-lock-fill text-success"></i>Cambio de Contraseña
+            </h1>
+            <p class="text-muted small mt-1">Actualice su contraseña de acceso al sistema NURSELOGIC</p>
           </div>
 
-        </div>
+          <div class="card border-0 shadow-sm rounded-4 mx-auto overflow-hidden" style="max-width:520px;">
+            <div class="card-header bg-brand-gradient text-white p-4 border-0 d-flex align-items-center gap-3">
+              <div class="rounded-3 bg-white bg-opacity-25 p-2 d-flex align-items-center justify-content-center" style="width:44px;height:44px;">
+                <i class="bi bi-key-fill fs-4 text-white"></i>
+              </div>
+              <div>
+                <h2 class="h5 fw-bold mb-0 text-white">Nueva Contraseña</h2>
+                <p class="text-white-50 small mb-0">
+                  Usuario: <strong>
+                  <%= session != null && session.getAttribute("usuario") != null
+                      ? session.getAttribute("usuario").toString().toUpperCase() : "" %>
+                  </strong>
+                </p>
+              </div>
+            </div>
+
+            <div class="card-body p-4">
+              <%
+                String errorMsg = (String) request.getAttribute("errorMsg");
+                if (errorMsg != null && !errorMsg.isEmpty()) {
+              %>
+              <div class="alert alert-danger d-flex align-items-center gap-2 py-2 small" role="alert">
+                <i class="bi bi-exclamation-circle-fill flex-shrink-0"></i><%= errorMsg %>
+              </div>
+              <% } %>
+
+              <form id="formCambioPass" action="${pageContext.request.contextPath}/CambioContrasenaServlet" method="POST" novalidate>
+                <!-- Sección: Verificación -->
+                <div class="nl-sep">
+                  <div class="nl-sep-icon"><i class="bi bi-check-circle-fill"></i></div>
+                  <span class="nl-sep-label">Verificación</span>
+                  <div class="nl-sep-line"></div>
+                </div>
+
+                <!-- Contraseña Actual -->
+                <div class="mb-3">
+                  <label class="form-label small fw-semibold text-uppercase text-muted" for="ContrasenaActual">Contraseña Actual *</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                    <input type="password" id="ContrasenaActual" name="ContrasenaActual" class="form-control" placeholder="Ingrese su contraseña actual" required/>
+                    <button class="btn btn-outline-secondary" type="button" id="toggleAct" title="Mostrar/Ocultar contraseña">
+                      <i class="bi bi-eye-slash" id="iconAct"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Sección: Nueva Contraseña -->
+                <div class="nl-sep mt-4">
+                  <div class="nl-sep-icon"><i class="bi bi-shield-plus"></i></div>
+                  <span class="nl-sep-label">Nueva Contraseña</span>
+                  <div class="nl-sep-line"></div>
+                </div>
+
+                <!-- Nueva Contraseña -->
+                <div class="mb-3">
+                  <label class="form-label small fw-semibold text-uppercase text-muted" for="NuevaContrasena">Nueva Contraseña *</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                    <input type="password" id="NuevaContrasena" name="NuevaContrasena" class="form-control" placeholder="Mínimo 6 caracteres" minlength="6" required/>
+                    <button class="btn btn-outline-secondary" type="button" id="toggleNue" title="Mostrar/Ocultar contraseña">
+                      <i class="bi bi-eye-slash" id="iconNue"></i>
+                    </button>
+                  </div>
+                  <ul class="nl-req-list" id="reqList">
+                    <li id="req-len" class="req-fail">
+                      <i class="bi bi-circle"></i> Mínimo 6 caracteres
+                    </li>
+                    <li id="req-dif" class="req-fail">
+                      <i class="bi bi-circle"></i> Distinta a la contraseña actual
+                    </li>
+                  </ul>
+                </div>
+
+                <!-- Confirmar Nueva Contraseña -->
+                <div class="mb-4">
+                  <label class="form-label small fw-semibold text-uppercase text-muted" for="ConfirmarContrasena">Confirmar Nueva Contraseña *</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                    <input type="password" id="ConfirmarContrasena" name="ConfirmarContrasena" class="form-control" placeholder="Repita la nueva contraseña" required/>
+                    <button class="btn btn-outline-secondary" type="button" id="toggleConf" title="Mostrar/Ocultar contraseña">
+                      <i class="bi bi-eye-slash" id="iconConf"></i>
+                    </button>
+                  </div>
+                  <p id="matchMsg" class="small mt-1 mb-0" style="color:#aac5c0;"></p>
+                </div>
+
+                <!-- Botones -->
+                <div class="d-flex gap-3">
+                  <button type="submit" id="btnGuardar" class="btn btn-success flex-grow-1 py-3 fw-semibold d-flex align-items-center justify-content-center gap-2">
+                    <i class="bi bi-floppy-fill"></i> Guardar Cambio
+                  </button>
+                  <button type="button" id="btnCancelar" class="btn btn-outline-secondary py-3 fw-semibold" onclick="window.history.back();">
+                    <i class="bi bi-x-circle"></i> Cancelar
+                  </button>
+                </div>
+              </form>
+
+              <!-- Nota de seguridad -->
+              <div class="nl-security-note">
+                <i class="bi bi-info-circle-fill"></i>
+                <span>Al guardar la nueva contraseña, su sesión actual se cerrará automáticamente y deberá iniciar sesión nuevamente con sus nuevas credenciales.</span>
+              </div>
+            </div>
+          </div>
+        </main>
       </div>
 
     </div>
-  </main>
+  </div>
 
   <script src="${pageContext.request.contextPath}/js/bootstrap.bundle.min.js"></script>
   <script>
+    function setupToggle(inputId, btnId, iconId) {
+      document.getElementById(btnId).addEventListener('click', function() {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+        const esPass = input.type === 'password';
+        input.type = esPass ? 'text' : 'password';
+        icon.className = esPass ? 'bi bi-eye-fill text-success' : 'bi bi-eye-slash';
+      });
+    }
+    setupToggle('ContrasenaActual', 'toggleAct', 'iconAct');
+    setupToggle('NuevaContrasena', 'toggleNue', 'iconNue');
+    setupToggle('ConfirmarContrasena', 'toggleConf', 'iconConf');
+
     const campoNueva   = document.getElementById('NuevaContrasena');
     const campoActual  = document.getElementById('ContrasenaActual');
     const campoConf    = document.getElementById('ConfirmarContrasena');
@@ -281,25 +256,22 @@
       const nueva  = campoNueva.value;
       const actual = campoActual.value;
 
-      // Requisito longitud
       if (nueva.length >= 6) {
-        reqLen.className = 'nl-req-ok';
+        reqLen.className = 'req-ok';
         reqLen.innerHTML = '<i class="bi bi-check-circle-fill"></i> Mínimo 6 caracteres';
       } else {
-        reqLen.className = 'nl-req-fail';
+        reqLen.className = 'req-fail';
         reqLen.innerHTML = '<i class="bi bi-circle"></i> Mínimo 6 caracteres';
       }
 
-      // Requisito: distinta a la actual
       if (nueva.length > 0 && actual.length > 0 && nueva !== actual) {
-        reqDif.className = 'nl-req-ok';
+        reqDif.className = 'req-ok';
         reqDif.innerHTML = '<i class="bi bi-check-circle-fill"></i> Distinta a la contraseña actual';
       } else {
-        reqDif.className = 'nl-req-fail';
+        reqDif.className = 'req-fail';
         reqDif.innerHTML = '<i class="bi bi-circle"></i> Distinta a la contraseña actual';
       }
 
-      // Confirmación coincide
       const conf = campoConf.value;
       if (conf.length > 0) {
         if (nueva === conf) {

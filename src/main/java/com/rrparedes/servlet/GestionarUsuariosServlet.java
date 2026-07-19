@@ -1,5 +1,6 @@
 package com.rrparedes.servlet;
 
+import com.rrparedes.dao.UsuarioDAO;
 import com.rrparedes.model.UserStore;
 import com.rrparedes.model.Usuario;
 import jakarta.servlet.ServletException;
@@ -10,29 +11,28 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.util.Collection;
 
 /**
  * NURSELOGIC – GestionarUsuariosServlet
  *
  * Controlador exclusivo para el rol ADMINISTRADOR.
- * Permite:
- *  GET  → muestra la lista de usuarios (gestionar_usuarios.jsp)
- *  POST → procesa acciones: asignarRol, bloquear, desbloquear
- *
- * TODO Fase 2: integrar con BD (UsuarioDAO).
+ * Permite listar y asignar roles / cambiar estados de cuentas en tiempo real (Persistido en MySQL).
  */
 @WebServlet("/GestionarUsuariosServlet")
 public class GestionarUsuariosServlet extends HttpServlet {
+
+    private final UsuarioDAO usuarioDAO = new UsuarioDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Solo ADMINISTRADOR puede acceder
         if (!esAdmin(request, response)) return;
 
-        // TODO Fase 2: cargar lista desde BD
-        // request.setAttribute("listaUsuarios", UsuarioDAO.obtenerTodos());
+        // Cargar lista de usuarios desde MySQL / UserStore
+        Collection<Usuario> lista = UserStore.getTodos();
+        request.setAttribute("listaUsuarios", lista);
 
         request.getRequestDispatcher("/gestionar_usuarios.jsp").forward(request, response);
     }
@@ -48,43 +48,48 @@ public class GestionarUsuariosServlet extends HttpServlet {
         String accion        = request.getParameter("accion");        // "asignarRol" | "bloquear" | "desbloquear"
         String nombreUsuario = request.getParameter("NombreUsuario");
 
-        if (accion == null || nombreUsuario == null) {
-            response.sendRedirect(request.getContextPath() + "/GestionarUsuariosServlet");
-            return;
-        }
+        if (accion != null && nombreUsuario != null) {
+            Usuario u = UserStore.buscarPorUsuario(nombreUsuario);
+            if (u != null) {
+                switch (accion) {
 
-        switch (accion) {
+                    case "asignarRol":
+                        String nuevoRol = request.getParameter("Rol");
+                        if (nuevoRol != null && !nuevoRol.trim().isEmpty()) {
+                            u.setRol(nuevoRol.trim());
+                            usuarioDAO.guardar(u);
+                            request.setAttribute("successMsg",
+                                "✔ Rol '" + nuevoRol.trim() + "' asignado exitosamente al usuario: " + u.getNombreUsuario());
+                        }
+                        break;
 
-            case "asignarRol":
-                String nuevoRol = request.getParameter("Rol");
-                if (nuevoRol != null && !nuevoRol.isEmpty()) {
-                    Usuario u = UserStore.buscarPorUsuario(nombreUsuario);
-                    if (u != null) u.setRol(nuevoRol);
-                    request.setAttribute("successMsg",
-                        "✔ Rol '" + nuevoRol + "' asignado al usuario: " + nombreUsuario);
+                    case "bloquear":
+                        UserStore.setBloqueado(nombreUsuario, true);
+                        request.setAttribute("successMsg",
+                            "✔ Cuenta bloqueada exitosamente: " + u.getNombreUsuario());
+                        break;
+
+                    case "desbloquear":
+                        UserStore.setBloqueado(nombreUsuario, false);
+                        request.setAttribute("successMsg",
+                            "✔ Cuenta desbloqueada exitosamente: " + u.getNombreUsuario());
+                        break;
+
+                    default:
+                        request.setAttribute("errorMsg", "⚠ Acción no reconocida.");
                 }
-                break;
-
-            case "bloquear":
-                UserStore.setBloqueado(nombreUsuario, true);
-                request.setAttribute("successMsg",
-                    "✔ Cuenta bloqueada: " + nombreUsuario);
-                break;
-
-            case "desbloquear":
-                UserStore.setBloqueado(nombreUsuario, false);
-                request.setAttribute("successMsg",
-                    "✔ Cuenta desbloqueada: " + nombreUsuario);
-                break;
-
-            default:
-                request.setAttribute("errorMsg", "⚠ Acción no reconocida.");
+            } else {
+                request.setAttribute("errorMsg", "⚠ No se encontró el usuario: " + nombreUsuario);
+            }
         }
+
+        // Refrescar lista de usuarios actualizada
+        Collection<Usuario> lista = UserStore.getTodos();
+        request.setAttribute("listaUsuarios", lista);
 
         request.getRequestDispatcher("/gestionar_usuarios.jsp").forward(request, response);
     }
 
-    /** Verifica que el usuario tenga rol ADMINISTRADOR. Si no, redirige. */
     private boolean esAdmin(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         HttpSession session = request.getSession(false);

@@ -81,7 +81,7 @@
           <h2 class="fw-bold mb-1" style="font-family:'Space Grotesk',sans-serif;">Iniciar sesión</h2>
           <p class="text-muted small mb-4">Acceso al Sistema de Gestión Clínica</p>
 
-          <%-- Mensaje de éxito (logout, nueva cuenta, cambio pass) --%>
+          <%-- Mensaje de éxito --%>
           <%
             String successMsg = request.getParameter("msg");
             String errorMsg   = (String) request.getAttribute("errorMsg");
@@ -92,7 +92,7 @@
           </div>
           <% } %>
 
-          <%-- Mensaje de error del LoginServlet --%>
+          <%-- Mensaje de error --%>
           <% if (errorMsg != null && !errorMsg.isEmpty()) { %>
           <div class="alert alert-danger d-flex align-items-center gap-2 py-2 small" role="alert">
             <i class="bi bi-exclamation-circle-fill flex-shrink-0"></i><%= errorMsg %>
@@ -100,74 +100,54 @@
           <% } %>
 
           <%-- FORMULARIO → LoginServlet --%>
-          <form id="formLogin"
-                action="${pageContext.request.contextPath}/LoginServlet"
-                method="POST" novalidate>
+          <form id="formLogin" action="${pageContext.request.contextPath}/LoginServlet" method="POST" novalidate>
 
             <!-- Nombre de Usuario -->
-            <label class="form-label small fw-semibold text-uppercase text-muted" for="NombreUsuario"
-                   style="letter-spacing:.6px;">Nombre de Usuario</label>
+            <label class="form-label small fw-semibold text-uppercase text-muted" for="NombreUsuario" style="letter-spacing:.6px;">Nombre de Usuario</label>
             <div class="input-group mb-3">
               <span class="input-group-text"><i class="bi bi-person"></i></span>
-              <input type="text" id="NombreUsuario" name="NombreUsuario"
-                     class="form-control" placeholder="Ingrese su usuario"
-                     autocomplete="username" required/>
+              <input type="text" id="NombreUsuario" name="NombreUsuario" class="form-control" placeholder="Ingrese su usuario" autocomplete="username" required/>
             </div>
 
-            <!-- Contraseña -->
-            <label class="form-label small fw-semibold text-uppercase text-muted" for="Contrasena"
-                   style="letter-spacing:.6px;">Contraseña</label>
+            <!-- Contraseña con botón Ver/Ocultar -->
+            <label class="form-label small fw-semibold text-uppercase text-muted" for="Contrasena" style="letter-spacing:.6px;">Contraseña</label>
             <div class="input-group mb-3">
               <span class="input-group-text"><i class="bi bi-lock"></i></span>
-              <input type="password" id="Contrasena" name="Contrasena"
-                     class="form-control" placeholder="Ingrese su contraseña"
-                     autocomplete="current-password" required/>
+              <input type="password" id="Contrasena" name="Contrasena" class="form-control" placeholder="Ingrese su contraseña" autocomplete="current-password" required/>
+              <button class="btn btn-outline-secondary" type="button" id="toggleContrasena" title="Mostrar/Ocultar contraseña">
+                <i class="bi bi-eye-slash" id="iconEye"></i>
+              </button>
             </div>
 
             <!-- Botón principal -->
-            <button type="submit" id="btnIngresar"
-                    class="btn btn-success w-100 py-3 fw-semibold d-flex align-items-center justify-content-center gap-2 mt-1">
-              <i class="bi bi-box-arrow-in-right"></i>Ingresar al Sistema
+            <button type="submit" id="btnIngresar" class="btn btn-success w-100 py-3 fw-semibold d-flex align-items-center justify-content-center gap-2 mt-1">
+              <i class="bi bi-box-arrow-right"></i>Ingresar al Sistema
             </button>
-
           </form>
 
           <!-- ══ ACCIONES SECUNDARIAS (3 botones) ══ -->
           <div class="row g-2 mt-3">
-
-            <%-- 1. Registrar Usuario --%>
             <div class="col-4">
-              <a href="${pageContext.request.contextPath}/NuevaCuentaServlet"
-                 id="linkRegistrar"
-                 class="btn btn-outline-secondary btn-sm w-100 py-3 d-flex flex-column align-items-center gap-1 text-muted text-decoration-none">
+              <a href="${pageContext.request.contextPath}/NuevaCuentaServlet" id="linkRegistrar" class="btn btn-outline-secondary btn-sm w-100 py-3 d-flex flex-column align-items-center gap-1 text-muted text-decoration-none">
                 <i class="bi bi-person-plus-fill fs-5"></i>
                 <span style="font-size:.72rem;font-weight:600;line-height:1.3;">Registrar Usuario</span>
               </a>
             </div>
-
-            <%-- 2. Olvidé mi Contraseña --%>
             <div class="col-4">
-              <a href="${pageContext.request.contextPath}/OlvidoContrasenaServlet"
-                 id="linkOlvido"
-                 class="btn btn-outline-secondary btn-sm w-100 py-3 d-flex flex-column align-items-center gap-1 text-muted text-decoration-none">
+              <a href="${pageContext.request.contextPath}/OlvidoContrasenaServlet" id="linkOlvido" class="btn btn-outline-secondary btn-sm w-100 py-3 d-flex flex-column align-items-center gap-1 text-muted text-decoration-none">
                 <i class="bi bi-key-fill fs-5"></i>
                 <span style="font-size:.72rem;font-weight:600;line-height:1.3;">Olvidé mi Contraseña</span>
               </a>
             </div>
-
-            <%-- 3. Recuperar Usuario --%>
             <div class="col-4">
-              <a href="${pageContext.request.contextPath}/RecuperarUsuarioServlet"
-                 id="linkRecuperar"
-                 class="btn btn-outline-secondary btn-sm w-100 py-3 d-flex flex-column align-items-center gap-1 text-muted text-decoration-none">
+              <a href="${pageContext.request.contextPath}/RecuperarUsuarioServlet" id="linkRecuperar" class="btn btn-outline-secondary btn-sm w-100 py-3 d-flex flex-column align-items-center gap-1 text-muted text-decoration-none">
                 <i class="bi bi-person-exclamation fs-5"></i>
                 <span style="font-size:.72rem;font-weight:600;line-height:1.3;">Recuperar Usuario</span>
               </a>
             </div>
+          </div>
 
-          </div><!-- /.row acciones -->
-
-          <!-- ══ FOOTER ══ -->
+          <!-- FOOTER -->
           <div class="bg-success bg-opacity-10 rounded-3 p-3 mt-4 text-center">
             <p class="text-muted small mb-0">
               <i class="bi bi-shield-lock-fill me-1"></i>
@@ -176,12 +156,22 @@
             </p>
           </div>
 
-        </div><!-- /.w-100 -->
-      </div><!-- /.col form panel -->
+        </div>
+      </div>
 
-    </div><!-- /.row -->
-  </div><!-- /.container-fluid -->
+    </div>
+  </div>
 
   <script src="${pageContext.request.contextPath}/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Alternar visibilidad de contraseña (Ojito)
+    document.getElementById('toggleContrasena').addEventListener('click', function () {
+      const input = document.getElementById('Contrasena');
+      const icon = document.getElementById('iconEye');
+      const esPass = input.type === 'password';
+      input.type = esPass ? 'text' : 'password';
+      icon.className = esPass ? 'bi bi-eye-fill text-success' : 'bi bi-eye-slash';
+    });
+  </script>
 </body>
 </html>

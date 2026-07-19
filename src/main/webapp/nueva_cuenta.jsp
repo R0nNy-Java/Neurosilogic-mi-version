@@ -95,6 +95,9 @@
           <input type="password" id="Contrasena" name="Contrasena"
                  class="form-control" placeholder="Mínimo 6 caracteres"
                  minlength="6" required/>
+          <button class="btn btn-outline-secondary" type="button" id="toggleContrasena1" title="Mostrar/Ocultar contraseña">
+            <i class="bi bi-eye-slash" id="iconEye1"></i>
+          </button>
         </div>
 
         <!-- Confirmar Contraseña -->
@@ -104,6 +107,9 @@
           <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
           <input type="password" id="ConfirmarContrasena" name="ConfirmarContrasena"
                  class="form-control" placeholder="Repita su contraseña" required/>
+          <button class="btn btn-outline-secondary" type="button" id="toggleContrasena2" title="Mostrar/Ocultar contraseña">
+            <i class="bi bi-eye-slash" id="iconEye2"></i>
+          </button>
         </div>
 
         <button type="submit" id="btnRegistrar"
@@ -127,6 +133,18 @@
 
   <script src="${pageContext.request.contextPath}/js/bootstrap.bundle.min.js"></script>
   <script>
+    function setupToggle(inputId, btnId, iconId) {
+      document.getElementById(btnId).addEventListener('click', function() {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+        const esPass = input.type === 'password';
+        input.type = esPass ? 'text' : 'password';
+        icon.className = esPass ? 'bi bi-eye-fill text-success' : 'bi bi-eye-slash';
+      });
+    }
+    setupToggle('Contrasena', 'toggleContrasena1', 'iconEye1');
+    setupToggle('ConfirmarContrasena', 'toggleContrasena2', 'iconEye2');
+
     /* Validación del lado del cliente: contraseñas coincidan */
     document.getElementById('btnRegistrar').addEventListener('click', function(e) {
       const p1 = document.getElementById('Contrasena').value;

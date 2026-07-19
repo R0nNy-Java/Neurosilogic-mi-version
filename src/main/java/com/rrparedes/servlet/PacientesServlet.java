@@ -1,5 +1,7 @@
 package com.rrparedes.servlet;
 
+import com.rrparedes.dao.PacienteDAO;
+import com.rrparedes.model.Paciente;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -8,18 +10,18 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * NURSELOGIC – PacientesServlet
  *
- * Controlador del módulo de Pacientes.
- * GET  → muestra formulario de nuevo registro (registro_paciente.jsp)
- * POST → delega en RegistroPacienteServlet (futuro: listar, buscar, editar)
- *
- * TODO Fase 2: Agregar lógica de listado y búsqueda con BD.
+ * Controlador del módulo de Gestión de Pacientes.
+ * Carga la lista de pacientes desde MySQL usando PacienteDAO y reenvía a pacientes.jsp.
  */
 @WebServlet("/PacientesServlet")
 public class PacientesServlet extends HttpServlet {
+
+    private final PacienteDAO pacienteDAO = new PacienteDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -32,11 +34,16 @@ public class PacientesServlet extends HttpServlet {
             return;
         }
 
-        // TODO Fase 2: cargar lista de pacientes
-        // List<Paciente> lista = PacienteDAO.obtenerTodos();
-        // request.setAttribute("listaPacientes", lista);
+        // Cargar todos los pacientes registrados desde la base de datos MySQL
+        try {
+            List<Paciente> lista = pacienteDAO.listarTodos();
+            request.setAttribute("listaPacientes", lista);
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("errorMsg", "⚠ Error al cargar los pacientes desde la Base de Datos: " + e.getMessage());
+        }
 
-        request.getRequestDispatcher("/registro_paciente.jsp").forward(request, response);
+        request.getRequestDispatcher("/pacientes.jsp").forward(request, response);
     }
 
     @Override

@@ -7,6 +7,23 @@
   if (nombreSesion == null) nombreSesion = usuarioSesion;
   boolean esAdmin  = "ADMINISTRADOR".equals(rolSesion);
   String tituloRol = esAdmin ? "Administrador" : "Enfermero/a";
+
+  /* ── Conteo dinámico desde base de datos MySQL ── */
+  int totalPacientes = 0;
+  int totalUsuarios = 0;
+  try {
+      com.rrparedes.dao.PacienteDAO pDAO = new com.rrparedes.dao.PacienteDAO();
+      totalPacientes = pDAO.listarTodos().size();
+  } catch (Exception e) {
+      totalPacientes = 0;
+  }
+
+  try {
+      com.rrparedes.dao.UsuarioDAO uDAO = new com.rrparedes.dao.UsuarioDAO();
+      totalUsuarios = uDAO.listarTodos().size();
+  } catch (Exception e) {
+      totalUsuarios = 0;
+  }
 %>
 <!DOCTYPE html>
 <html lang="es">
@@ -25,19 +42,13 @@
 
 <body class="bg-light" style="font-family:'Inter',sans-serif;">
 
-  <!-- ══════════════════════════════════════════
-       OFFCANVAS SIDEBAR – móvil
-       ══════════════════════════════════════════ -->
-  <div class="offcanvas offcanvas-start nl-sidebar text-white"
-       id="sidebarMobile" style="width:240px;" tabindex="-1"
-       aria-labelledby="sidebarMobileLabel">
+  <!-- OFFCANVAS SIDEBAR – móvil -->
+  <div class="offcanvas offcanvas-start nl-sidebar text-white" id="sidebarMobile" style="width:240px;" tabindex="-1">
     <div class="offcanvas-header border-bottom border-white border-opacity-10 py-3">
-      <span id="sidebarMobileLabel" class="fw-bold text-white">NURSELOGIC</span>
-      <button type="button" class="btn-close btn-close-white"
-              data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+      <span class="fw-bold text-white">NURSELOGIC</span>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
     </div>
     <div class="offcanvas-body d-flex flex-column p-0">
-      <%-- Contenido de nav (móvil) --%>
       <div class="px-3 pt-3 pb-2">
         <span class="badge w-100 py-2 <%= esAdmin ? "bg-info bg-opacity-25 text-info" : "bg-success bg-opacity-25 text-success" %>" style="font-size:.7rem;">
           <i class="bi bi-<%= esAdmin ? "shield-fill" : "person-fill-check" %> me-1"></i><%= tituloRol %>
@@ -119,22 +130,15 @@
         </a>
       </div>
     </div>
-  </div><!-- /#sidebarMobile -->
+  </div>
 
 
   <div class="container-fluid p-0">
     <div class="row g-0" style="min-height:100vh;">
 
-      <!-- ══════════════════════════════════════════
-           SIDEBAR DESKTOP – col fijo
-           ══════════════════════════════════════════ -->
-      <nav class="col-auto d-none d-lg-flex flex-column nl-sidebar text-white p-0"
-           id="nl-sidebar"
-           style="width:240px;min-height:100vh;position:sticky;top:0;height:100vh;overflow-y:auto;">
-
-        <!-- Brand -->
-        <a href="${pageContext.request.contextPath}/index.jsp"
-           class="d-flex align-items-center gap-3 p-4 text-white text-decoration-none border-bottom border-white border-opacity-10">
+      <!-- SIDEBAR DESKTOP -->
+      <nav class="col-auto d-none d-lg-flex flex-column nl-sidebar text-white p-0" id="nl-sidebar" style="width:240px;min-height:100vh;position:sticky;top:0;height:100vh;overflow-y:auto;">
+        <a href="${pageContext.request.contextPath}/index.jsp" class="d-flex align-items-center gap-3 p-4 text-white text-decoration-none border-bottom border-white border-opacity-10">
           <div class="rounded-3 bg-success p-2 flex-shrink-0">
             <i class="bi bi-heart-pulse-fill text-white fs-5"></i>
           </div>
@@ -144,19 +148,16 @@
           </div>
         </a>
 
-        <!-- Badge de rol -->
         <div class="px-3 pt-3 pb-2">
           <span class="badge w-100 py-2 <%= esAdmin ? "bg-info bg-opacity-25 text-info" : "bg-success bg-opacity-25 text-success" %>" style="font-size:.7rem;">
             <i class="bi bi-<%= esAdmin ? "shield-fill" : "person-fill-check" %> me-1"></i><%= tituloRol %>
           </span>
         </div>
 
-        <!-- Etiqueta nav -->
         <div class="px-4 py-1">
           <small class="fw-bold text-uppercase" style="color:rgba(255,255,255,.3);font-size:.65rem;letter-spacing:1px;">Menu Principal</small>
         </div>
 
-        <!-- Nav items -->
         <ul class="nav flex-column px-2 flex-grow-1 mt-1">
           <li class="nav-item">
             <a href="${pageContext.request.contextPath}/index.jsp" id="nav-dashboard" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3 active">
@@ -213,7 +214,6 @@
           <% } %>
         </ul>
 
-        <!-- Footer del sidebar -->
         <div class="border-top border-white border-opacity-10 p-3 mt-auto">
           <div class="d-flex align-items-center gap-2 mb-2">
             <div class="rounded-circle bg-success d-flex align-items-center justify-content-center flex-shrink-0" style="width:36px;height:36px;">
@@ -231,21 +231,14 @@
             <i class="bi bi-box-arrow-right"></i>Cerrar sesión
           </a>
         </div>
+      </nav>
 
-      </nav><!-- /#nl-sidebar -->
-
-
-      <!-- ══════════════════════════════════════════
-           CONTENIDO PRINCIPAL
-           ══════════════════════════════════════════ -->
+      <!-- CONTENIDO PRINCIPAL -->
       <div class="col">
-
         <!-- Topbar móvil -->
         <nav class="navbar navbar-dark bg-brand-gradient d-lg-none shadow-sm px-3">
           <div class="container-fluid px-0">
-            <button class="navbar-toggler border-0" type="button"
-                    data-bs-toggle="offcanvas" data-bs-target="#sidebarMobile"
-                    aria-controls="sidebarMobile" aria-label="Menú">
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMobile">
               <span class="navbar-toggler-icon"></span>
             </button>
             <span class="navbar-brand fw-bold mb-0">NURSELOGIC</span>
@@ -253,9 +246,7 @@
         </nav>
 
         <!-- Topbar desktop -->
-        <header id="nl-topbar"
-                class="navbar navbar-dark bg-brand-gradient d-none d-lg-flex shadow-sm px-4"
-                style="min-height:62px;">
+        <header id="nl-topbar" class="navbar navbar-dark bg-brand-gradient d-none d-lg-flex shadow-sm px-4" style="min-height:62px;">
           <span class="navbar-brand fw-semibold mb-0 d-flex align-items-center gap-2">
             <i class="bi bi-grid-1x2-fill"></i>
             Dashboard &middot; <%= esAdmin ? "Panel de Administración" : "Panel de Enfermería" %>
@@ -264,19 +255,13 @@
             <span class="text-white-50 small d-flex align-items-center gap-1">
               <i class="bi bi-person-circle"></i><%= nombreSesion %>
             </span>
-            <a href="${pageContext.request.contextPath}/LogoutServlet"
-               id="btnLogoutTop"
-               class="btn btn-outline-light btn-sm d-flex align-items-center gap-1">
+            <a href="${pageContext.request.contextPath}/LogoutServlet" id="btnLogoutTop" class="btn btn-outline-light btn-sm d-flex align-items-center gap-1">
               <i class="bi bi-box-arrow-right"></i>Salir
             </a>
           </div>
         </header>
 
-
-        <!-- ══ PAGE CONTENT ══ -->
         <main class="p-4">
-
-          <%-- Alertas de error/info desde redirect --%>
           <%
             String errParam = request.getParameter("error");
             String infoMsg  = (String) request.getAttribute("infoMsg");
@@ -292,13 +277,8 @@
           </div>
           <% } %>
 
-
-          <%-- ══════════════════════════════════════
-               DASHBOARD ADMINISTRADOR
-               ══════════════════════════════════════ --%>
           <% if (esAdmin) { %>
-
-          <!-- Banner bienvenida Admin -->
+          <!-- DASHBOARD ADMINISTRADOR -->
           <div class="card border-0 text-white bg-brand-gradient shadow rounded-4 mb-4">
             <div class="card-body d-flex align-items-center gap-3 py-4 px-4">
               <i class="bi bi-shield-check flex-shrink-0" style="font-size:2.2rem;color:rgba(255,255,255,.8);"></i>
@@ -311,7 +291,6 @@
             </div>
           </div>
 
-          <!-- Page header -->
           <div class="mb-4">
             <h1 class="h4 fw-bold d-flex align-items-center gap-2">
               <i class="bi bi-speedometer2 text-success"></i>Resumen del Sistema
@@ -319,7 +298,6 @@
             <p class="text-muted small mt-1">Estado general de NURSELOGIC</p>
           </div>
 
-          <!-- Stat cards Admin -->
           <div class="row row-cols-2 row-cols-lg-4 g-3 mb-4">
             <div class="col">
               <div class="card border-0 shadow-sm h-100 rounded-3 border-start border-4 border-primary">
@@ -328,7 +306,7 @@
                     <i class="bi bi-people-fill fs-4"></i>
                   </div>
                   <div>
-                    <div class="fw-bold lh-1" style="font-size:1.9rem;">3</div>
+                    <div class="fw-bold lh-1" style="font-size:1.9rem;"><%= totalUsuarios %></div>
                     <div class="text-muted small mt-1">Usuarios Registrados</div>
                   </div>
                 </div>
@@ -343,7 +321,6 @@
                   <div>
                     <div class="fw-bold lh-1" style="font-size:1.9rem;">1</div>
                     <div class="text-muted small mt-1">Pendientes de Rol</div>
-                    <span class="badge" style="background:#fff8e1;color:#c05621;font-size:.68rem;">Requiere acción</span>
                   </div>
                 </div>
               </div>
@@ -368,60 +345,16 @@
                     <i class="bi bi-shield-check fs-4"></i>
                   </div>
                   <div>
-                    <div class="fw-bold lh-1" style="font-size:1.9rem;">2</div>
+                    <div class="fw-bold lh-1" style="font-size:1.9rem;"><%= totalUsuarios %></div>
                     <div class="text-muted small mt-1">Cuentas Activas</div>
                   </div>
                 </div>
               </div>
             </div>
-          </div><!-- /.row stats admin -->
+          </div>
 
-          <!-- Acciones rápidas Admin -->
-          <p class="small fw-bold text-uppercase text-muted mb-3 d-flex align-items-center gap-1">
-            <i class="bi bi-lightning-fill"></i>Acciones Rápidas
-          </p>
-          <div class="row row-cols-1 row-cols-lg-2 g-3">
-            <div class="col">
-              <a href="${pageContext.request.contextPath}/GestionarUsuariosServlet"
-                 id="card-gestUsuarios"
-                 class="card border rounded-3 text-decoration-none h-100 p-3 d-flex flex-column gap-3">
-                <div class="rounded-3 d-flex align-items-center justify-content-center bg-success bg-opacity-10 flex-shrink-0" style="width:46px;height:46px;">
-                  <i class="bi bi-people-fill text-success fs-5"></i>
-                </div>
-                <div>
-                  <div class="fw-bold text-dark">Gestionar Usuarios</div>
-                  <div class="text-muted small mt-1">Asignar roles, bloquear o desbloquear cuentas de acceso</div>
-                </div>
-                <div class="text-muted small d-flex align-items-center gap-1 mt-auto">
-                  <i class="bi bi-arrow-right-circle"></i>Ir al módulo
-                </div>
-              </a>
-            </div>
-            <div class="col">
-              <a href="${pageContext.request.contextPath}/GestionarCatalogoServlet"
-                 id="card-gestCatalogo"
-                 class="card border rounded-3 text-decoration-none h-100 p-3 d-flex flex-column gap-3">
-                <div class="rounded-3 d-flex align-items-center justify-content-center bg-success bg-opacity-10 flex-shrink-0" style="width:46px;height:46px;">
-                  <i class="bi bi-journal-medical text-success fs-5"></i>
-                </div>
-                <div>
-                  <div class="fw-bold text-dark">Catálogo de Medicamentos</div>
-                  <div class="text-muted small mt-1">Agregar, editar o eliminar medicamentos del sistema</div>
-                </div>
-                <div class="text-muted small d-flex align-items-center gap-1 mt-auto">
-                  <i class="bi bi-arrow-right-circle"></i>Ir al módulo
-                </div>
-              </a>
-            </div>
-          </div><!-- /.row acciones admin -->
-
-
-          <%-- ══════════════════════════════════════
-               DASHBOARD ENFERMERO
-               ══════════════════════════════════════ --%>
           <% } else { %>
-
-          <!-- Banner bienvenida Enfermero -->
+          <!-- DASHBOARD ENFERMERO -->
           <div class="card border-0 text-white bg-brand-gradient shadow rounded-4 mb-4">
             <div class="card-body d-flex align-items-center gap-3 py-4 px-4">
               <i class="bi bi-heart-pulse flex-shrink-0" style="font-size:2.2rem;color:rgba(255,255,255,.8);"></i>
@@ -434,7 +367,6 @@
             </div>
           </div>
 
-          <!-- Page header -->
           <div class="mb-4">
             <h1 class="h4 fw-bold d-flex align-items-center gap-2">
               <i class="bi bi-speedometer2 text-success"></i>Resumen de Actividad
@@ -442,7 +374,6 @@
             <p class="text-muted small mt-1">Estado actual del servicio de enfermería</p>
           </div>
 
-          <!-- Stat cards Enfermero -->
           <div class="row row-cols-2 row-cols-lg-4 g-3 mb-4">
             <div class="col">
               <div class="card border-0 shadow-sm h-100 rounded-3 border-start border-4 border-success">
@@ -451,7 +382,7 @@
                     <i class="bi bi-person-vcard-fill fs-4"></i>
                   </div>
                   <div>
-                    <div class="fw-bold lh-1" style="font-size:1.9rem;">0</div>
+                    <div class="fw-bold lh-1" style="font-size:1.9rem;"><%= totalPacientes %></div>
                     <div class="text-muted small mt-1">Pacientes Registrados</div>
                   </div>
                 </div>
@@ -496,16 +427,14 @@
                 </div>
               </div>
             </div>
-          </div><!-- /.row stats enfermero -->
+          </div>
 
-          <!-- Módulos de enfermería (7 cards) -->
           <p class="small fw-bold text-uppercase text-muted mb-3 d-flex align-items-center gap-1">
             <i class="bi bi-lightning-fill"></i>Módulos de Enfermería
           </p>
           <div class="row row-cols-2 row-cols-lg-4 g-3">
             <div class="col">
-              <a href="${pageContext.request.contextPath}/PacientesServlet" id="card-pacientes"
-                 class="card border rounded-3 text-decoration-none h-100 p-3 d-flex flex-column gap-2">
+              <a href="${pageContext.request.contextPath}/PacientesServlet" id="card-pacientes" class="card border rounded-3 text-decoration-none h-100 p-3 d-flex flex-column gap-2">
                 <div class="rounded-3 d-flex align-items-center justify-content-center bg-success bg-opacity-10 flex-shrink-0" style="width:46px;height:46px;">
                   <i class="bi bi-person-vcard-fill text-success fs-5"></i>
                 </div>
@@ -515,8 +444,7 @@
               </a>
             </div>
             <div class="col">
-              <a href="${pageContext.request.contextPath}/SignosVitalesServlet" id="card-signos"
-                 class="card border rounded-3 text-decoration-none h-100 p-3 d-flex flex-column gap-2">
+              <a href="${pageContext.request.contextPath}/SignosVitalesServlet" id="card-signos" class="card border rounded-3 text-decoration-none h-100 p-3 d-flex flex-column gap-2">
                 <div class="rounded-3 d-flex align-items-center justify-content-center bg-success bg-opacity-10 flex-shrink-0" style="width:46px;height:46px;">
                   <i class="bi bi-activity text-success fs-5"></i>
                 </div>
@@ -526,8 +454,7 @@
               </a>
             </div>
             <div class="col">
-              <a href="${pageContext.request.contextPath}/GlasgowServlet" id="card-glasgow"
-                 class="card border rounded-3 text-decoration-none h-100 p-3 d-flex flex-column gap-2">
+              <a href="${pageContext.request.contextPath}/GlasgowServlet" id="card-glasgow" class="card border rounded-3 text-decoration-none h-100 p-3 d-flex flex-column gap-2">
                 <div class="rounded-3 d-flex align-items-center justify-content-center bg-success bg-opacity-10 flex-shrink-0" style="width:46px;height:46px;">
                   <i class="bi bi-clipboard2-data-fill text-success fs-5"></i>
                 </div>
@@ -537,8 +464,7 @@
               </a>
             </div>
             <div class="col">
-              <a href="${pageContext.request.contextPath}/DosificacionServlet" id="card-dosis"
-                 class="card border rounded-3 text-decoration-none h-100 p-3 d-flex flex-column gap-2">
+              <a href="${pageContext.request.contextPath}/DosificacionServlet" id="card-dosis" class="card border rounded-3 text-decoration-none h-100 p-3 d-flex flex-column gap-2">
                 <div class="rounded-3 d-flex align-items-center justify-content-center bg-success bg-opacity-10 flex-shrink-0" style="width:46px;height:46px;">
                   <i class="bi bi-droplet-fill text-success fs-5"></i>
                 </div>
@@ -548,8 +474,7 @@
               </a>
             </div>
             <div class="col">
-              <a href="${pageContext.request.contextPath}/AdministracionServlet" id="card-admin"
-                 class="card border rounded-3 text-decoration-none h-100 p-3 d-flex flex-column gap-2">
+              <a href="${pageContext.request.contextPath}/AdministracionServlet" id="card-admin" class="card border rounded-3 text-decoration-none h-100 p-3 d-flex flex-column gap-2">
                 <div class="rounded-3 d-flex align-items-center justify-content-center bg-success bg-opacity-10 flex-shrink-0" style="width:46px;height:46px;">
                   <i class="bi bi-clipboard2-check-fill text-success fs-5"></i>
                 </div>
@@ -559,8 +484,7 @@
               </a>
             </div>
             <div class="col">
-              <a href="${pageContext.request.contextPath}/ReportesServlet" id="card-reportes"
-                 class="card border rounded-3 text-decoration-none h-100 p-3 d-flex flex-column gap-2">
+              <a href="${pageContext.request.contextPath}/ReportesServlet" id="card-reportes" class="card border rounded-3 text-decoration-none h-100 p-3 d-flex flex-column gap-2">
                 <div class="rounded-3 d-flex align-items-center justify-content-center bg-success bg-opacity-10 flex-shrink-0" style="width:46px;height:46px;">
                   <i class="bi bi-graph-up-arrow text-success fs-5"></i>
                 </div>
@@ -570,8 +494,7 @@
               </a>
             </div>
             <div class="col">
-              <a href="${pageContext.request.contextPath}/calculadora.jsp" id="card-imc"
-                 class="card border rounded-3 text-decoration-none h-100 p-3 d-flex flex-column gap-2">
+              <a href="${pageContext.request.contextPath}/calculadora.jsp" id="card-imc" class="card border rounded-3 text-decoration-none h-100 p-3 d-flex flex-column gap-2">
                 <div class="rounded-3 d-flex align-items-center justify-content-center bg-success bg-opacity-10 flex-shrink-0" style="width:46px;height:46px;">
                   <i class="bi bi-calculator-fill text-success fs-5"></i>
                 </div>
@@ -580,15 +503,14 @@
                 <div class="text-muted small d-flex align-items-center gap-1 mt-auto"><i class="bi bi-arrow-right-circle"></i>Calcular</div>
               </a>
             </div>
-          </div><!-- /.row módulos enfermero -->
-
+          </div>
           <% } %>
 
-        </main><!-- /main -->
-      </div><!-- /.col content -->
+        </main>
+      </div>
 
-    </div><!-- /.row -->
-  </div><!-- /.container-fluid -->
+    </div>
+  </div>
 
   <script src="${pageContext.request.contextPath}/js/bootstrap.bundle.min.js"></script>
 </body>

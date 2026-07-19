@@ -18,10 +18,10 @@ import java.util.Map;
  *
  * Gestiona el módulo de seguridad de acceso:
  *  ✔ Login exitoso     → crea sesión y redirige al Dashboard
+ *  ✔ Rol pendiente     → deniega el acceso indicando "Usuario Aún no asignado"
  *  ✔ Login fallido     → muestra error y cuenta intentos
  *  ✔ Bloqueo temporal  → 3 intentos fallidos → bloqueo de 5 minutos
  *  ✔ Bloqueo permanente→ cuenta deshabilitada por administrador
- *  ✔ Control de sesión → rol determinado IMPLÍCITAMENTE por las credenciales
  */
 @WebServlet("/LoginServlet")
 public class LoginServlet extends HttpServlet {
@@ -38,7 +38,7 @@ public class LoginServlet extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
 
-        // 1. Leer sólo usuario y contraseña (el rol es implícito)
+        // 1. Leer usuario y contraseña
         String nombreUsuario = request.getParameter("NombreUsuario");
         String contrasena    = request.getParameter("Contrasena");
 
@@ -51,7 +51,7 @@ public class LoginServlet extends HttpServlet {
 
         final String usuario = nombreUsuario.trim().toLowerCase();
 
-        // 3. Bloqueo temporal por intentos
+        // 3. Bloqueo temporal por intentos fallidos
         if (estaBloqueadoTemporalmente(usuario)) {
             long min = minutosRestantes(usuario);
             reenviarConError(request, response,
@@ -63,7 +63,7 @@ public class LoginServlet extends HttpServlet {
         // 4. Buscar usuario en el almacén
         Usuario u = UserStore.buscarPorUsuario(usuario);
 
-        // 5. Bloqueo permanente
+        // 5. Bloqueo permanente por administrador
         if (u != null && u.isBloqueado()) {
             reenviarConError(request, response,
                 "🚫 Su cuenta ha sido deshabilitada. Contacte al administrador del sistema.",
@@ -71,11 +71,20 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        // 6. Validar credenciales (sólo usuario + contraseña)
-        //    El ROL es tomado directamente del objeto Usuario registrado
+        // 6. Validar credenciales (usuario + contraseña)
         boolean credencialesOk = u != null && u.getContrasena().equals(contrasena);
 
         if (credencialesOk) {
+
+            // 7. VERIFICACIÓN DE ROL: Si aún no tiene rol asignado (PENDIENTE / NULO)
+            String rol = u.getRol();
+            if (estaVacio(rol) || "PENDIENTE".equalsIgnoreCase(rol.trim()) || "AUN NO ASIGNADO".equalsIgnoreCase(rol.trim())) {
+                reenviarConError(request, response,
+                    "⏳ Usuario Aún no asignado. Su cuenta está pendiente de asignación de rol por un Administrador.",
+                    "SIN_ROL");
+                return;
+            }
+
             // ═══════════════════════════════
             //   ✔ LOGIN EXITOSO
             // ═══════════════════════════════
@@ -83,7 +92,7 @@ public class LoginServlet extends HttpServlet {
 
             HttpSession session = request.getSession(true);
             session.setAttribute("usuario",        u.getNombreUsuario());
-            session.setAttribute("rol",            u.getRol());          // implícito
+            session.setAttribute("rol",            u.getRol());
             session.setAttribute("nombreCompleto", u.getNombreCompleto());
             session.setAttribute("sesionIniciada", true);
             session.setMaxInactiveInterval(30 * 60); // 30 min inactividad
