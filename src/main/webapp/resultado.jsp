@@ -1,4 +1,18 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%
+  String nombreSesion = (session != null) ? (String) session.getAttribute("nombreCompleto") : "";
+  if (nombreSesion == null) nombreSesion = (session != null) ? (String) session.getAttribute("usuario") : "";
+
+  String cedulaVal    = (String) request.getAttribute("cedula");
+  String nombreVal    = (String) request.getAttribute("nombre");
+  Object pesoVal      = request.getAttribute("peso");
+  Object alturaVal    = request.getAttribute("altura");
+  Object imcVal       = request.getAttribute("imc");
+  String categoriaVal = (String) request.getAttribute("categoria");
+
+  if (cedulaVal == null) cedulaVal = request.getParameter("cedula");
+  if (nombreVal == null) nombreVal = request.getParameter("nombre");
+%>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -79,7 +93,7 @@
       </nav>
 
       <!-- CONTENIDO PRINCIPAL -->
-      <div class="col">
+      <div class="col nl-main-col">
         <!-- Topbar móvil -->
         <nav class="navbar navbar-dark bg-brand-gradient d-lg-none shadow-sm px-3">
           <div class="container-fluid px-0">
@@ -96,43 +110,95 @@
             <i class="bi bi-house-fill"></i><span>/</span><span>Herramientas</span><span>/</span>
             <span class="text-white fw-semibold">Resultado IMC</span>
           </div>
-          <a href="${pageContext.request.contextPath}/calculadora.jsp" class="btn btn-outline-light btn-sm ms-auto d-flex align-items-center gap-1">
-            <i class="bi bi-arrow-left"></i>Volver
-          </a>
+          <div class="ms-auto d-flex align-items-center gap-2">
+            <% if (cedulaVal != null && !cedulaVal.trim().isEmpty()) { %>
+              <a href="${pageContext.request.contextPath}/PanelPacienteServlet?cedula=<%= cedulaVal.trim() %>" class="btn btn-outline-light btn-sm d-flex align-items-center gap-1">
+                <i class="bi bi-arrow-left"></i> Volver al Panel del Paciente
+              </a>
+            <% } else { %>
+              <a href="${pageContext.request.contextPath}/calculadora.jsp" class="btn btn-outline-light btn-sm d-flex align-items-center gap-1">
+                <i class="bi bi-arrow-left"></i> Volver
+              </a>
+            <% } %>
+          </div>
         </header>
 
         <main class="p-4">
+          <!-- BOTÓN VOLVER PROMINENTE AL PANEL DEL PACIENTE -->
+          <div class="d-flex align-items-center justify-content-between mb-4 mx-auto" style="max-width:520px;">
+            <div>
+              <h1 class="h4 fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                <i class="bi bi-clipboard2-check-fill text-success"></i> Resultado IMC
+              </h1>
+              <p class="text-muted small mb-0">Evaluación calculada con éxito</p>
+            </div>
+            <% if (cedulaVal != null && !cedulaVal.trim().isEmpty()) { %>
+              <a href="${pageContext.request.contextPath}/PanelPacienteServlet?cedula=<%= cedulaVal.trim() %>" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1">
+                <i class="bi bi-arrow-left-circle"></i> Volver al Panel
+              </a>
+            <% } else { %>
+              <a href="${pageContext.request.contextPath}/calculadora.jsp" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1">
+                <i class="bi bi-arrow-left-circle"></i> Volver
+              </a>
+            <% } %>
+          </div>
+
           <div class="card border-0 shadow-sm rounded-4 mx-auto overflow-hidden" style="max-width:520px;">
             <div class="card-header bg-brand-gradient text-white p-4 text-center border-0">
               <i class="bi bi-clipboard2-data-fill fs-1 text-white d-block mb-2"></i>
-              <h1 class="h5 fw-bold mb-0 text-white">Resultado del Cálculo IMC</h1>
+              <h2 class="h5 fw-bold mb-0 text-white">Resultado del Cálculo IMC</h2>
             </div>
             <div class="card-body p-4">
               <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                 <span class="small fw-semibold text-uppercase text-muted">Paciente</span>
-                <span class="fw-semibold text-dark"><%= request.getAttribute("nombre") %></span>
+                <span class="fw-semibold text-dark"><%= nombreVal != null ? nombreVal : "Sin nombre" %></span>
               </div>
               <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                 <span class="small fw-semibold text-uppercase text-muted">Peso</span>
-                <span class="fw-semibold text-dark"><%= request.getAttribute("peso") %> kg</span>
+                <span class="fw-semibold text-dark"><%= pesoVal %> kg</span>
               </div>
               <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                 <span class="small fw-semibold text-uppercase text-muted">Altura</span>
-                <span class="fw-semibold text-dark"><%= request.getAttribute("altura") %> m</span>
+                <span class="fw-semibold text-dark"><%= alturaVal %> m</span>
               </div>
               <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                 <span class="small fw-semibold text-uppercase text-muted">IMC Calculado</span>
-                <span class="fw-bold text-success fs-5"><%= request.getAttribute("imc") %></span>
+                <span class="fw-bold text-success fs-5"><%= imcVal %> kg/m²</span>
               </div>
               <div class="d-flex justify-content-between align-items-center py-2 border-bottom mb-4">
                 <span class="small fw-semibold text-uppercase text-muted">Clasificación</span>
-                <span class="nl-categoria-badge <%= request.getAttribute("categoria") != null ? request.getAttribute("categoria").toString().toLowerCase().replace(" ", "-") : "" %>">
-                  <%= request.getAttribute("categoria") %>
+                <span class="badge <%= "Bajo peso".equalsIgnoreCase(categoriaVal) ? "bg-warning text-dark" : "Peso normal".equalsIgnoreCase(categoriaVal) ? "bg-success" : "bg-danger" %> px-3 py-2 rounded-pill">
+                  <%= categoriaVal %>
                 </span>
               </div>
-              <a href="${pageContext.request.contextPath}/calculadora.jsp" class="btn btn-success w-100 py-3 fw-semibold d-flex align-items-center justify-content-center gap-2">
-                <i class="bi bi-arrow-left-circle"></i> Calcular otro IMC
-              </a>
+
+              <!-- BOTONES DE ACCIÓN: GUARDAR EN FICHA O VOLVER -->
+              <div class="d-flex flex-column gap-2">
+                <% if (cedulaVal != null && !cedulaVal.trim().isEmpty()) { %>
+                  <form action="${pageContext.request.contextPath}/calcular" method="POST">
+                    <input type="hidden" name="accion" value="guardar"/>
+                    <input type="hidden" name="cedula" value="<%= cedulaVal.trim() %>"/>
+                    <input type="hidden" name="nombre" value="<%= nombreVal %>"/>
+                    <input type="hidden" name="imc" value="<%= imcVal %>"/>
+                    <input type="hidden" name="categoria" value="<%= categoriaVal %>"/>
+                    <input type="hidden" name="peso" value="<%= pesoVal %>"/>
+                    <input type="hidden" name="altura" value="<%= alturaVal %>"/>
+
+                    <button type="submit" class="btn btn-success w-100 py-3 fw-semibold d-flex align-items-center justify-content-center gap-2 shadow-sm">
+                      <i class="bi bi-floppy-fill fs-5"></i> Guardar en Ficha Clínica del Paciente
+                    </button>
+                  </form>
+
+                  <a href="${pageContext.request.contextPath}/PanelPacienteServlet?cedula=<%= cedulaVal.trim() %>" class="btn btn-outline-secondary w-100 py-2.5 fw-semibold d-flex align-items-center justify-content-center gap-2">
+                    <i class="bi bi-arrow-left-circle"></i> Volver al Panel del Paciente
+                  </a>
+                <% } else { %>
+                  <a href="${pageContext.request.contextPath}/calculadora.jsp" class="btn btn-success w-100 py-3 fw-semibold d-flex align-items-center justify-content-center gap-2">
+                    <i class="bi bi-arrow-left-circle"></i> Calcular otro IMC
+                  </a>
+                <% } %>
+              </div>
+
             </div>
           </div>
         </main>

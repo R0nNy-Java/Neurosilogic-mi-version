@@ -15,15 +15,19 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * NURSELOGIC – RegistroPacienteServlet
  *
- * Procesa el formulario de Apertura de Ficha Clínica (registro_paciente.jsp)
- * y persiste el paciente y sus antecedentes directamente en MySQL usando JPA (PacienteDAO).
+ * Procesa el formulario de Apertura de Ficha Clínica (registro_paciente.jsp).
+ * Soporta creación y actualización (edición por Cédula) evitando duplicación de pacientes.
+ * Al guardar exitosamente, redirige directamente al Panel Individual del Paciente.
  */
 @WebServlet("/RegistroPacienteServlet")
 public class RegistroPacienteServlet extends HttpServlet {
+
+    private final PacienteDAO pacienteDAO = new PacienteDAO();
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -51,19 +55,29 @@ public class RegistroPacienteServlet extends HttpServlet {
         String alergias             = request.getParameter("Alergias");
         String dispositivosMedicos  = request.getParameter("DispositivosMedicos");
 
+        // Preservar valores ingresados en el request en caso de error de validación
+        request.setAttribute("paramNombres", nombres);
+        request.setAttribute("paramApellidos", apellidos);
+        request.setAttribute("paramCedula", cedula);
+        request.setAttribute("paramEdad", edadStr);
+        request.setAttribute("paramSexo", sexo);
+        request.setAttribute("paramGlicemia", glicemiaStr);
+        request.setAttribute("paramOtrosTexto", otrosTexto);
+        request.setAttribute("paramSintomas", sintomasActuales);
+        request.setAttribute("paramAlergias", alergias);
+        request.setAttribute("paramDispositivos", dispositivosMedicos);
+
         // 2. Validar campos demográficos obligatorios
         if (estaVacio(nombres) || estaVacio(apellidos) || estaVacio(cedula)
                 || estaVacio(edadStr) || estaVacio(sexo)) {
-            request.setAttribute("errorMsg",
-                "⚠ Los campos Nombres, Apellidos, Cédula, Edad y Sexo son obligatorios.");
+            request.setAttribute("errorMsg", "⚠ Los campos Nombres, Apellidos, Cédula, Edad y Sexo son obligatorios.");
             request.getRequestDispatcher("/registro_paciente.jsp").forward(request, response);
             return;
         }
 
         // 3. Validar cédula (10 dígitos numéricos)
         if (!cedula.trim().matches("\\d{10}")) {
-            request.setAttribute("errorMsg",
-                "⚠ La cédula debe contener exactamente 10 dígitos numéricos.");
+            request.setAttribute("errorMsg", "⚠ La cédula debe contener exactamente 10 dígitos numéricos.");
             request.getRequestDispatcher("/registro_paciente.jsp").forward(request, response);
             return;
         }
@@ -73,8 +87,7 @@ public class RegistroPacienteServlet extends HttpServlet {
         try {
             edad = Integer.parseInt(edadStr.trim());
             if (edad < 19 || edad > 60) {
-                request.setAttribute("errorMsg",
-                    "⚠ La edad debe estar entre 19 y 60 años.");
+                request.setAttribute("errorMsg", "⚠ La edad debe estar entre 19 y 60 años.");
                 request.getRequestDispatcher("/registro_paciente.jsp").forward(request, response);
                 return;
             }
@@ -85,23 +98,38 @@ public class RegistroPacienteServlet extends HttpServlet {
         }
 
         try {
-            // 5. Persistir en la base de datos MySQL mediante PacienteDAO
-            Paciente paciente = new Paciente(
-                nombres.trim(),
-                apellidos.trim(),
-                cedula.trim(),
-                edad,
-                sexo.trim(),
-                sintomasActuales != null ? sintomasActuales.trim() : "",
-                alergias != null ? alergias.trim() : "",
-                dispositivosMedicos != null ? dispositivosMedicos.trim() : "",
-                "A"
-            );
+            // 5. Verificar si el paciente ya existe por Cédula (Reusar / Actualizar si ya existe)
+            String cedulaLimpia = cedula.trim();
+            Paciente pacienteExistente = pacienteDAO.buscarPorCedula(cedulaLimpia);
 
-            PacienteDAO pacienteDAO = new PacienteDAO();
-            pacienteDAO.guardar(paciente);
+            if (pacienteExistente != null) {
+                // Actualizar paciente existente
+                pacienteExistente.setNombres(nombres.trim());
+                pacienteExistente.setApellidos(apellidos.trim());
+                pacienteExistente.setEdad(edad);
+                pacienteExistente.setSexo(sexo.trim());
+                pacienteExistente.setSintomasActuales(sintomasActuales != null ? sintomasActuales.trim() : "");
+                pacienteExistente.setAlergias(alergias != null ? alergias.trim() : "");
+                pacienteExistente.setDispositivosMedicos(dispositivosMedicos != null ? dispositivosMedicos.trim() : "");
+                pacienteDAO.actualizar(pacienteExistente);
+            } else {
+                // Crear nuevo paciente
+                Paciente pacienteNuevo = new Paciente(
+                    nombres.trim(),
+                    apellidos.trim(),
+                    cedulaLimpia,
+                    edad,
+                    sexo.trim(),
+                    sintomasActuales != null ? sintomasActuales.trim() : "",
+                    alergias != null ? alergias.trim() : "",
+                    dispositivosMedicos != null ? dispositivosMedicos.trim() : "",
+                    "A"
+                );
+                pacienteDAO.guardar(pacienteNuevo);
+                pacienteExistente = pacienteNuevo;
+            }
 
-            // 6. Guardar antecedentes clínicos asociados
+            // 6. Guardar / actualizar antecedentes clínicos
             if (antecedentes != null && antecedentes.length > 0) {
                 EntityManager em = JPAUtil.getEntityManager();
                 EntityTransaction tx = em.getTransaction();
@@ -114,7 +142,7 @@ public class RegistroPacienteServlet extends HttpServlet {
                         } else if ("OTROS".equalsIgnoreCase(ant) && !estaVacio(otrosTexto)) {
                             detalle = "OTROS: " + otrosTexto.trim();
                         }
-                        Antecedente a = new Antecedente(paciente, detalle, LocalDateTime.now());
+                        Antecedente a = new Antecedente(pacienteExistente, detalle, LocalDateTime.now());
                         em.persist(a);
                     }
                     tx.commit();
@@ -126,31 +154,43 @@ public class RegistroPacienteServlet extends HttpServlet {
                 }
             }
 
-            // 7. Preparar respuesta exitosa
-            request.setAttribute("nombrePaciente", nombres.trim() + " " + apellidos.trim());
-            request.setAttribute("cedula", cedula.trim());
-            request.setAttribute("registroExitoso", true);
-            request.setAttribute("successMsg",
-                "✔ Ficha clínica registrada en la Base de Datos correctamente para: "
-                + nombres.trim() + " " + apellidos.trim());
+            // 7. Redirigir directamente al Panel Individual del Paciente
+            response.sendRedirect(request.getContextPath() + "/PanelPacienteServlet?cedula=" + cedulaLimpia);
+            return;
 
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("errorMsg",
-                "❌ Error al guardar en la Base de Datos: " + e.getMessage());
+            request.setAttribute("errorMsg", "❌ Error al guardar en la Base de Datos: " + e.getMessage());
+            request.getRequestDispatcher("/registro_paciente.jsp").forward(request, response);
         }
-
-        request.getRequestDispatcher("/registro_paciente.jsp").forward(request, response);
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("usuario") == null) {
             response.sendRedirect(request.getContextPath() + "/login.jsp");
             return;
         }
+
+        // Si viene un parámetro 'cedula' en GET, prellenar datos para edición
+        String cedula = request.getParameter("cedula");
+        if (cedula != null && !cedula.trim().isEmpty()) {
+            Paciente p = pacienteDAO.buscarPorCedula(cedula.trim());
+            if (p != null) {
+                request.setAttribute("paramNombres", p.getNombres());
+                request.setAttribute("paramApellidos", p.getApellidos());
+                request.setAttribute("paramCedula", p.getCedula());
+                request.setAttribute("paramEdad", String.valueOf(p.getEdad()));
+                request.setAttribute("paramSexo", p.getSexo());
+                request.setAttribute("paramSintomas", p.getSintomasActuales());
+                request.setAttribute("paramAlergias", p.getAlergias());
+                request.setAttribute("paramDispositivos", p.getDispositivosMedicos());
+            }
+        }
+
         request.getRequestDispatcher("/registro_paciente.jsp").forward(request, response);
     }
 

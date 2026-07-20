@@ -1,22 +1,22 @@
 package com.rrparedes.dao;
 
 import com.rrparedes.config.JPAUtil;
-import com.rrparedes.model.Usuario;
+import com.rrparedes.model.Medicamento;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import java.util.List;
 
-public class UsuarioDAO {
+public class MedicamentoDAO {
 
-    public void guardar(Usuario usuario) {
+    public void guardar(Medicamento medicamento) {
         EntityManager em = JPAUtil.getEntityManager();
         EntityTransaction tx = em.getTransaction();
         try {
             tx.begin();
-            if (usuario.getIdUsuario() == null) {
-                em.persist(usuario);
+            if (medicamento.getIdMedicamento() == null) {
+                em.persist(medicamento);
             } else {
-                em.merge(usuario);
+                em.merge(medicamento);
             }
             tx.commit();
         } catch (Exception e) {
@@ -28,8 +28,8 @@ public class UsuarioDAO {
         }
     }
 
-    public void actualizar(Usuario usuario) {
-        guardar(usuario);
+    public void actualizar(Medicamento medicamento) {
+        guardar(medicamento);
     }
 
     public void eliminar(Long id) {
@@ -37,9 +37,9 @@ public class UsuarioDAO {
         EntityTransaction tx = em.getTransaction();
         try {
             tx.begin();
-            Usuario u = em.find(Usuario.class, id);
-            if (u != null) {
-                em.remove(u);
+            Medicamento m = em.find(Medicamento.class, id);
+            if (m != null) {
+                em.remove(m);
             }
             tx.commit();
         } catch (Exception e) {
@@ -51,33 +51,20 @@ public class UsuarioDAO {
         }
     }
 
-    public Usuario buscarPorId(Long id) {
+    public Medicamento buscarPorId(Long id) {
         EntityManager em = JPAUtil.getEntityManager();
         try {
-            return em.find(Usuario.class, id);
+            return em.find(Medicamento.class, id);
         } finally {
             em.close();
         }
     }
 
-    public Usuario buscarPorNombreUsuario(String nombreUsuario) {
-        if (nombreUsuario == null) return null;
+    public List<Medicamento> listarTodos() {
         EntityManager em = JPAUtil.getEntityManager();
         try {
-            List<Usuario> resultados = em.createQuery(
-                "SELECT u FROM Usuario u WHERE LOWER(u.nombreUsuario) = :nombreUsuario", Usuario.class)
-                .setParameter("nombreUsuario", nombreUsuario.trim().toLowerCase())
-                .getResultList();
-            return resultados.isEmpty() ? null : resultados.get(0);
-        } finally {
-            em.close();
-        }
-    }
-
-    public List<Usuario> listarTodos() {
-        EntityManager em = JPAUtil.getEntityManager();
-        try {
-            return em.createQuery("SELECT u FROM Usuario u ORDER BY u.nombreUsuario ASC", Usuario.class).getResultList();
+            return em.createQuery("SELECT m FROM Medicamento m ORDER BY m.nombreMedicamento ASC", Medicamento.class)
+                    .getResultList();
         } finally {
             em.close();
         }
