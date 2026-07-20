@@ -1,7 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="com.rrparedes.model.Medicamento, java.util.List" %>
 <%
   String nombreSesion = (session != null) ? (String) session.getAttribute("nombreCompleto") : "";
   if (nombreSesion == null) nombreSesion = (session != null) ? (String) session.getAttribute("usuario") : "";
+
+  List<Medicamento> listaMedicamentos = (List<Medicamento>) request.getAttribute("listaMedicamentos");
 %>
 <!DOCTYPE html>
 <html lang="es">
@@ -138,7 +141,7 @@
             <h1 class="h4 fw-bold d-flex align-items-center gap-2">
               <i class="bi bi-journal-medical text-success"></i>Catálogo de Medicamentos
             </h1>
-            <p class="text-muted small mt-1">Administre los medicamentos disponibles en el sistema NURSELOGIC</p>
+            <p class="text-muted small mt-1">Administre los medicamentos disponibles en el sistema NURSELOGIC (Persistido en MySQL)</p>
           </div>
 
           <%-- Mensajes del servlet --%>
@@ -147,169 +150,130 @@
             String errorMsg   = (String) request.getAttribute("errorMsg");
             if (successMsg != null && !successMsg.isEmpty()) {
           %>
-          <div class="alert alert-success d-flex align-items-center gap-2 py-2 small" role="alert">
-            <i class="bi bi-check-circle-fill flex-shrink-0"></i><%= successMsg %>
+          <div class="alert alert-success d-flex align-items-center gap-2 py-2 small mb-4" role="alert">
+            <i class="bi bi-check-circle-fill flex-shrink-0"></i><strong><%= successMsg %></strong>
           </div>
           <% } %>
           <% if (errorMsg != null && !errorMsg.isEmpty()) { %>
-          <div class="alert alert-danger d-flex align-items-center gap-2 py-2 small" role="alert">
-            <i class="bi bi-exclamation-circle-fill flex-shrink-0"></i><%= errorMsg %>
+          <div class="alert alert-danger d-flex align-items-center gap-2 py-2 small mb-4" role="alert">
+            <i class="bi bi-exclamation-circle-fill flex-shrink-0"></i><strong><%= errorMsg %></strong>
           </div>
           <% } %>
 
-          <div class="nl-grid-2col">
+          <div class="row g-4">
             <!-- TABLA DE MEDICAMENTOS -->
-            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-              <div class="card-header bg-brand-gradient text-white p-3 border-0">
-                <div class="fw-bold"><i class="bi bi-table me-2"></i>Medicamentos Registrados</div>
-                <div class="text-white-50 small">Catálogo actual del sistema</div>
-              </div>
-              <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0" id="tablaCatalogo">
-                  <thead class="table-light">
-                    <tr>
-                      <th class="small fw-bold text-uppercase text-muted">Código</th>
-                      <th class="small fw-bold text-uppercase text-muted">Medicamento</th>
-                      <th class="small fw-bold text-uppercase text-muted">Descripción</th>
-                      <th class="small fw-bold text-uppercase text-muted">Unidad</th>
-                      <th class="small fw-bold text-uppercase text-muted">Stock</th>
-                      <th class="small fw-bold text-uppercase text-muted">Acción</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr id="row-med-001">
-                      <td><code>MED-001</code></td>
-                      <td><strong>Paracetamol 500mg</strong></td>
-                      <td>Analgésico y antipirético</td>
-                      <td>Comprimido</td>
-                      <td><span class="badge-stock stock-ok">120 uds</span></td>
-                      <td>
-                        <form action="${pageContext.request.contextPath}/GestionarCatalogoServlet" method="POST" class="d-inline" id="formDel-001">
-                          <input type="hidden" name="accion" value="eliminar"/>
-                          <input type="hidden" name="Codigo" value="MED-001"/>
-                          <button type="submit" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1" id="btnDel-001" onclick="return confirm('¿Eliminar Paracetamol 500mg del catálogo?')">
-                            <i class="bi bi-trash3-fill"></i> Eliminar
-                          </button>
-                        </form>
-                      </td>
-                    </tr>
-                    <tr id="row-med-002">
-                      <td><code>MED-002</code></td>
-                      <td><strong>Ibuprofeno 400mg</strong></td>
-                      <td>Antiinflamatorio no esteroideo</td>
-                      <td>Comprimido</td>
-                      <td><span class="badge-stock stock-ok">85 uds</span></td>
-                      <td>
-                        <form action="${pageContext.request.contextPath}/GestionarCatalogoServlet" method="POST" class="d-inline" id="formDel-002">
-                          <input type="hidden" name="accion" value="eliminar"/>
-                          <input type="hidden" name="Codigo" value="MED-002"/>
-                          <button type="submit" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1" id="btnDel-002" onclick="return confirm('¿Eliminar Ibuprofeno 400mg del catálogo?')">
-                            <i class="bi bi-trash3-fill"></i> Eliminar
-                          </button>
-                        </form>
-                      </td>
-                    </tr>
-                    <tr id="row-med-003">
-                      <td><code>MED-003</code></td>
-                      <td><strong>Amoxicilina 500mg</strong></td>
-                      <td>Antibiótico de amplio espectro</td>
-                      <td>Cápsula</td>
-                      <td><span class="badge-stock stock-low">18 uds</span></td>
-                      <td>
-                        <form action="${pageContext.request.contextPath}/GestionarCatalogoServlet" method="POST" class="d-inline" id="formDel-003">
-                          <input type="hidden" name="accion" value="eliminar"/>
-                          <input type="hidden" name="Codigo" value="MED-003"/>
-                          <button type="submit" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1" id="btnDel-003" onclick="return confirm('¿Eliminar Amoxicilina del catálogo?')">
-                            <i class="bi bi-trash3-fill"></i> Eliminar
-                          </button>
-                        </form>
-                      </td>
-                    </tr>
-                    <tr id="row-med-004">
-                      <td><code>MED-004</code></td>
-                      <td><strong>Suero Fisiológico 0.9%</strong></td>
-                      <td>Solución isotónica para uso IV</td>
-                      <td>Frasco 500ml</td>
-                      <td><span class="badge-stock stock-ok">44 uds</span></td>
-                      <td>
-                        <form action="${pageContext.request.contextPath}/GestionarCatalogoServlet" method="POST" class="d-inline" id="formDel-004">
-                          <input type="hidden" name="accion" value="eliminar"/>
-                          <input type="hidden" name="Codigo" value="MED-004"/>
-                          <button type="submit" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1" id="btnDel-004" onclick="return confirm('¿Eliminar Suero Fisiológico del catálogo?')">
-                            <i class="bi bi-trash3-fill"></i> Eliminar
-                          </button>
-                        </form>
-                      </td>
-                    </tr>
-                    <tr id="row-med-005">
-                      <td><code>MED-005</code></td>
-                      <td><strong>Metformina 850mg</strong></td>
-                      <td>Antidiabético oral (biguanida)</td>
-                      <td>Comprimido</td>
-                      <td><span class="badge-stock stock-out">0 uds</span></td>
-                      <td>
-                        <form action="${pageContext.request.contextPath}/GestionarCatalogoServlet" method="POST" class="d-inline" id="formDel-005">
-                          <input type="hidden" name="accion" value="eliminar"/>
-                          <input type="hidden" name="Codigo" value="MED-005"/>
-                          <button type="submit" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1" id="btnDel-005" onclick="return confirm('¿Eliminar Metformina del catálogo?')">
-                            <i class="bi bi-trash3-fill"></i> Eliminar
-                          </button>
-                        </form>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+            <div class="col-lg-7">
+              <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
+                <div class="card-header bg-brand-gradient text-white p-4 border-0 d-flex align-items-center justify-content-between">
+                  <div class="fw-bold fs-6"><i class="bi bi-table me-2"></i>Medicamentos en Base de Datos</div>
+                  <span class="badge bg-white bg-opacity-25 text-white px-3 py-2">Total: <%= listaMedicamentos != null ? listaMedicamentos.size() : 0 %></span>
+                </div>
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-muted small text-uppercase" style="letter-spacing:.6px;">
+                      <tr>
+                        <th class="ps-4">ID</th>
+                        <th>Nombre</th>
+                        <th>Concentración</th>
+                        <th>Presentación</th>
+                        <th class="pe-4 text-end">Acción</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <%
+                        if (listaMedicamentos != null && !listaMedicamentos.isEmpty()) {
+                            for (Medicamento m : listaMedicamentos) {
+                      %>
+                      <tr>
+                        <td class="ps-4"><code>MED-00<%= m.getIdMedicamento() %></code></td>
+                        <td><strong><%= m.getNombreMedicamento() %></strong></td>
+                        <td><%= m.getConcentracion() %> <%= m.getUnidadConcentracion() %></td>
+                        <td><%= m.getPresentacionCompleta() != null ? m.getPresentacionCompleta() : "—" %></td>
+                        <td class="pe-4 text-end">
+                          <form action="${pageContext.request.contextPath}/GestionarCatalogoServlet" method="POST" class="d-inline">
+                            <input type="hidden" name="accion" value="eliminar"/>
+                            <input type="hidden" name="idMedicamento" value="<%= m.getIdMedicamento() %>"/>
+                            <button type="submit" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1" onclick="return confirm('¿Eliminar <%= m.getNombreMedicamento() %> del catálogo?')">
+                              <i class="bi bi-trash3-fill"></i> Eliminar
+                            </button>
+                          </form>
+                        </td>
+                      </tr>
+                      <%    }
+                        } else { %>
+                      <tr>
+                        <td colspan="5" class="text-center py-5 text-muted">
+                          <i class="bi bi-journal-x fs-1 d-block mb-2 text-secondary"></i>
+                          No hay medicamentos registrados en el catálogo.
+                        </td>
+                      </tr>
+                      <% } %>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
 
-            <!-- FORMULARIO AGREGAR MEDICAMENTO -->
-            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-              <div class="card-header bg-brand-gradient text-white p-3 border-0">
-                <div class="fw-bold"><i class="bi bi-plus-circle-fill me-2"></i>Agregar Medicamento</div>
-                <div class="text-white-50 small">Complete los datos del nuevo medicamento</div>
-              </div>
-              <div class="card-body p-4">
-                <form id="formAgregarMed" action="${pageContext.request.contextPath}/GestionarCatalogoServlet" method="POST" novalidate>
-                  <input type="hidden" name="accion" value="agregar"/>
+            <!-- FORMULARIO DE AGREGAR MEDICAMENTO -->
+            <div class="col-lg-5">
+              <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-brand-gradient text-white p-4 border-0">
+                  <div class="fw-bold fs-6"><i class="bi bi-plus-circle-fill me-2"></i>Agregar Medicamento</div>
+                  <div class="text-white-50 small">Registrar nuevo fármaco en MySQL</div>
+                </div>
+                <div class="card-body p-4">
+                  <form action="${pageContext.request.contextPath}/GestionarCatalogoServlet" method="POST" novalidate>
+                    <input type="hidden" name="accion" value="agregar"/>
 
-                  <div class="mb-3">
-                    <label class="form-label small fw-semibold text-uppercase text-muted" for="Codigo">Código *</label>
-                    <input type="text" id="Codigo" name="Codigo" class="form-control" placeholder="Ej: MED-006" maxlength="20" required/>
-                  </div>
+                    <div class="mb-3">
+                      <label class="form-label small fw-semibold text-uppercase text-muted" for="NombreMedicamento">Nombre del Medicamento *</label>
+                      <input type="text" id="NombreMedicamento" name="NombreMedicamento" class="form-control py-2" placeholder="Ej: Paracetamol" required/>
+                    </div>
 
-                  <div class="mb-3">
-                    <label class="form-label small fw-semibold text-uppercase text-muted" for="NombreMedicamento">Nombre del Medicamento *</label>
-                    <input type="text" id="NombreMedicamento" name="NombreMedicamento" class="form-control" placeholder="Ej: Atorvastatina 20mg" required/>
-                  </div>
+                    <div class="row g-2 mb-3">
+                      <div class="col-8">
+                        <label class="form-label small fw-semibold text-uppercase text-muted" for="Concentracion">Concentración *</label>
+                        <input type="number" id="Concentracion" name="Concentracion" class="form-control py-2" placeholder="Ej: 500" step="0.01" required/>
+                      </div>
+                      <div class="col-4">
+                        <label class="form-label small fw-semibold text-uppercase text-muted" for="UnidadConcentracion">Unidad</label>
+                        <select id="UnidadConcentracion" name="UnidadConcentracion" class="form-select py-2">
+                          <option value="mg" selected>mg</option>
+                          <option value="g">g</option>
+                          <option value="mcg">mcg</option>
+                          <option value="UI">UI</option>
+                          <option value="%">%</option>
+                        </select>
+                      </div>
+                    </div>
 
-                  <div class="mb-3">
-                    <label class="form-label small fw-semibold text-uppercase text-muted" for="Descripcion">Descripción</label>
-                    <input type="text" id="Descripcion" name="Descripcion" class="form-control" placeholder="Uso o categoría del medicamento"/>
-                  </div>
+                    <div class="row g-2 mb-3">
+                      <div class="col-8">
+                        <label class="form-label small fw-semibold text-uppercase text-muted" for="VolumenPresentacion">Volumen / Presentación</label>
+                        <input type="number" id="VolumenPresentacion" name="VolumenPresentacion" class="form-control py-2" placeholder="Ej: 1 o 500" step="0.01"/>
+                      </div>
+                      <div class="col-4">
+                        <label class="form-label small fw-semibold text-uppercase text-muted" for="UnidadVolumen">Unidad</label>
+                        <select id="UnidadVolumen" name="UnidadVolumen" class="form-select py-2">
+                          <option value="tab">tab</option>
+                          <option value="cap">cap</option>
+                          <option value="mL" selected>mL</option>
+                          <option value="L">L</option>
+                          <option value="amp">amp</option>
+                        </select>
+                      </div>
+                    </div>
 
-                  <div class="mb-3">
-                    <label class="form-label small fw-semibold text-uppercase text-muted" for="Unidad">Presentación / Unidad *</label>
-                    <select id="Unidad" name="Unidad" class="form-select" required>
-                      <option value="" disabled selected>-- Seleccione --</option>
-                      <option value="Comprimido">Comprimido</option>
-                      <option value="Cápsula">Cápsula</option>
-                      <option value="Frasco">Frasco</option>
-                      <option value="Ampolla">Ampolla</option>
-                      <option value="Sobre">Sobre</option>
-                      <option value="Jarabe">Jarabe (ml)</option>
-                      <option value="Parche">Parche</option>
-                    </select>
-                  </div>
+                    <div class="mb-4">
+                      <label class="form-label small fw-semibold text-uppercase text-muted" for="PresentacionCompleta">Presentación Completa</label>
+                      <input type="text" id="PresentacionCompleta" name="PresentacionCompleta" class="form-control py-2" placeholder="Ej: Paracetamol 500mg Comprimido"/>
+                    </div>
 
-                  <div class="mb-4">
-                    <label class="form-label small fw-semibold text-uppercase text-muted" for="Stock">Stock Inicial</label>
-                    <input type="number" id="Stock" name="Stock" class="form-control" placeholder="0" min="0" value="0"/>
-                  </div>
-
-                  <button type="submit" id="btnAgregarMed" class="btn btn-success w-100 py-3 fw-semibold d-flex align-items-center justify-content-center gap-2">
-                    <i class="bi bi-plus-circle-fill"></i> Agregar al Catálogo
-                  </button>
-                </form>
+                    <button type="submit" class="btn btn-success w-100 py-3 fw-semibold d-flex align-items-center justify-content-center gap-2">
+                      <i class="bi bi-plus-lg"></i> Guardar Medicamento
+                    </button>
+                  </form>
+                </div>
               </div>
             </div>
           </div>

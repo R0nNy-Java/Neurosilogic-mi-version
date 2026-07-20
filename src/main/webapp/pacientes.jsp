@@ -103,7 +103,7 @@
       </nav>
 
       <!-- CONTENIDO PRINCIPAL -->
-      <div class="col">
+      <div class="col nl-main-col">
         <!-- Topbar móvil -->
         <nav class="navbar navbar-dark bg-brand-gradient d-lg-none shadow-sm px-3">
           <div class="container-fluid px-0">
@@ -190,12 +190,12 @@
                       <td><code><%= p.getCedula() %></code></td>
                       <td><strong><%= p.getNombres() + " " + p.getApellidos() %></strong></td>
                       <td><%= p.getEdad() %> años (<%= "M".equalsIgnoreCase(p.getSexo()) ? "Masculino" : "Femenino" %>)</td>
-                      <td class="small text-muted" style="max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                      <td class="small text-muted" style="max-width:180px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
                         <%= (p.getSintomasActuales() != null && !p.getSintomasActuales().isEmpty()) ? p.getSintomasActuales() : "Sin observaciones" %>
                       </td>
-                      <td>
+                      <td style="max-width:180px;">
                         <% if (p.getAlergias() != null && !p.getAlergias().trim().isEmpty()) { %>
-                          <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2 py-1"><i class="bi bi-exclamation-triangle-fill me-1"></i><%= p.getAlergias() %></span>
+                          <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2 py-1 text-truncate d-inline-block" style="max-width:170px;" title="<%= p.getAlergias() %>"><i class="bi bi-exclamation-triangle-fill me-1"></i><%= p.getAlergias() %></span>
                         <% } else { %>
                           <span class="badge bg-secondary bg-opacity-10 text-muted px-2 py-1">Ninguna</span>
                         <% } %>
@@ -203,10 +203,15 @@
                       <td>
                         <span class="badge bg-success px-3 py-2 rounded-pill">Activo</span>
                       </td>
-                      <td class="pe-4 text-end">
-                        <button type="button" class="btn btn-sm btn-outline-info me-1" onclick="verDetalles('<%= p.getNombres() + " " + p.getApellidos() %>', '<%= p.getCedula() %>', '<%= p.getEdad() %>', '<%= p.getSexo() %>', '<%= p.getSintomasActuales() != null ? p.getSintomasActuales().replace("'", "\\'") : "" %>', '<%= p.getAlergias() != null ? p.getAlergias().replace("'", "\\'") : "" %>', '<%= p.getDispositivosMedicos() != null ? p.getDispositivosMedicos().replace("'", "\\'") : "" %>')">
-                          <i class="bi bi-eye-fill"></i> Ver Ficha
-                        </button>
+                      <td class="pe-4 text-end text-nowrap">
+                        <div class="d-inline-flex align-items-center gap-2">
+                          <a href="${pageContext.request.contextPath}/PanelPacienteServlet?cedula=<%= p.getCedula() %>" class="btn btn-sm btn-success d-inline-flex align-items-center gap-1 py-1 px-3">
+                            <i class="bi bi-grid-3x3-gap-fill"></i> Panel Paciente
+                          </a>
+                          <button type="button" class="btn btn-sm btn-outline-info d-inline-flex align-items-center gap-1 py-1 px-3" onclick="verDetalles('<%= p.getNombres() + " " + p.getApellidos() %>', '<%= p.getCedula() %>', '<%= p.getEdad() %>', '<%= p.getSexo() %>', '<%= p.getSintomasActuales() != null ? p.getSintomasActuales().replace("'", "\\'") : "" %>', '<%= p.getAlergias() != null ? p.getAlergias().replace("'", "\\'") : "" %>', '<%= p.getDispositivosMedicos() != null ? p.getDispositivosMedicos().replace("'", "\\'") : "" %>')">
+                            <i class="bi bi-eye-fill"></i> Ver Ficha
+                          </button>
+                        </div>
                       </td>
                     </tr>
                     <%    }
@@ -292,7 +297,6 @@
 
   <script src="${pageContext.request.contextPath}/js/bootstrap.bundle.min.js"></script>
   <script>
-    // Búsqueda en tiempo real en la tabla
     document.getElementById('inputBuscarPaciente').addEventListener('input', function() {
       const q = this.value.toLowerCase().trim();
       const filas = document.querySelectorAll('#tablaPacientes tbody tr');

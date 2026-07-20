@@ -113,7 +113,7 @@
       </nav>
 
       <!-- CONTENIDO PRINCIPAL -->
-      <div class="col">
+      <div class="col nl-main-col">
         <!-- Topbar móvil -->
         <nav class="navbar navbar-dark bg-brand-gradient d-lg-none shadow-sm px-3">
           <div class="container-fluid px-0">

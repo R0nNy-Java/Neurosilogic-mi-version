@@ -26,6 +26,7 @@
 /* ── Sidebar oscuro y navegación ── */
 .nl-sidebar {
   background-color: #0f3831 !important;
+  flex-shrink: 0 !important;
 }
 
 @media (min-width: 992px) {
@@ -46,6 +47,13 @@
   color: #fff !important;
 }
 
+/* ── Prevención de desalineación y desbordamiento en columnas principales ── */
+.nl-main-col {
+  min-width: 0 !important;
+  flex: 1 1 0% !important;
+  overflow-x: hidden;
+}
+
 /* ── Gradiente de marca (paneles, card-headers, topbar) ── */
 .bg-brand-gradient {
   background: linear-gradient(135deg, #134f45 0%, #2a9d8a 100%) !important;
@@ -59,94 +67,152 @@
 .icon-violet { background: #faf5ff; color: #6b46c1; }
 .icon-green  { background: #f0fff4; color: #276749; }
 
-/* ── Animación: corazón pulsante (login) ── */
-.heart-beat {
-  animation: heartbeat 1.3s ease-in-out infinite;
-  filter: drop-shadow(0 0 18px rgba(195, 69, 61, .55));
-}
+/* ── Animación heartbeat para el ícono de marca ── */
 @keyframes heartbeat {
-  0%, 100% { transform: scale(1); }
-  14%       { transform: scale(1.18); }
-  28%       { transform: scale(1); }
-  42%       { transform: scale(1.12); }
-  56%       { transform: scale(1); }
+  0%   { transform: scale(1); }
+  14%  { transform: scale(1.18); }
+  28%  { transform: scale(1); }
+  42%  { transform: scale(1.12); }
+  70%  { transform: scale(1); }
+  100% { transform: scale(1); }
+}
+.heart-beat {
+  animation: heartbeat 1.6s infinite ease-in-out;
+  transform-origin: center;
 }
 
-/* ── Animación: trazado EKG (login) ── */
-.ekg-wrap { width: 90%; max-width: 320px; overflow: hidden; }
-.ekg-svg  { width: 200%; display: block; }
+/* ── Animación EKG ── */
+.ekg-wrap {
+  width: 100%;
+  max-width: 420px;
+  overflow: hidden;
+}
+.ekg-svg {
+  width: 100%;
+  height: 60px;
+}
 .ekg-line {
   fill: none;
-  stroke: rgba(255, 255, 255, .70);
+  stroke: #ffffff;
   stroke-width: 2.5;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-dasharray: 420;
-  stroke-dashoffset: 0;
-  animation: ekgMove 2s linear infinite;
+  stroke-dasharray: 600;
+  stroke-dashoffset: 600;
+  animation: ekgMove 2.4s linear infinite;
+  opacity: .9;
 }
 @keyframes ekgMove {
-  from { stroke-dashoffset: 420; }
-  to   { stroke-dashoffset: 0; }
+  0%   { stroke-dashoffset: 600; }
+  100% { stroke-dashoffset: 0; }
 }
 
-/* ── Animación fadeIn ── */
-.fade-in { animation: fadeIn 0.3s ease; }
+/* ── Transición Fade-in ── */
+.fade-in {
+  animation: fadeIn .25s ease-in-out;
+}
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-8px); }
+  from { opacity: 0; transform: translateY(4px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Indicadores de requisitos de contraseña ── */
-.req-ok   { color: #2a9d8a !important; }
-.req-fail { color: #aac5c0 !important; }
+/* ── Badges personalizados ── */
+.badge-stock {
+  font-size: .75rem;
+  font-weight: 600;
+  padding: .35em .65em;
+  border-radius: 50rem;
+}
+.stock-ok   { background: #def7ec; color: #03543f; }
+.stock-low  { background: #fdf6b2; color: #723b13; }
+.stock-out  { background: #fde8e8; color: #9b1c1c; }
 
-/* ── Badges de stock, roles y estado ── */
-.badge-stock { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
-.stock-ok   { background: #d1fae5; color: #065f46; }
-.stock-low  { background: #fef3c7; color: #92400e; }
-.stock-out  { background: #fee2e2; color: #991b1b; }
+.badge-rol {
+  font-size: .75rem;
+  font-weight: 600;
+  padding: .35em .75em;
+  border-radius: 50rem;
+}
+.badge-admin     { background: #ebf8ff; color: #2b6cb0; }
+.badge-enfermero  { background: #e9f5f3; color: #1a6b5e; }
+.badge-pendiente { background: #fffaf0; color: #c05621; }
 
-.badge-rol { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; }
-.badge-admin     { background: #dbeafe; color: #1d4ed8; }
-.badge-enfermero { background: #d1fae5; color: #065f46; }
-.badge-pendiente { background: #fef3c7; color: #92400e; }
+.badge-estado {
+  font-size: .75rem;
+  font-weight: 600;
+  padding: .35em .75em;
+  border-radius: 50rem;
+}
+.badge-activo    { background: #def7ec; color: #03543f; }
+.badge-bloqueado { background: #fde8e8; color: #9b1c1c; }
 
-.badge-estado { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; }
-.badge-activo    { background: #d1fae5; color: #065f46; }
-.badge-bloqueado { background: #fee2e2; color: #991b1b; }
+/* ── Separadores de formulario ── */
+.nl-sep {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+}
+.nl-sep-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: .4rem;
+  background: #1a6b5e;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .85rem;
+  flex-shrink: 0;
+}
+.nl-sep-label {
+  font-size: .85rem;
+  font-weight: 700;
+  color: #1a6b5e;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  white-space: nowrap;
+}
+.nl-sep-line {
+  flex-grow: 1;
+  height: 1px;
+  background: #d0e8e4;
+}
 
-/* ── Badges IMC ── */
-.nl-categoria-badge { display: inline-block; padding: 6px 16px; border-radius: 20px; font-weight: 700; font-size: 0.88rem; }
-.bajo-peso  { background: #fff3cd; color: #856404; }
-.normal     { background: #d1f0e3; color: #155724; }
-.sobrepeso  { background: #ffe5cc; color: #7a3b00; }
-.obesidad   { background: #f8d7da; color: #721c24; }
+/* ── Requisitos de contraseña ── */
+.nl-req-list {
+  list-style: none;
+  padding-left: 0;
+  margin-top: .4rem;
+  margin-bottom: 0;
+  font-size: .75rem;
+}
+.req-ok   { color: #1a6b5e; font-weight: 600; }
+.req-fail { color: #889a96; }
 
-/* ── Layout grid 2 columnas ── */
+/* ── Nota de seguridad ── */
+.nl-security-note {
+  background: #e9f5f3;
+  border: 1px solid #d0e8e4;
+  border-radius: .5rem;
+  padding: .75rem 1rem;
+  font-size: .78rem;
+  color: #1a6b5e;
+  display: flex;
+  align-items: flex-start;
+  gap: .5rem;
+  margin-top: 1.25rem;
+}
+
+/* ── Grilla 2 columnas adaptativa ── */
 .nl-grid-2col {
   display: grid;
-  grid-template-columns: 1fr 380px;
-  gap: 22px;
-  align-items: start;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
 }
-@media (max-width: 992px) {
+@media (min-width: 992px) {
   .nl-grid-2col {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
   }
 }
-
-/* ── Separadores de sección ── */
-.nl-sep { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
-.nl-sep-icon { width: 30px; height: 30px; background: #e9f5f3; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
-.nl-sep-icon i { font-size: 0.88rem; color: #1a6b5e; }
-.nl-sep-label { font-size: 0.75rem; font-weight: 700; color: #1a6b5e; text-transform: uppercase; letter-spacing: 0.7px; }
-.nl-sep-line { flex: 1; height: 1px; background: #d0e8e4; }
-
-/* ── Notas de seguridad ── */
-.nl-security-note { background: #e9f5f3; border-radius: 10px; padding: 12px 16px; margin-top: 20px; font-size: 0.8rem; color: #6c8c87; display: flex; align-items: flex-start; gap: 8px; }
-.nl-security-note i { color: #1a6b5e; margin-top: 2px; flex-shrink: 0; }
-
-/* ── Lista de requisitos ── */
-.nl-req-list { list-style: none; margin-top: 10px; padding-left: 0; }
-.nl-req-list li { font-size: 0.77rem; color: #6c8c87; display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }

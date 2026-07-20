@@ -1,4 +1,22 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="com.rrparedes.dao.PacienteDAO, com.rrparedes.model.Paciente" %>
+<%
+  String nombreSesion = (session != null) ? (String) session.getAttribute("nombreCompleto") : "";
+  if (nombreSesion == null) nombreSesion = (session != null) ? (String) session.getAttribute("usuario") : "";
+
+  String cedulaParam = request.getParameter("cedula");
+  String nombreParam = request.getParameter("nombre");
+
+  if ((nombreParam == null || nombreParam.trim().isEmpty()) && cedulaParam != null && !cedulaParam.trim().isEmpty()) {
+      PacienteDAO pDao = new PacienteDAO();
+      Paciente p = pDao.buscarPorCedula(cedulaParam.trim());
+      if (p != null) {
+          nombreParam = p.getNombres() + " " + p.getApellidos();
+      }
+  }
+
+  boolean tienePaciente = (nombreParam != null && !nombreParam.trim().isEmpty());
+%>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -80,7 +98,7 @@
       </nav>
 
       <!-- CONTENIDO PRINCIPAL -->
-      <div class="col">
+      <div class="col nl-main-col">
         <!-- Topbar móvil -->
         <nav class="navbar navbar-dark bg-brand-gradient d-lg-none shadow-sm px-3">
           <div class="container-fluid px-0">
@@ -97,37 +115,79 @@
             <i class="bi bi-house-fill"></i><span>/</span><span>Herramientas</span><span>/</span>
             <span class="text-white fw-semibold">Calculadora IMC</span>
           </div>
-          <a href="${pageContext.request.contextPath}/LogoutServlet" class="btn btn-outline-light btn-sm ms-auto d-flex align-items-center gap-1">
-            <i class="bi bi-box-arrow-right"></i>Salir
-          </a>
+
+          <div class="ms-auto d-flex align-items-center gap-2">
+            <% if (cedulaParam != null && !cedulaParam.trim().isEmpty()) { %>
+              <a href="${pageContext.request.contextPath}/PanelPacienteServlet?cedula=<%= cedulaParam %>" class="btn btn-outline-light btn-sm d-flex align-items-center gap-1">
+                <i class="bi bi-arrow-left"></i> Volver al Panel del Paciente
+              </a>
+            <% } else { %>
+              <button type="button" onclick="history.back()" class="btn btn-outline-light btn-sm d-flex align-items-center gap-1">
+                <i class="bi bi-arrow-left"></i> Volver
+              </button>
+            <% } %>
+          </div>
         </header>
 
         <main class="p-4">
+          <!-- BOTÓN VOLVER PROMINENTE -->
+          <div class="d-flex align-items-center justify-content-between mb-4 mx-auto" style="max-width:560px;">
+            <div>
+              <h1 class="h4 fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                <i class="bi bi-calculator-fill text-success"></i> Calculadora IMC
+              </h1>
+              <p class="text-muted small mb-0">Evaluación antropométrica rápida</p>
+            </div>
+            <% if (cedulaParam != null && !cedulaParam.trim().isEmpty()) { %>
+              <a href="${pageContext.request.contextPath}/PanelPacienteServlet?cedula=<%= cedulaParam %>" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1">
+                <i class="bi bi-arrow-left-circle"></i> Volver al Panel
+              </a>
+            <% } else { %>
+              <button type="button" onclick="history.back()" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1">
+                <i class="bi bi-arrow-left-circle"></i> Volver
+              </button>
+            <% } %>
+          </div>
+
           <div class="card border-0 shadow-sm rounded-4 mx-auto overflow-hidden" style="max-width:560px;">
             <div class="card-header bg-brand-gradient text-white p-4 border-0 d-flex align-items-center gap-3">
               <div class="rounded-3 bg-white bg-opacity-25 p-2 d-flex align-items-center justify-content-center" style="width:44px;height:44px;">
                 <i class="bi bi-calculator-fill fs-4 text-white"></i>
               </div>
               <div>
-                <h1 class="h5 fw-bold mb-0 text-white">Calculadora de IMC</h1>
-                <p class="text-white-50 small mb-0">Índice de Masa Corporal del paciente</p>
+                <h2 class="h5 fw-bold mb-0 text-white">Calculadora de IMC</h2>
+                <p class="text-white-50 small mb-0">
+                  <%= tienePaciente ? "Paciente: " + nombreParam : "Índice de Masa Corporal del paciente" %>
+                </p>
               </div>
             </div>
             <div class="card-body p-4">
               <form action="${pageContext.request.contextPath}/calcular" method="POST" novalidate>
+                <% if (cedulaParam != null && !cedulaParam.trim().isEmpty()) { %>
+                  <input type="hidden" name="cedula" value="<%= cedulaParam.trim() %>"/>
+                <% } %>
+
                 <div class="mb-3">
                   <label class="form-label small fw-semibold text-uppercase text-muted" for="nombre">Nombre del Paciente</label>
-                  <input type="text" id="nombre" name="nombre" class="form-control py-2" placeholder="Ingrese el nombre" required/>
+                  <input type="text" id="nombre" name="nombre" class="form-control py-2 <%= tienePaciente ? "bg-light text-dark fw-semibold" : "" %>" placeholder="Ingrese el nombre" value="<%= nombreParam != null ? nombreParam : "" %>" <%= tienePaciente ? "readonly" : "required" %>/>
+                  <% if (tienePaciente) { %>
+                    <div class="form-text text-success" style="font-size:.73rem;">
+                      <i class="bi bi-check-circle-fill me-1"></i>Nombre precargado automáticamente desde la Ficha Clínica.
+                    </div>
+                  <% } %>
                 </div>
+
                 <div class="mb-3">
-                  <label class="form-label small fw-semibold text-uppercase text-muted" for="peso">Peso (kg)</label>
+                  <label class="form-label small fw-semibold text-uppercase text-muted" for="peso">Peso (kg) *</label>
                   <input type="number" id="peso" name="peso" class="form-control py-2" step="0.1" placeholder="Ej: 70.5" required/>
                 </div>
+
                 <div class="mb-4">
-                  <label class="form-label small fw-semibold text-uppercase text-muted" for="altura">Altura (metros)</label>
+                  <label class="form-label small fw-semibold text-uppercase text-muted" for="altura">Altura (metros) *</label>
                   <input type="number" id="altura" name="altura" class="form-control py-2" step="0.01" placeholder="Ej: 1.75" required/>
                 </div>
-                <button type="submit" class="btn btn-success w-100 py-3 fw-semibold d-flex align-items-center justify-content-center gap-2">
+
+                <button type="submit" class="btn btn-success w-100 py-3 fw-semibold d-flex align-items-center justify-content-center gap-2 shadow-sm">
                   <i class="bi bi-calculator"></i> Calcular IMC
                 </button>
               </form>
