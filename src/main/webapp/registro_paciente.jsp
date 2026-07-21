@@ -324,9 +324,41 @@
       this.value = this.value.replace(/\D/g, '').slice(0, 10);
     });
 
-    function comprobarCedulaExistente(cedula) {
-      if (cedula && cedula.length === 10) {
-        window.location.href = '${pageContext.request.contextPath}/RegistroPacienteServlet?cedula=' + cedula;
+  async function comprobarCedulaExistente(cedula) {
+    if (!cedula || cedula.length !== 10) return;
+
+    try {
+      const resp = await fetch(
+              '${pageContext.request.contextPath}/RegistroPacienteServlet?cedula=' + cedula
+      );
+      if (!resp.ok) return;
+
+      const html = await resp.text();
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+
+      // Si el paciente no existe, el servlet devuelve el formulario vacío:
+      // no sobrescribimos nada (y jamás tocamos el campo Cédula).
+      const nombresEncontrados = doc.getElementById('Nombres')?.value;
+      if (!nombresEncontrados) return;
+
+      const setIfPresent = (id) => {
+        const nuevo = doc.getElementById(id);
+        const actual = document.getElementById(id);
+        if (nuevo && actual) actual.value = nuevo.value;
+      };
+
+      setIfPresent('Nombres');
+      setIfPresent('Apellidos');
+      setIfPresent('Edad');
+      setIfPresent('SintomasActuales');
+      setIfPresent('Alergias');
+      setIfPresent('DispositivosMedicos');
+
+      const sexoNuevo = doc.getElementById('Sexo')?.value;
+      if (sexoNuevo) document.getElementById('Sexo').value = sexoNuevo;
+
+    } catch (e) {
+      console.error('No se pudo verificar la cédula existente:', e);
       }
     }
 
