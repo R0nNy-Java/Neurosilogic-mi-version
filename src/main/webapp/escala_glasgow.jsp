@@ -183,40 +183,32 @@
                 </div>
             </header>
 
-            <main class="p-4">
+            <main class="p-4" style="background:#f4f7f6;">
                 <!-- ENCABEZADO -->
                 <div class="d-flex align-items-center justify-content-between mb-4">
                     <div>
                         <h1 class="h4 fw-bold mb-0 text-dark d-flex align-items-center gap-2">
-                            <i class="bi bi-clipboard2-data-fill text-success"></i> Escala de Glasgow
+                            <i class="bi bi-clipboard2-pulse-fill text-success"></i> Escala de Glasgow
                         </h1>
-                        <p class="text-muted small mb-0">Respuesta Ocular (1-4) · Verbal (1-5) · Motora (1-6)</p>
+                        <p class="text-muted small mb-0">Valoración neurológica</p>
                     </div>
                     <% if (cedulaParam != null && !cedulaParam.trim().isEmpty()) { %>
-                    <a href="${pageContext.request.contextPath}/PanelPacienteServlet?cedula=<%= cedulaParam %>" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1">
-                        <i class="bi bi-arrow-left-circle"></i> Volver al Panel
-                    </a>
                     <% } else { %>
-                    <button type="button" onclick="history.back()" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1">
-                        <i class="bi bi-arrow-left-circle"></i> Volver
-                    </button>
                     <% } %>
                 </div>
 
                 <% if (!tienePaciente) { %>
-                <!-- ══════════ BUSCADOR POR CÉDULA (acceso directo, sin paciente) ══════════ -->
+                <!-- ══════════ BUSCADOR POR CÉDULA ══════════ -->
                 <div class="row justify-content-center">
-                    <div class="col-lg-6 col-md-8">
-                        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-                            <div class="card-header bg-brand-gradient text-white p-4 border-0 d-flex align-items-center gap-3">
-                                <div class="rounded-3 bg-white bg-opacity-25 p-2 d-flex align-items-center justify-content-center" style="width:44px;height:44px;">
-                                    <i class="bi bi-search fs-4 text-white"></i>
-                                </div>
-                                <div>
-                                    <h2 class="h5 fw-bold mb-0 text-white">Buscar Paciente</h2>
-                                    <p class="text-white-50 small mb-0">Ingrese la cédula para cargar la ficha clínica</p>
-                                </div>
+                    <div class="col-lg-5 col-md-8">
+                        <div class="text-center mb-4">
+                            <div class="mx-auto rounded-circle bg-success bg-opacity-10 d-flex align-items-center justify-content-center mb-3" style="width:72px;height:72px;">
+                                <i class="bi bi-search text-success" style="font-size:1.8rem;"></i>
                             </div>
+                            <h2 class="h5 fw-bold text-dark mb-1">Buscar Paciente</h2>
+                            <p class="text-muted small">Ingresa la cédula para cargar la ficha clínica y registrar la escala.</p>
+                        </div>
+                        <div class="card border-0 shadow-sm rounded-4">
                             <div class="card-body p-4">
                                 <% if (pacienteNoEncontrado) { %>
                                 <div class="alert alert-danger d-flex align-items-center gap-2 mb-3" role="alert">
@@ -225,22 +217,38 @@
                                 </div>
                                 <% } %>
                                 <form action="${pageContext.request.contextPath}/GlasgowServlet" method="GET">
-                                    <label class="form-label small fw-semibold text-uppercase text-muted" for="cedulaBusqueda">Cédula del Paciente *</label>
-                                    <div class="input-group">
-                                        <input type="text" id="cedulaBusqueda" name="cedula" class="form-control py-2" placeholder="Ej: 1712345678" maxlength="10" pattern="[0-9]{10}" inputmode="numeric" value="<%= cedulaParam != null ? cedulaParam.trim() : "" %>" required autofocus/>
-                                        <button type="submit" class="btn btn-success d-flex align-items-center gap-2 px-4">
-                                            <i class="bi bi-search"></i> Buscar
-                                        </button>
+                                    <div class="input-group input-group-lg">
+                                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-person-vcard text-muted"></i></span>
+                                        <input type="text" name="cedula" class="form-control border-start-0" placeholder="Número de cédula" maxlength="10" pattern="[0-9]{10}" inputmode="numeric" value="<%= cedulaParam != null ? cedulaParam.trim() : "" %>" required autofocus/>
                                     </div>
-                                    <div class="form-text" style="font-size:.73rem;">
-                                        También puede acceder directamente desde el Panel del Paciente, donde el nombre y la cédula ya vienen precargados.
-                                    </div>
+                                    <button type="submit" class="btn btn-success w-100 mt-3 py-2 fw-semibold">
+                                        <i class="bi bi-search me-1"></i> Buscar Paciente
+                                    </button>
                                 </form>
                             </div>
                         </div>
                     </div>
                 </div>
                 <% } else { %>
+
+                <!-- BANNER PACIENTE -->
+                <div class="rounded-4 mb-4 p-4 text-white d-flex align-items-center gap-3 flex-wrap"
+                     style="background:linear-gradient(120deg,#0f5b4c,#159a7a 60%,#1fb88f);">
+                    <div class="rounded-circle bg-white bg-opacity-25 d-flex align-items-center justify-content-center fw-bold fs-4 flex-shrink-0" style="width:56px;height:56px;">
+                        <%= nombreParam.trim().substring(0,1).toUpperCase() %>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="fw-bold fs-5"><%= nombreParam %></div>
+                        <div class="text-white-50 small"><i class="bi bi-clipboard2-data me-1"></i>Evaluación de Escala de Glasgow</div>
+                    </div>
+                    <% if (yaTienePrueba) { %>
+                    <div class="text-center px-3 border-start border-white border-opacity-25">
+                        <div class="text-white-50" style="font-size:.65rem;text-transform:uppercase;letter-spacing:.5px;">Última</div>
+                        <div class="fw-bold fs-5"><%= ultimaPrueba.getPuntajeTotal() %>/15</div>
+                        <span class="badge <%= ultimoBadgeClass %> rounded-pill px-2"><%= ultimoNivel %></span>
+                    </div>
+                    <% } %>
+                </div>
 
                 <div class="row g-4">
 
@@ -259,97 +267,108 @@
                         </div>
                         <% } %>
 
-                        <!-- RESULTADO -->
-                        <% if (total != null && nivel != null) { %>
-                        <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
-                            <div class="card-body p-4 d-flex align-items-center justify-content-between">
-                                <div>
-                                    <div class="text-uppercase text-muted small fw-semibold">Puntaje Total Glasgow</div>
-                                    <div class="fw-bold text-dark" style="font-size:2rem;line-height:1;"><%= total %><span class="fs-6 text-muted">/15</span></div>
-                                </div>
-                                <span class="badge <%= nivelBadgeClass %> rounded-pill px-3 py-2 fs-6"><%= nivel %></span>
-                            </div>
-                        </div>
-                        <% } %>
-
-                        <!-- FORMULARIO -->
                         <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-                            <div class="card-header bg-brand-gradient text-white p-4 border-0 d-flex align-items-center gap-3">
-                                <div class="rounded-3 bg-white bg-opacity-25 p-2 d-flex align-items-center justify-content-center" style="width:44px;height:44px;">
-                                    <i class="bi bi-clipboard2-data-fill fs-4 text-white"></i>
-                                </div>
-                                <div>
-                                    <h2 class="h5 fw-bold mb-0 text-white">Registro de Escala Glasgow</h2>
-                                    <p class="text-white-50 small mb-0">
-                                        <%= tienePaciente ? "Paciente: " + nombreParam : "Evaluación neurológica del paciente" %>
-                                    </p>
-                                </div>
-                            </div>
                             <div class="card-body p-4">
-                                <form action="${pageContext.request.contextPath}/GlasgowServlet" method="POST" novalidate>
-                                    <% if (cedulaParam != null && !cedulaParam.trim().isEmpty()) { %>
-                                    <input type="hidden" name="cedula" value="<%= cedulaParam.trim() %>"/>
-                                    <% } %>
 
-                                    <div class="mb-3">
-                                        <label class="form-label small fw-semibold text-uppercase text-muted" for="Paciente">Paciente *</label>
-                                        <input type="text" id="Paciente" name="Paciente" class="form-control py-2 <%= tienePaciente ? "bg-light text-dark fw-semibold" : "" %>" placeholder="Ingrese el nombre del paciente" value="<%= nombreParam != null ? nombreParam : "" %>" <%= tienePaciente ? "readonly" : "required" %>/>
-                                        <% if (tienePaciente) { %>
-                                        <div class="form-text text-success" style="font-size:.73rem;">
-                                            <i class="bi bi-check-circle-fill me-1"></i>Nombre precargado automáticamente desde la Ficha Clínica.
+                                <form action="${pageContext.request.contextPath}/GlasgowServlet" method="POST" novalidate id="glasgowForm">
+                                    <input type="hidden" name="cedula" value="<%= cedulaParam != null ? cedulaParam.trim() : "" %>"/>
+                                    <input type="hidden" name="Paciente" value="<%= nombreParam %>"/>
+
+                                    <!-- Score circular + Fecha -->
+                                    <div class="d-flex align-items-center gap-4 mb-4 flex-wrap">
+                                        <div class="position-relative flex-shrink-0" style="width:110px;height:110px;">
+                                            <svg width="110" height="110" viewBox="0 0 110 110">
+                                                <circle cx="55" cy="55" r="47" fill="none" stroke="#e9ecef" stroke-width="10"/>
+                                                <circle id="scoreRing" cx="55" cy="55" r="47" fill="none" stroke="#adb5bd" stroke-width="10"
+                                                        stroke-linecap="round" stroke-dasharray="295.3" stroke-dashoffset="295.3"
+                                                        transform="rotate(-90 55 55)" style="transition:stroke-dashoffset .3s, stroke .3s;"/>
+                                            </svg>
+                                            <div class="position-absolute top-50 start-50 translate-middle text-center">
+                                                <div id="scoreNumber" class="fw-bold text-dark" style="font-size:1.6rem;line-height:1;">--</div>
+                                                <div class="text-muted" style="font-size:.65rem;">/ 15</div>
+                                            </div>
                                         </div>
-                                        <% } %>
+                                        <div class="flex-grow-1" style="min-width:200px;">
+                                            <label class="form-label small fw-semibold text-uppercase text-muted" for="FechaHora">Fecha y Hora *</label>
+                                            <input type="datetime-local" id="FechaHora" name="FechaHora" class="form-control form-control-lg" required/>
+                                            <div id="nivelTexto" class="small fw-semibold mt-2 text-muted">Complete los 3 componentes para ver el resultado</div>
+                                        </div>
                                     </div>
 
-                                    <div class="mb-3">
-                                        <label class="form-label small fw-semibold text-uppercase text-muted" for="FechaHora">Fecha y Hora *</label>
-                                        <input type="datetime-local" id="FechaHora" name="FechaHora" class="form-control py-2" required/>
+                                    <hr class="text-muted opacity-25"/>
+
+                                    <!-- RESPUESTA OCULAR -->
+                                    <div class="mb-4">
+                                        <label class="form-label small fw-semibold text-uppercase text-muted d-flex align-items-center gap-2">
+                                            <i class="bi bi-eye-fill"></i> Respuesta Ocular <span class="text-muted fw-normal"></span>
+                                        </label>
+                                        <div class="btn-group w-100 nl-glasgow-group" role="group">
+                                            <input type="radio" class="btn-check nl-glasgow-input" name="Ocular" id="oc4" value="4" autocomplete="off" data-label="Espontánea">
+                                            <label class="btn btn-outline-success py-2" for="oc4">4<br><small>Espontánea</small></label>
+
+                                            <input type="radio" class="btn-check nl-glasgow-input" name="Ocular" id="oc3" value="3" autocomplete="off" data-label="Al estímulo verbal">
+                                            <label class="btn btn-outline-success py-2" for="oc3">3<br><small>Al hablarle</small></label>
+
+                                            <input type="radio" class="btn-check nl-glasgow-input" name="Ocular" id="oc2" value="2" autocomplete="off" data-label="Al estímulo doloroso">
+                                            <label class="btn btn-outline-success py-2" for="oc2">2<br><small>Al dolor</small></label>
+
+                                            <input type="radio" class="btn-check nl-glasgow-input" name="Ocular" id="oc1" value="1" autocomplete="off" data-label="Ninguna">
+                                            <label class="btn btn-outline-success py-2" for="oc1">1<br><small>Ninguna</small></label>
+                                        </div>
                                     </div>
 
-                                    <div class="mb-3">
-                                        <label class="form-label small fw-semibold text-uppercase text-muted" for="Ocular">Respuesta Ocular (1-4) *</label>
-                                        <select id="Ocular" name="Ocular" class="form-select py-2 nl-glasgow-input" required>
-                                            <option value="" selected disabled>Seleccione una opción</option>
-                                            <option value="4">4 - Espontánea</option>
-                                            <option value="3">3 - Al estímulo verbal</option>
-                                            <option value="2">2 - Al estímulo doloroso</option>
-                                            <option value="1">1 - Ninguna</option>
-                                        </select>
+                                    <!-- RESPUESTA VERBAL -->
+                                    <div class="mb-4">
+                                        <label class="form-label small fw-semibold text-uppercase text-muted d-flex align-items-center gap-2">
+                                            <i class="bi bi-chat-dots-fill"></i> Respuesta Verbal <span class="text-muted fw-normal"></span>
+                                        </label>
+                                        <div class="btn-group w-100 nl-glasgow-group" role="group">
+                                            <input type="radio" class="btn-check nl-glasgow-input" name="Verbal" id="ve5" value="5" autocomplete="off" data-label="Orientada">
+                                            <label class="btn btn-outline-success py-2" for="ve5">5<br><small>Orientada</small></label>
+
+                                            <input type="radio" class="btn-check nl-glasgow-input" name="Verbal" id="ve4" value="4" autocomplete="off" data-label="Confusa">
+                                            <label class="btn btn-outline-success py-2" for="ve4">4<br><small>Confusa</small></label>
+
+                                            <input type="radio" class="btn-check nl-glasgow-input" name="Verbal" id="ve3" value="3" autocomplete="off" data-label="Palabras inapropiadas">
+                                            <label class="btn btn-outline-success py-2" for="ve3">3<br><small>Inapropiada</small></label>
+
+                                            <input type="radio" class="btn-check nl-glasgow-input" name="Verbal" id="ve2" value="2" autocomplete="off" data-label="Sonidos incomprensibles">
+                                            <label class="btn btn-outline-success py-2" for="ve2">2<br><small>Incompren.</small></label>
+
+                                            <input type="radio" class="btn-check nl-glasgow-input" name="Verbal" id="ve1" value="1" autocomplete="off" data-label="Ninguna">
+                                            <label class="btn btn-outline-success py-2" for="ve1">1<br><small>Ninguna</small></label>
+                                        </div>
                                     </div>
 
-                                    <div class="mb-3">
-                                        <label class="form-label small fw-semibold text-uppercase text-muted" for="Verbal">Respuesta Verbal (1-5) *</label>
-                                        <select id="Verbal" name="Verbal" class="form-select py-2 nl-glasgow-input" required>
-                                            <option value="" selected disabled>Seleccione una opción</option>
-                                            <option value="5">5 - Orientada</option>
-                                            <option value="4">4 - Confusa</option>
-                                            <option value="3">3 - Palabras inapropiadas</option>
-                                            <option value="2">2 - Sonidos incomprensibles</option>
-                                            <option value="1">1 - Ninguna</option>
-                                        </select>
-                                    </div>
+                                    <!-- RESPUESTA MOTORA -->
+                                    <div class="mb-4">
+                                        <label class="form-label small fw-semibold text-uppercase text-muted d-flex align-items-center gap-2">
+                                            <i class="bi bi-hand-index-thumb-fill"></i> Respuesta Motora <span class="text-muted fw-normal"></span>
+                                        </label>
+                                        <div class="btn-group w-100 nl-glasgow-group flex-wrap" role="group">
+                                            <input type="radio" class="btn-check nl-glasgow-input" name="Motor" id="mo6" value="6" autocomplete="off" data-label="Obedece órdenes">
+                                            <label class="btn btn-outline-success py-2" for="mo6">6<br><small>Obedece</small></label>
 
-                                    <div class="mb-3">
-                                        <label class="form-label small fw-semibold text-uppercase text-muted" for="Motor">Respuesta Motora (1-6) *</label>
-                                        <select id="Motor" name="Motor" class="form-select py-2 nl-glasgow-input" required>
-                                            <option value="" selected disabled>Seleccione una opción</option>
-                                            <option value="6">6 - Obedece órdenes</option>
-                                            <option value="5">5 - Localiza el dolor</option>
-                                            <option value="4">4 - Retira ante el dolor</option>
-                                            <option value="3">3 - Flexión anormal</option>
-                                            <option value="2">2 - Extensión anormal</option>
-                                            <option value="1">1 - Ninguna</option>
-                                        </select>
-                                    </div>
+                                            <input type="radio" class="btn-check nl-glasgow-input" name="Motor" id="mo5" value="5" autocomplete="off" data-label="Localiza el dolor">
+                                            <label class="btn btn-outline-success py-2" for="mo5">5<br><small>Localiza</small></label>
 
-                                    <div class="mb-3 p-3 rounded-3 bg-light border d-flex align-items-center justify-content-between">
-                                        <span class="small fw-semibold text-muted text-uppercase">Puntaje estimado</span>
-                                        <span id="previewTotal" class="fw-bold fs-5 text-dark">--</span>
+                                            <input type="radio" class="btn-check nl-glasgow-input" name="Motor" id="mo4" value="4" autocomplete="off" data-label="Retira ante el dolor">
+                                            <label class="btn btn-outline-success py-2" for="mo4">4<br><small>Retira</small></label>
+
+                                            <input type="radio" class="btn-check nl-glasgow-input" name="Motor" id="mo3" value="3" autocomplete="off" data-label="Flexión anormal">
+                                            <label class="btn btn-outline-success py-2" for="mo3">3<br><small>Flexión</small></label>
+
+                                            <input type="radio" class="btn-check nl-glasgow-input" name="Motor" id="mo2" value="2" autocomplete="off" data-label="Extensión anormal">
+                                            <label class="btn btn-outline-success py-2" for="mo2">2<br><small>Extensión</small></label>
+
+                                            <input type="radio" class="btn-check nl-glasgow-input" name="Motor" id="mo1" value="1" autocomplete="off" data-label="Ninguna">
+                                            <label class="btn btn-outline-success py-2" for="mo1">1<br><small>Ninguna</small></label>
+                                        </div>
                                     </div>
 
                                     <div class="mb-4">
                                         <label class="form-label small fw-semibold text-uppercase text-muted" for="Observacion">Observaciones</label>
-                                        <textarea id="Observacion" name="Observacion" class="form-control py-2" rows="3" placeholder="Observaciones clínicas adicionales (opcional)"></textarea>
+                                        <textarea id="Observacion" name="Observacion" class="form-control" rows="3" placeholder="Observaciones clínicas adicionales (opcional)"></textarea>
                                     </div>
 
                                     <button type="submit" class="btn btn-success w-100 py-3 fw-semibold d-flex align-items-center justify-content-center gap-2 shadow-sm">
@@ -360,66 +379,69 @@
                         </div>
                     </div>
 
-                    <!-- ══════════ COLUMNA DERECHA: HISTORIAL ══════════ -->
+                    <!-- ══════════ COLUMNA DERECHA: HISTORIAL (TIMELINE) ══════════ -->
                     <div class="col-lg-5">
-                        <div class="card border-0 shadow-sm rounded-4 overflow-hidden" style="position:sticky; top:1rem;">
-                            <div class="card-header bg-white p-3 d-flex align-items-center gap-2 border-bottom">
-                                <div class="rounded-3 bg-success bg-opacity-10 p-2 d-flex align-items-center justify-content-center" style="width:38px;height:38px;">
-                                    <i class="bi bi-clock-history text-success fs-5"></i>
-                                </div>
+                        <div class="card border-0 shadow-sm rounded-4 overflow-hidden" style="position:sticky;top:1rem;">
+                            <div class="card-header bg-white p-3 border-bottom d-flex align-items-center gap-2">
+                                <i class="bi bi-clock-history text-success fs-5"></i>
                                 <div>
-                                    <h2 class="h6 fw-bold mb-0 text-dark">Historial de Evaluaciones</h2>
+                                    <h2 class="h6 fw-bold mb-0 text-dark">Línea de Tiempo</h2>
                                     <p class="text-muted mb-0" style="font-size:.72rem;">
                                         <% if (yaTienePrueba) { %>
-                                        <%= historialGlasgow.size() %> registro<%= historialGlasgow.size() != 1 ? "s" : "" %> previo<%= historialGlasgow.size() != 1 ? "s" : "" %>
+                                        <%= historialGlasgow.size() %> evaluación<%= historialGlasgow.size() != 1 ? "es" : "" %> registrada<%= historialGlasgow.size() != 1 ? "s" : "" %>
                                         <% } else { %>
-                                        Sin registros previos
+                                        Sin evaluaciones previas
                                         <% } %>
                                     </p>
                                 </div>
                             </div>
-                            <div class="card-body p-3" style="max-height:680px;overflow-y:auto;">
+                            <div class="card-body p-4" style="max-height:720px;overflow-y:auto;">
                                 <% if (!yaTienePrueba) { %>
                                 <div class="text-center text-muted py-5">
                                     <i class="bi bi-inbox fs-1 d-block mb-2 opacity-50"></i>
                                     <span class="small">Este paciente no tiene evaluaciones de Glasgow registradas todavía.</span>
                                 </div>
-                                <% } else {
-                                    for (EscalaGlasgow registro : historialGlasgow) {
+                                <% } else { %>
+                                <div class="nl-timeline">
+                                    <% for (EscalaGlasgow registro : historialGlasgow) {
                                         String nivelReg = registro.getNivelSeveridad();
                                         if (nivelReg == null && registro.getPuntajeTotal() != null) {
                                             int t = registro.getPuntajeTotal();
                                             nivelReg = t >= 13 ? "Leve" : t >= 9 ? "Moderado" : "Grave";
                                         }
+                                        String dotColor = "#6c757d";
                                         String badgeReg = "bg-secondary";
-                                        if ("Leve".equals(nivelReg)) badgeReg = "bg-success";
-                                        else if ("Moderado".equals(nivelReg)) badgeReg = "bg-warning text-dark";
-                                        else if ("Grave".equals(nivelReg)) badgeReg = "bg-danger";
-                                %>
-                                <div class="border rounded-3 p-3 mb-2">
-                                    <div class="d-flex justify-content-between align-items-start mb-2 gap-2">
-                        <span class="small fw-semibold text-dark">
-                          <i class="bi bi-calendar-event text-muted me-1"></i>
-                          <%= registro.getFechaHora() != null ? registro.getFechaHora().toString().replace("T", " ") : "-" %>
-                        </span>
-                                        <span class="badge <%= badgeReg %> rounded-pill px-2 py-1 flex-shrink-0"><%= nivelReg %></span>
-                                    </div>
-                                    <div class="d-flex align-items-center justify-content-between">
-                                        <div class="small text-muted">
-                                            O:<b class="text-dark"><%= registro.getRespuestaOcular() %></b>
-                                            &nbsp;·&nbsp; V:<b class="text-dark"><%= registro.getRespuestaVerbal() %></b>
-                                            &nbsp;·&nbsp; M:<b class="text-dark"><%= registro.getRespuestaMotora() %></b>
+                                        if ("Leve".equals(nivelReg)) { dotColor = "#198754"; badgeReg = "bg-success"; }
+                                        else if ("Moderado".equals(nivelReg)) { dotColor = "#ffc107"; badgeReg = "bg-warning text-dark"; }
+                                        else if ("Grave".equals(nivelReg)) { dotColor = "#dc3545"; badgeReg = "bg-danger"; }
+                                    %>
+                                    <div class="nl-timeline-item">
+                                        <span class="nl-timeline-dot" style="background:<%= dotColor %>;"></span>
+                                        <div class="nl-timeline-content">
+                                            <div class="d-flex justify-content-between align-items-start gap-2 mb-1">
+                            <span class="small fw-semibold text-dark">
+                              <%= registro.getFechaHora() != null ? registro.getFechaHora().toString().replace("T", " ") : "-" %>
+                            </span>
+                                                <span class="badge <%= badgeReg %> rounded-pill px-2 py-1"><%= nivelReg %></span>
+                                            </div>
+                                            <div class="d-flex align-items-center justify-content-between">
+                                                <div class="small text-muted">
+                                                    O:<b class="text-dark"><%= registro.getRespuestaOcular() %></b>
+                                                    &nbsp;V:<b class="text-dark"><%= registro.getRespuestaVerbal() %></b>
+                                                    &nbsp;M:<b class="text-dark"><%= registro.getRespuestaMotora() %></b>
+                                                </div>
+                                                <div class="fw-bold text-dark"><%= registro.getPuntajeTotal() %><span class="text-muted fw-normal">/15</span></div>
+                                            </div>
+                                            <% if (registro.getObservacion() != null && !registro.getObservacion().trim().isEmpty()) { %>
+                                            <div class="small text-muted fst-italic mt-1" style="font-size:.75rem;">
+                                                <i class="bi bi-chat-left-quote me-1"></i><%= registro.getObservacion() %>
+                                            </div>
+                                            <% } %>
                                         </div>
-                                        <div class="fw-bold text-dark"><%= registro.getPuntajeTotal() %><span class="text-muted fw-normal">/15</span></div>
-                                    </div>
-                                    <% if (registro.getObservacion() != null && !registro.getObservacion().trim().isEmpty()) { %>
-                                    <div class="small text-muted fst-italic mt-2" style="font-size:.75rem;">
-                                        <i class="bi bi-chat-left-quote me-1"></i><%= registro.getObservacion() %>
                                     </div>
                                     <% } %>
                                 </div>
-                                <%   }
-                                } %>
+                                <% } %>
                             </div>
                         </div>
                     </div>
@@ -432,28 +454,60 @@
     </div>
 </div>
 
+<style>
+    .nl-glasgow-group label { font-size:.78rem; line-height:1.3; }
+    .nl-glasgow-group label small { font-weight:400; opacity:.75; font-size:.68rem; }
+    .nl-timeline { position:relative; padding-left:26px; }
+    .nl-timeline::before {
+        content:''; position:absolute; left:6px; top:6px; bottom:6px; width:2px; background:#e9ecef;
+    }
+    .nl-timeline-item { position:relative; margin-bottom:1.25rem; }
+    .nl-timeline-item:last-child { margin-bottom:0; }
+    .nl-timeline-dot {
+        position:absolute; left:-26px; top:4px; width:14px; height:14px; border-radius:50%;
+        border:3px solid #fff; box-shadow:0 0 0 2px #e9ecef;
+    }
+    .nl-timeline-content {
+        background:#f8f9fa; border-radius:.75rem; padding:.85rem 1rem;
+    }
+</style>
+
 <script src="${pageContext.request.contextPath}/js/bootstrap.bundle.min.js"></script>
 <script>
-    // Vista previa en vivo del puntaje total (no reemplaza el cálculo del servidor)
     (function () {
-        var selects = document.querySelectorAll('.nl-glasgow-input');
-        var preview = document.getElementById('previewTotal');
+        var inputs = document.querySelectorAll('.nl-glasgow-input');
+        var ring = document.getElementById('scoreRing');
+        var scoreNumber = document.getElementById('scoreNumber');
+        var nivelTexto = document.getElementById('nivelTexto');
+        var CIRCUNFERENCIA = 295.3; // 2 * PI * 47
 
-        function actualizarPreview() {
-            var ocular = document.getElementById('Ocular').value;
-            var verbal = document.getElementById('Verbal').value;
-            var motor  = document.getElementById('Motor').value;
+        function actualizar() {
+            var ocular = document.querySelector('input[name="Ocular"]:checked');
+            var verbal = document.querySelector('input[name="Verbal"]:checked');
+            var motor  = document.querySelector('input[name="Motor"]:checked');
 
             if (ocular && verbal && motor) {
-                var total = parseInt(ocular, 10) + parseInt(verbal, 10) + parseInt(motor, 10);
+                var total = parseInt(ocular.value, 10) + parseInt(verbal.value, 10) + parseInt(motor.value, 10);
                 var nivel = total >= 13 ? 'Leve' : total >= 9 ? 'Moderado' : 'Grave';
-                preview.textContent = total + '/15 (' + nivel + ')';
+                var color = nivel === 'Leve' ? '#198754' : nivel === 'Moderado' ? '#ffc107' : '#dc3545';
+
+                scoreNumber.textContent = total;
+                nivelTexto.textContent = 'Puntaje total: ' + total + '/15 — ' + nivel;
+                nivelTexto.style.color = color;
+
+                var offset = CIRCUNFERENCIA - (total / 15) * CIRCUNFERENCIA;
+                ring.style.strokeDashoffset = offset;
+                ring.style.stroke = color;
             } else {
-                preview.textContent = '--';
+                scoreNumber.textContent = '--';
+                nivelTexto.textContent = 'Complete los 3 componentes para ver el resultado';
+                nivelTexto.style.color = '';
+                ring.style.strokeDashoffset = CIRCUNFERENCIA;
+                ring.style.stroke = '#adb5bd';
             }
         }
 
-        selects.forEach(function (s) { s.addEventListener('change', actualizarPreview); });
+        inputs.forEach(function (el) { el.addEventListener('change', actualizar); });
     })();
 </script>
 </body>
