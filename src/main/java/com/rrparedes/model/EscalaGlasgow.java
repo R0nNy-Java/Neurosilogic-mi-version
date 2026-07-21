@@ -32,6 +32,12 @@ public class EscalaGlasgow implements Serializable {
     @Column(name = "PuntajeTotal")
     private Integer puntajeTotal;
 
+    @Column(name = "NivelSeveridad", length = 20)
+    private String nivelSeveridad;
+
+    @Column(name = "Observacion", length = 500)
+    private String observacion;
+
     public EscalaGlasgow() {
     }
 
@@ -42,6 +48,17 @@ public class EscalaGlasgow implements Serializable {
         this.respuestaVerbal = respuestaVerbal;
         this.respuestaMotora = respuestaMotora;
         this.puntajeTotal = puntajeTotal;
+    }
+
+    public EscalaGlasgow(Paciente paciente, LocalDateTime fechaHora, Integer respuestaOcular, Integer respuestaVerbal, Integer respuestaMotora, Integer puntajeTotal, String nivelSeveridad, String observacion) {
+        this.paciente = paciente;
+        this.fechaHora = fechaHora;
+        this.respuestaOcular = respuestaOcular;
+        this.respuestaVerbal = respuestaVerbal;
+        this.respuestaMotora = respuestaMotora;
+        this.puntajeTotal = puntajeTotal;
+        this.nivelSeveridad = nivelSeveridad;
+        this.observacion = observacion;
     }
 
     public Long getIdGlasgow() {
@@ -98,5 +115,21 @@ public class EscalaGlasgow implements Serializable {
 
     public void setPuntajeTotal(Integer puntajeTotal) {
         this.puntajeTotal = puntajeTotal;
+    }
+
+    public String getNivelSeveridad() {
+        return nivelSeveridad;
+    }
+
+    public void setNivelSeveridad(String nivelSeveridad) {
+        this.nivelSeveridad = nivelSeveridad;
+    }
+
+    public String getObservacion() {
+        return observacion;
+    }
+
+    public void setObservacion(String observacion) {
+        this.observacion = observacion;
     }
 }

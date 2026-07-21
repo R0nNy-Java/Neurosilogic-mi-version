@@ -117,12 +117,14 @@ CREATE TABLE IF NOT EXISTS escalaglasgow (
     RespuestaVerbal INT,
     RespuestaMotora INT,
     PuntajeTotal INT,
+    NivelSeveridad VARCHAR(20),
+    Observacion VARCHAR(500),
     FOREIGN KEY (IdPaciente) REFERENCES paciente(IdPaciente)
 );
 
 -- ── DATOS DE SEMILLA INICIALES ──
 INSERT INTO usuario (NombreUsuario, ContrasenaHash, Nombres, Apellidos, Rol, Estado)
-VALUES 
+    VALUES
 ('admin', 'Admin1234', 'Administrador', 'del Sistema', 'ADMINISTRADOR', 'A'),
 ('enfermero1', 'Nurse1234', 'María Fernanda', 'López', 'ENFERMERO', 'A'),
 ('enfermero2', 'Nurse5678', 'Carlos Eduardo', 'Vega', 'ENFERMERO', 'A')
