@@ -1,24 +1,46 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="com.rrparedes.model.Paciente, java.util.List" %>
+<%@ page isELIgnored="false" %>
 <%
-  /* ── Variables de sesión homologadas ── */
-  String rolSesion    = (session != null) ? (String) session.getAttribute("rol")           : "";
-  String usuarioSesion= (session != null) ? (String) session.getAttribute("usuario")        : "usuario";
-  String nombreSesion = (session != null) ? (String) session.getAttribute("nombreCompleto") : usuarioSesion;
-  if (nombreSesion == null) nombreSesion = usuarioSesion;
-  boolean esAdmin  = "ADMINISTRADOR".equals(rolSesion);
-  String tituloRol = esAdmin ? "Administrador" : "Enfermero/a";
+  // Recuperar las variables exactamente como están configuradas en la sesión de tu aplicación
+  String nombreSesion = (session.getAttribute("nombreSesion") != null) ? session.getAttribute("nombreSesion").toString() : "María Fernanda Lopez";
+  String tituloRol = (session.getAttribute("tituloRol") != null) ? session.getAttribute("tituloRol").toString() : "Enfermero/a";
 
-  List<Paciente> listaPacientes = (List<Paciente>) request.getAttribute("listaPacientes");
+  Boolean esAdminObj = (Boolean) session.getAttribute("esAdmin");
+  boolean esAdmin = (esAdminObj != null) ? esAdminObj : false;
+
+  // Lógica del Módulo de Dosificación
+  String tabActiva = (String) request.getAttribute("tabActiva");
+  if (tabActiva == null) tabActiva = "REGULAR_DOSIS";
+
+  String error = (String) request.getAttribute("error");
+
+  // Recuperar valores del Request
+  String dosisIndicadaVal = (request.getAttribute("dosisIndicada") != null) ? request.getAttribute("dosisIndicada").toString() : "";
+  String presentacionVal = (request.getAttribute("presentacion") != null) ? request.getAttribute("presentacion").toString() : "";
+  String diluyenteMlVal = (request.getAttribute("diluyenteMl") != null) ? request.getAttribute("diluyenteMl").toString() : "";
+
+  String unidadDosis = (String) request.getAttribute("unidadDosis");
+  if (unidadDosis == null) unidadDosis = "mg";
+
+  String unidadPresentacion = (String) request.getAttribute("unidadPresentacion");
+  if (unidadPresentacion == null) unidadPresentacion = "mg";
+
+  String resultadoVolumen = (String) request.getAttribute("resultadoVolumen");
+
+  // Módulo de infusión
+  String volumenTotalMlVal = (request.getAttribute("volumenTotalMl") != null) ? request.getAttribute("volumenTotalMl").toString() : "";
+  String horasTotalesVal = (request.getAttribute("horasTotales") != null) ? request.getAttribute("horasTotales").toString() : "";
+
+  String gotasPorMinuto = (String) request.getAttribute("gotasPorMinuto");
+  String microgotasPorMinuto = (String) request.getAttribute("microgotasPorMinuto");
+  String mlPorHora = (String) request.getAttribute("mlPorHora");
 %>
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8"/>
-  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
-  <title>NURSELOGIC | Gestión de Pacientes</title>
-
+  <title>NURSELOGIC | Dosificación</title>
   <link href="${pageContext.request.contextPath}/css/bootstrap.min.css" rel="stylesheet"/>
   <link href="${pageContext.request.contextPath}/css/nurselogic.css" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
@@ -26,7 +48,9 @@
 </head>
 <body class="bg-light" style="font-family:'Inter',sans-serif;">
 
-  <!-- OFFCANVAS SIDEBAR – móvil -->
+  <!-- ======================================================================= -->
+  <!-- 1. OFFCANVAS SIDEBAR – VISTA MÓVIL                                      -->
+  <!-- ======================================================================= -->
   <div class="offcanvas offcanvas-start nl-sidebar text-white" id="sidebarMobile" style="width:240px;" tabindex="-1">
     <div class="offcanvas-header border-bottom border-white border-opacity-10 py-3 flex-column align-items-start gap-2">
       <div class="d-flex w-100 justify-content-between align-items-center">
@@ -60,7 +84,7 @@
         </li>
         <% } else { %>
         <li class="nav-item">
-          <a href="${pageContext.request.contextPath}/PacientesServlet" id="nav-pacientes-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3 active">
+          <a href="${pageContext.request.contextPath}/PacientesServlet" id="nav-pacientes-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
             <i class="bi bi-person-badge"></i>Gestionar Pacientes
           </a>
         </li>
@@ -75,7 +99,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a href="${pageContext.request.contextPath}/DosificacionServlet" id="nav-dosificacion-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+          <a href="${pageContext.request.contextPath}/DosificacionServlet" id="nav-dosificacion-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3 active">
             <i class="bi bi-droplet"></i>Calcular Dosis
           </a>
         </li>
@@ -122,10 +146,13 @@
     </div>
   </div>
 
+  <!-- Contenedor Principal de la Aplicación -->
   <div class="container-fluid p-0">
     <div class="row g-0" style="min-height:100vh;">
 
-      <!-- SIDEBAR DESKTOP -->
+      <!-- ======================================================================= -->
+      <!-- 2. SIDEBAR – VISTA ESCRITORIO (PC)                                      -->
+      <!-- ======================================================================= -->
       <nav class="col-auto d-none d-lg-flex flex-column nl-sidebar text-white p-0" id="nl-sidebar" style="width:240px;min-height:100vh;position:sticky;top:0;height:100vh;overflow-y:auto;">
         <div class="p-4 border-bottom border-white border-opacity-10">
           <a href="${pageContext.request.contextPath}/index.jsp" class="d-flex align-items-center gap-3 text-white text-decoration-none mb-3">
@@ -165,7 +192,7 @@
           </li>
           <% } else { %>
           <li class="nav-item">
-            <a href="${pageContext.request.contextPath}/PacientesServlet" id="nav-pacientes" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3 active">
+            <a href="${pageContext.request.contextPath}/PacientesServlet" id="nav-pacientes" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
               <i class="bi bi-person-badge"></i><span>Gestionar Pacientes</span>
             </a>
           </li>
@@ -180,7 +207,7 @@
             </a>
           </li>
           <li class="nav-item">
-            <a href="${pageContext.request.contextPath}/DosificacionServlet" id="nav-dosificacion" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+            <a href="${pageContext.request.contextPath}/DosificacionServlet" id="nav-dosificacion" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3 active">
               <i class="bi bi-droplet"></i><span>Calcular Dosis</span>
             </a>
           </li>
@@ -227,8 +254,11 @@
         </div>
       </nav>
 
-      <!-- CONTENIDO PRINCIPAL -->
-      <div class="col">
+      <!-- ======================================================================= -->
+      <!-- 3. ÁREA DE CONTENIDO Y TOPBARS                                         -->
+      <!-- ======================================================================= -->
+      <div class="col min-vh-100 d-flex flex-column">
+
         <!-- Topbar móvil -->
         <nav class="navbar navbar-dark bg-brand-gradient d-lg-none shadow-sm px-3">
           <div class="container-fluid px-0">
@@ -239,11 +269,11 @@
           </div>
         </nav>
 
-        <!-- TOPBAR DESKTOP CORREGIDA (Eliminada la barra morada inconsistente) -->
+        <!-- Topbar Escritorio -->
         <header id="nl-topbar" class="navbar navbar-dark bg-brand-gradient d-none d-lg-flex shadow-sm px-4" style="min-height:62px;">
           <span class="navbar-brand fw-semibold mb-0 d-flex align-items-center gap-2">
-            <i class="bi bi-person-vcard-fill"></i>
-            Gestión de Pacientes &middot; <%= tituloRol %>
+            <i class="bi bi-calculator-fill"></i>
+            Módulo de Dosificación & Infusiones &middot; <%= tituloRol %>
           </span>
           <div class="d-flex align-items-center gap-3 ms-auto">
             <span class="text-white-50 small d-flex align-items-center gap-1">
@@ -255,116 +285,141 @@
           </div>
         </header>
 
-        <main class="p-4">
-          <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
-            <div>
-              <h1 class="h4 fw-bold mb-1 d-flex align-items-center gap-2">
-                <i class="bi bi-person-badge text-success"></i>Fichas Clínicas Digitales
-              </h1>
-              <p class="text-muted small mb-0">Listado de pacientes registrados en el sistema (Base de Datos MySQL)</p>
+        <!-- MAIN CONTENT -->
+        <main class="p-4 flex-grow-1">
+          <% if (error != null) { %>
+            <div class="row justify-content-center mb-3">
+              <div class="col-md-6"><div class="alert alert-danger border-0 rounded-3 shadow-sm"><%= error %></div></div>
             </div>
-            <div>
-              <a href="${pageContext.request.contextPath}/RegistroPacienteServlet" class="btn btn-success py-2 px-3 fw-semibold d-inline-flex align-items-center gap-2 shadow-sm">
-                <i class="bi bi-person-plus-fill fs-5"></i> Registrar Nuevo Paciente
-              </a>
+          <% } %>
+
+          <!-- PESTAÑAS CENTRADAS -->
+          <div class="row justify-content-center mb-4">
+            <div class="col-md-6">
+              <ul class="nav nav-tabs justify-content-center" id="dosificacionTabs" role="tablist">
+                <li class="nav-item">
+                  <button class="nav-link <%= "REGULAR_DOSIS".equals(tabActiva) ? "active fw-bold text-success" : "text-secondary" %>" id="dosis-tab" data-bs-toggle="tab" data-bs-target="#dosisPanel" type="button">
+                    <i class="bi bi-capsule"></i> Cálculo de Dosis
+                  </button>
+                </li>
+                <li class="nav-item">
+                  <button class="nav-link <%= "INFUSION_GOTEO".equals(tabActiva) ? "active fw-bold text-success" : "text-secondary" %>" id="infusion-tab" data-bs-toggle="tab" data-bs-target="#infusionPanel" type="button">
+                    <i class="bi bi-droplet-half"></i> Cálculo de Infusión
+                  </button>
+                </li>
+              </ul>
             </div>
           </div>
 
-          <!-- FILA DE KPIs REFORMADA CON EL ESTILO COMPACTO Y BORDE LATERAL -->
-          <div class="row mb-4">
-            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-              <div class="card border-0 shadow-sm h-100 rounded-3 border-start border-4 border-success">
-                <div class="card-body d-flex align-items-center gap-3 p-3">
-                  <div class="rounded-3 d-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success flex-shrink-0" style="width:48px;height:48px;">
-                    <i class="bi bi-people-fill fs-4"></i>
-                  </div>
-                  <div>
-                    <div class="fw-bold lh-1 fs-3"><%= listaPacientes != null ? listaPacientes.size() : 0 %></div>
-                    <div class="text-muted small mt-1">Pacientes Registrados</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <div class="tab-content" id="dosificacionTabsContent">
 
-          <!-- TABLA DE PACIENTES -->
-          <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-            <div class="card-header bg-brand-gradient text-white p-4 border-0 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
-              <div class="d-flex align-items-center gap-3">
-                <div class="rounded-3 bg-white bg-opacity-25 p-2 d-flex align-items-center justify-content-center" style="width:44px;height:44px;">
-                  <i class="bi bi-folder-fill fs-4 text-white"></i>
-                </div>
-                <div>
-                  <h2 class="h5 fw-bold mb-0 text-white">Pacientes en Base de Datos</h2>
-                  <p class="text-white-50 small mb-0">
-                    Total activos: <strong><%= listaPacientes != null ? listaPacientes.size() : 0 %></strong>
-                  </p>
-                </div>
-              </div>
-              <div style="min-width: 250px;">
-                <input type="text" id="inputBuscarPaciente" class="form-control form-control-sm bg-white text-dark border-0 shadow-sm" placeholder="🔍 Buscar por Cédula o Nombre..."/>
-              </div>
-            </div>
+            <!-- PANEL 1: REGLA DE TRES -->
+            <div class="tab-pane fade <%= "REGULAR_DOSIS".equals(tabActiva) ? "show active" : "" %>" id="dosisPanel">
+              <div class="row justify-content-center">
+                <div class="col-md-6">
+                  <div class="card border-0 shadow-sm rounded-3 p-4">
+                    <form action="${pageContext.request.contextPath}/DosificacionServlet" method="POST">
+                      <input type="hidden" name="tipoCalculo" value="REGULAR_DOSIS">
 
-            <div class="card-body p-0">
-              <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0" id="tablaPacientes">
-                  <thead class="bg-light text-muted small text-uppercase" style="letter-spacing:.6px;">
-                    <tr>
-                      <th class="ps-4">#</th>
-                      <th>Cédula</th>
-                      <th>Nombre Completo</th>
-                      <th>Edad / Sexo</th>
-                      <th>Estado</th>
-                      <th class="pe-4 text-end">Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <%
-                      if (listaPacientes != null && !listaPacientes.isEmpty()) {
-                          int count = 1;
-                          for (Paciente p : listaPacientes) {
-                    %>
-                    <tr>
-                      <td class="ps-4"><%= count++ %></td>
-                      <td><code><%= p.getCedula() %></code></td>
-                      <td><strong><%= p.getNombres() + " " + p.getApellidos() %></strong></td>
-                      <td><%= p.getEdad() %> años (<%= "M".equalsIgnoreCase(p.getSexo()) ? "Masculino" : "Femenino" %>)</td>
-                      <td>
-                        <span class="badge bg-success px-3 py-2 rounded-pill">Activo</span>
-                      </td>
-                      <td class="pe-4 text-end text-nowrap">
-                        <div class="d-inline-flex align-items-center gap-2">
-                          <a href="${pageContext.request.contextPath}/PanelPacienteServlet?cedula=<%= p.getCedula() %>" class="btn btn-sm btn-success d-inline-flex align-items-center gap-1 py-1 px-3">
-                            <i class="bi bi-grid-3x3-gap-fill"></i> Panel Paciente
-                          </a>
-                          <button type="button" class="btn btn-sm btn-outline-info d-inline-flex align-items-center gap-1 py-1 px-3" onclick="verDetalles('<%= p.getNombres() + " " + p.getApellidos() %>', '<%= p.getCedula() %>', '<%= p.getEdad() %>', '<%= p.getSexo() %>', '<%= p.getSintomasActuales() != null ? p.getSintomasActuales().replace("'", "\\'") : "" %>', '<%= p.getAlergias() != null ? p.getAlergias().replace("'", "\\'") : "" %>', '<%= p.getDispositivosMedicos() != null ? p.getDispositivosMedicos().replace("'", "\\'") : "" %>')">
-                            <i class="bi bi-eye-fill"></i> Ver Ficha
-                          </button>
+                      <div class="mb-3">
+                        <label class="form-label small fw-bold">Dosis Indicada / Solicitada *</label>
+                        <div class="input-group">
+                          <input type="number" step="0.001" name="dosisIndicada" class="form-control" required value="<%= dosisIndicadaVal %>">
+                          <select name="unidadDosis" class="form-select text-center" style="max-width: 90px;">
+                            <option value="mg" <%= "mg".equals(unidadDosis) ? "selected" : "" %>>mg</option>
+                            <option value="g" <%= "g".equals(unidadDosis) ? "selected" : "" %>>g</option>
+                            <option value="mcg" <%= "mcg".equals(unidadDosis) ? "selected" : "" %>>mcg</option>
+                          </select>
                         </div>
-                      </td>
-                    </tr>
-                    <%    }
-                      } else { %>
-                    <tr>
-                      <td colspan="6" class="text-center py-5 text-muted">
-                        <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary"></i>
-                        No hay pacientes registrados aún en la Base de Datos MySQL.<br/>
-                        <a href="${pageContext.request.contextPath}/RegistroPacienteServlet" class="btn btn-success btn-sm mt-3">
-                          <i class="bi bi-person-plus-fill me-1"></i> Registrar Primer Paciente
-                        </a>
-                      </td>
-                    </tr>
+                      </div>
+
+                      <div class="mb-3">
+                        <label class="form-label small fw-bold">Presentación del Fármaco *</label>
+                        <div class="input-group">
+                          <input type="number" step="0.001" name="presentacion" class="form-control" required value="<%= presentacionVal %>">
+                          <select name="unidadPresentacion" class="form-select text-center" style="max-width: 90px;">
+                            <option value="mg" <%= "mg".equals(unidadPresentacion) ? "selected" : "" %>>mg</option>
+                            <option value="g" <%= "g".equals(unidadPresentacion) ? "selected" : "" %>>g</option>
+                            <option value="mcg" <%= "mcg".equals(unidadPresentacion) ? "selected" : "" %>>mcg</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div class="mb-3">
+                        <label class="form-label small fw-bold">Diluyente / Volumen Total (ml) *</label>
+                        <input type="number" step="0.01" name="diluyenteMl" class="form-control" required value="<%= diluyenteMlVal %>">
+                      </div>
+
+                      <button type="submit" class="btn btn-success w-100 py-2 fw-semibold mt-2">
+                        <i class="bi bi-lightning-fill"></i> Calcular Volumen a Administrar
+                      </button>
+                    </form>
+
+                    <!-- RESPUESTA -->
+                    <% if (resultadoVolumen != null) { %>
+                      <div class="mt-4 bg-success bg-opacity-10 p-4 rounded-3 text-center border border-success border-opacity-20 shadow-sm">
+                        <span class="text-success small d-block mb-1 text-uppercase fw-bold">Volumen Resultante</span>
+                        <h2 class="display-6 fw-bold text-success mb-0"><%= resultadoVolumen %> <small class="fs-4">ml</small></h2>
+                      </div>
                     <% } %>
-                  </tbody>
-                </table>
+
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div class="card-footer bg-light p-3 small text-muted border-0">
-              <i class="bi bi-shield-check me-1 text-success"></i>
-              Información clínica confidencial protegida por roles de usuario NURSELOGIC.
+            <!-- PANEL 2: INFUSIÓN Y GOTEO -->
+            <div class="tab-pane fade <%= "INFUSION_GOTEO".equals(tabActiva) ? "show active" : "" %>" id="infusionPanel">
+              <div class="row justify-content-center">
+                <div class="col-md-6">
+                  <div class="card border-0 shadow-sm rounded-3 p-4">
+                    <form action="${pageContext.request.contextPath}/DosificacionServlet" method="POST">
+                      <input type="hidden" name="tipoCalculo" value="INFUSION_GOTEO">
+
+                      <div class="mb-3">
+                        <label class="form-label small fw-bold">Volumen Total (ml) *</label>
+                        <input type="number" step="0.01" name="volumenTotalMl" class="form-control" required value="<%= volumenTotalMlVal %>">
+                      </div>
+
+                      <div class="mb-3">
+                        <label class="form-label small fw-bold">Tiempo de Infusión (Horas) *</label>
+                        <input type="number" step="0.01" name="horasTotales" class="form-control" required value="<%= horasTotalesVal %>">
+                      </div>
+
+                      <button type="submit" class="btn btn-success w-100 py-2 fw-semibold mt-2">
+                        <i class="bi bi-speedometer2"></i> Calcular Flujo e Infusión
+                      </button>
+                    </form>
+
+                    <!-- RESPUESTA DEL GOTEO -->
+                    <% if (gotasPorMinuto != null) { %>
+                      <div class="mt-4 p-3 bg-light rounded-3 border shadow-sm">
+                        <div class="row g-2 mb-2">
+                          <div class="col-6">
+                            <div class="bg-white p-3 rounded text-center border">
+                              <span class="text-muted d-block small fw-bold">Macrogotas</span>
+                              <h4 class="fw-bold text-primary mb-0"><%= gotasPorMinuto %> <small class="fs-6">gtt/min</small></h4>
+                            </div>
+                          </div>
+                          <div class="col-6">
+                            <div class="bg-white p-3 rounded text-center border">
+                              <span class="text-muted d-block small fw-bold">Microgotas</span>
+                              <h4 class="fw-bold text-success mb-0"><%= microgotasPorMinuto %> <small class="fs-6">ugtt/min</small></h4>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="bg-dark text-white p-3 rounded text-center">
+                          <span class="text-white-50 d-block small fw-bold">Bomba de Infusión</span>
+                          <h3 class="fw-bold text-warning mb-0"><%= mlPorHora %> <small class="fs-5">ml/hr</small></h3>
+                        </div>
+                      </div>
+                    <% } %>
+
+                  </div>
+                </div>
+              </div>
             </div>
+
           </div>
         </main>
       </div>
@@ -372,81 +427,6 @@
     </div>
   </div>
 
-  <!-- MODAL FICHA COMPLETA -->
-  <div class="modal fade" id="modalFicha" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-      <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-        <div class="modal-header bg-brand-gradient text-white p-4 border-0">
-          <div class="d-flex align-items-center gap-3">
-            <div class="rounded-3 bg-white bg-opacity-25 p-2 d-flex align-items-center justify-content-center" style="width:40px;height:40px;">
-              <i class="bi bi-person-vcard-fill fs-4 text-white"></i>
-            </div>
-            <div>
-              <h5 class="modal-title fw-bold text-white mb-0" id="mNombre">Ficha Clínica</h5>
-              <small class="text-white-50" id="mCedula">Cédula: -</small>
-            </div>
-          </div>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        </div>
-        <div class="modal-body p-4">
-          <div class="row g-3 mb-3">
-            <div class="col-md-6">
-              <div class="p-3 bg-light rounded-3 border">
-                <small class="fw-semibold text-uppercase text-muted d-block mb-1">Edad y Sexo</small>
-                <span id="mEdadSexo" class="fw-bold text-dark fs-6">-</span>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="p-3 bg-light rounded-3 border">
-                <small class="fw-semibold text-uppercase text-muted d-block mb-1">Estado de Ficha</small>
-                <span class="badge bg-success px-3 py-2 rounded-pill">Activo</span>
-              </div>
-            </div>
-          </div>
-          <div class="mb-3">
-            <small class="fw-semibold text-uppercase text-muted d-block mb-1">Síntomas Actuales</small>
-            <div class="p-3 bg-light rounded-3 border text-dark" id="mSintomas">-</div>
-          </div>
-          <div class="row g-3">
-            <div class="col-md-6">
-              <small class="fw-semibold text-uppercase text-muted d-block mb-1">Alergias Conocidas</small>
-              <div class="p-3 bg-light rounded-3 border text-danger fw-semibold" id="mAlergias">-</div>
-            </div>
-            <div class="col-md-6">
-              <small class="fw-semibold text-uppercase text-muted d-block mb-1">Dispositivos Médicos</small>
-              <div class="p-3 bg-light rounded-3 border text-dark" id="mDispositivos">-</div>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer bg-light border-0 p-3">
-          <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cerrar</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <script src="${pageContext.request.contextPath}/js/bootstrap.bundle.min.js"></script>
-  <script>
-    document.getElementById('inputBuscarPaciente').addEventListener('input', function() {
-      const q = this.value.toLowerCase().trim();
-      const filas = document.querySelectorAll('#tablaPacientes tbody tr');
-      filas.forEach(f => {
-        const txt = f.textContent.toLowerCase();
-        f.style.display = txt.includes(q) ? '' : 'none';
-      });
-    });
-
-    function verDetalles(nombre, cedula, edad, sexo, sintomas, alergias, dispositivos) {
-      document.getElementById('mNombre').textContent = nombre;
-      document.getElementById('mCedula').textContent = 'Cédula: ' + cedula;
-      document.getElementById('mEdadSexo').textContent = edad + ' años (' + (sexo === 'M' ? 'Masculino' : 'Femenino') + ')';
-      document.getElementById('mSintomas').textContent = sintomas || 'Sin síntomas registrados';
-      document.getElementById('mAlergias').textContent = alergias || 'Ninguna alergia conocida';
-      document.getElementById('mDispositivos').textContent = dispositivos || 'Ninguno';
-
-      const modal = new bootstrap.Modal(document.getElementById('modalFicha'));
-      modal.show();
-    }
-  </script>
 </body>
 </html>

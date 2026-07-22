@@ -1,103 +1,86 @@
 package com.rrparedes.servlet;
 
+
+import com.rrparedes.model.Dosificacion;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 
-/**
- * NURSELOGIC – DosificacionServlet
- * Módulo: Cálculo de Dosificación de Medicamentos
- * Aplica regla de tres con conversión de unidades (g↔mg, L↔mL).
- * Fórmula: Volumen a administrar = (Dosis prescrita / Concentración disponible) × Volumen presentación
- * GET  → muestra formulario dosificacion.jsp
- * POST → calcula y devuelve el volumen en mL
- * TODO Fase 2: guardar cálculo vinculado al paciente (DosificacionDAO)
- */
 @WebServlet("/DosificacionServlet")
 public class DosificacionServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        if (!verificarSesion(request, response)) return;
         request.getRequestDispatcher("/dosificacion.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        if (!verificarSesion(request, response)) return;
         request.setCharacterEncoding("UTF-8");
 
-        String medicamento      = request.getParameter("Medicamento");
-        String dosisPrescStr    = request.getParameter("DosisPrescrita");
-        String unidadPrescrita  = request.getParameter("UnidadPrescrita");  // mg, g, mcg
-        String concStr          = request.getParameter("Concentracion");
-        String unidadConc       = request.getParameter("UnidadConcentracion");
-        String volPresStr       = request.getParameter("VolumenPresentacion");
-
-        if (estaVacio(dosisPrescStr) || estaVacio(concStr) || estaVacio(volPresStr)) {
-            request.setAttribute("errorMsg", "⚠ Todos los campos de cálculo son obligatorios.");
-            request.getRequestDispatcher("/dosificacion.jsp").forward(request, response);
-            return;
-        }
+        String tipoCalculo = request.getParameter("tipoCalculo");
+        request.setAttribute("tabActiva", tipoCalculo);
 
         try {
-            double dosisPrescrita = Double.parseDouble(dosisPrescStr);
-            double concentracion  = Double.parseDouble(concStr);
-            double volPresent     = Double.parseDouble(volPresStr);
+            if ("REGULAR_DOSIS".equalsIgnoreCase(tipoCalculo)) {
+                // 1. Recibir los datos del formulario
+                String dosisStr = request.getParameter("dosisIndicada");
+                String presStr = request.getParameter("presentacion");
+                String dilStr = request.getParameter("diluyenteMl");
 
-            // Convertir todo a mg para uniformidad
-            double dosisMg = convertirAMg(dosisPrescrita, unidadPrescrita);
-            double concMg  = convertirAMg(concentracion,  unidadConc);
+                String unidadDosis = request.getParameter("unidadDosis");
+                String unidadPresentacion = request.getParameter("unidadPresentacion");
 
-            if (concMg <= 0) throw new ArithmeticException("Concentración no puede ser cero.");
+                // 2. Validar que no vengan vacíos
+                if (dosisStr != null && presStr != null && dilStr != null) {
+                    double dosisIndicada = Double.parseDouble(dosisStr);
+                    double presentacion = Double.parseDouble(presStr);
+                    double diluyenteMl = Double.parseDouble(dilStr);
 
-            // Regla de tres: V_admin = (Dosis_prescrita / Concentración) × Volumen_presentación
-            double volAdmin = (dosisMg / concMg) * volPresent;
+                    // 3. Calcular
+                    double resultadoVolumen = Dosificacion.calcularVolumenAdministrar(
+                            dosisIndicada, unidadDosis, presentacion, unidadPresentacion, diluyenteMl
+                    );
 
-            // Truncar a 2 decimales
-            volAdmin = Math.floor(volAdmin * 100) / 100;
+                    // 4. Devolver TODO al JSP (para que no se borren los campos y muestre el resultado)
+                    request.setAttribute("dosisIndicada", dosisStr);
+                    request.setAttribute("presentacion", presStr);
+                    request.setAttribute("diluyenteMl", dilStr);
+                    request.setAttribute("unidadDosis", unidadDosis);
+                    request.setAttribute("unidadPresentacion", unidadPresentacion);
+                    request.setAttribute("resultadoVolumen", String.format("%.2f", resultadoVolumen));
+                }
 
-            request.setAttribute("volumenCalculado", volAdmin);
-            request.setAttribute("medicamentoCalc",  medicamento);
-            request.setAttribute("successMsg",
-                "✔ Volumen a administrar: " + volAdmin + " mL de " + medicamento);
+            } else if ("INFUSION_GOTEO".equalsIgnoreCase(tipoCalculo)) {
+                String volStr = request.getParameter("volumenTotalMl");
+                String hrsStr = request.getParameter("horasTotales");
 
-        } catch (NumberFormatException e) {
-            request.setAttribute("errorMsg", "⚠ Ingrese valores numéricos válidos.");
-        } catch (ArithmeticException e) {
-            request.setAttribute("errorMsg", "⚠ " + e.getMessage());
+                if (volStr != null && hrsStr != null) {
+                    double volumenTotalMl = Double.parseDouble(volStr);
+                    double horasTotales = Double.parseDouble(hrsStr);
+
+                    double gotasPorMinuto = Dosificacion.calcularGotasPorMinuto(volumenTotalMl, horasTotales);
+                    double microgotasPorMinuto = Dosificacion.calcularMicrogotasPorMinuto(volumenTotalMl, horasTotales);
+                    double mlPorHora = Dosificacion.calcularMlPorHora(volumenTotalMl, horasTotales);
+
+                    request.setAttribute("volumenTotalMl", volStr);
+                    request.setAttribute("horasTotales", hrsStr);
+                    request.setAttribute("gotasPorMinuto", String.format("%.1f", gotasPorMinuto));
+                    request.setAttribute("microgotasPorMinuto", String.format("%.1f", microgotasPorMinuto));
+                    request.setAttribute("mlPorHora", String.format("%.1f", mlPorHora));
+                }
+            }
+        } catch (Exception e) {
+            request.setAttribute("error", "Error en el cálculo: " + e.getMessage());
         }
 
+        // Volvemos a la misma página
         request.getRequestDispatcher("/dosificacion.jsp").forward(request, response);
     }
-
-    /** Convierte dosis a miligramos para cálculo uniforme. */
-    private double convertirAMg(double valor, String unidad) {
-        if (unidad == null) return valor;
-        return switch (unidad) {
-            case "g"   -> valor * 1000;
-            case "mcg" -> valor / 1000;
-            case "L"   -> valor * 1000; // para líquidos: L→mL
-            default    -> valor;        // mg o mL sin conversión
-        };
-    }
-
-    private boolean verificarSesion(HttpServletRequest req, HttpServletResponse res)
-            throws IOException {
-        HttpSession s = req.getSession(false);
-        if (s == null || s.getAttribute("usuario") == null) {
-            res.sendRedirect(req.getContextPath() + "/login.jsp");
-            return false;
-        }
-        return true;
-    }
-
-    private boolean estaVacio(String s) { return s == null || s.trim().isEmpty(); }
 }

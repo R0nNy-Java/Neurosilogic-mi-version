@@ -9,6 +9,11 @@
     String nombreSesion = (session != null) ? (String) session.getAttribute("nombreCompleto") : "";
     if (nombreSesion == null) nombreSesion = (session != null) ? (String) session.getAttribute("usuario") : "";
 
+    // Simulación o recuperación de variables de rol para la nueva plantilla global
+    boolean esAdmin = (session != null) && "ADMIN".equals(session.getAttribute("rol"));
+    String tituloRol = (String) (session != null ? session.getAttribute("rolDescripcion") : "Personal de Enfermería");
+    if (tituloRol == null) tituloRol = "Personal Clínico";
+
     String cedulaParam  = request.getParameter("cedula");
     String nombreParam  = request.getParameter("Paciente");
 
@@ -46,112 +51,244 @@
 </head>
 <body class="bg-light" style="font-family:'Inter',sans-serif;">
 
-<!-- OFFCANVAS SIDEBAR (móvil) -->
+<!-- ======================================================================= -->
+<!-- 1. OFFCANVAS SIDEBAR – VISTA MÓVIL                                      -->
+<!-- ======================================================================= -->
 <div class="offcanvas offcanvas-start nl-sidebar text-white" id="sidebarMobile" style="width:240px;" tabindex="-1">
-    <div class="offcanvas-header border-bottom border-white border-opacity-10 py-3">
-        <span class="fw-bold text-white">NURSELOGIC</span>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+  <div class="offcanvas-header border-bottom border-white border-opacity-10 py-3 flex-column align-items-start gap-2">
+    <div class="d-flex w-100 justify-content-between align-items-center">
+      <span class="fw-bold text-white">NURSELOGIC</span>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
     </div>
-    <div class="offcanvas-body d-flex flex-column p-0">
-        <div class="px-4 py-3">
-            <small class="fw-bold text-uppercase" style="color:rgba(255,255,255,.3);font-size:.65rem;letter-spacing:1px;">Navegación Principal</small>
+    <div class="rounded bg-white bg-opacity-10 w-100 py-1.5 px-3 text-center small text-white-50" style="font-size: 0.8rem; letter-spacing: 0.5px;">
+      <i class="bi bi-person-badge me-1"></i><%= tituloRol %>
+    </div>
+  </div>
+  <div class="offcanvas-body d-flex flex-column p-0">
+    <div class="px-4 py-3">
+      <small class="fw-bold text-uppercase" style="color:rgba(255,255,255,.3);font-size:.65rem;letter-spacing:1px;">MENU PRINCIPAL</small>
+    </div>
+    <ul class="nav flex-column px-2 flex-grow-1">
+      <li class="nav-item">
+        <a href="${pageContext.request.contextPath}/index.jsp" id="nav-dashboard-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+          <i class="bi bi-grid-1x2-fill"></i>Dashboard
+        </a>
+      </li>
+      <% if (esAdmin) { %>
+      <li class="nav-item">
+        <a href="${pageContext.request.contextPath}/GestionarUsuariosServlet" id="nav-usuarios-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+          <i class="bi bi-people-fill"></i>Gestionar Usuarios
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="${pageContext.request.contextPath}/GestionarCatalogoServlet" id="nav-catalogo-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+          <i class="bi bi-journal-medical"></i>Catalogo Medicamentos
+        </a>
+      </li>
+      <% } else { %>
+      <li class="nav-item">
+        <a href="${pageContext.request.contextPath}/PacientesServlet" id="nav-pacientes-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+          <i class="bi bi-person-badge"></i>Gestionar Pacientes
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="${pageContext.request.contextPath}/SignosVitalesServlet" id="nav-signos-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3 active">
+          <i class="bi bi-activity"></i>Signos Vitales
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="${pageContext.request.contextPath}/GlasgowServlet" id="nav-glasgow-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+          <i class="bi bi-file-earmark-bar-graph"></i>Escala Glasgow
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="${pageContext.request.contextPath}/DosificacionServlet" id="nav-dosificacion-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+          <i class="bi bi-droplet"></i>Calcular Dosis
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="${pageContext.request.contextPath}/AdministracionServlet" id="nav-admin-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+          <i class="bi bi-clipboard-check"></i>Administracion
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="${pageContext.request.contextPath}/ReportesServlet" id="nav-reportes-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+          <i class="bi bi-graph-up"></i>Reportes
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="${pageContext.request.contextPath}/calculadora.jsp" id="nav-imc-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+          <i class="bi bi-calculator"></i>Calculadora IMC
+        </a>
+      </li>
+      <% } %>
+    </ul>
+    <div class="border-top border-white border-opacity-10 p-3 mt-auto">
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <div class="rounded-circle bg-success d-flex align-items-center justify-content-center flex-shrink-0" style="width:36px;height:36px;">
+          <i class="bi bi-person-fill text-white small"></i>
         </div>
-        <ul class="nav flex-column px-2 flex-grow-1">
-            <li class="nav-item">
-                <a href="${pageContext.request.contextPath}/index.jsp" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-                    <i class="bi bi-grid-1x2-fill"></i>Dashboard
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="${pageContext.request.contextPath}/PacientesServlet" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-                    <i class="bi bi-person-vcard-fill"></i>Pacientes
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="${pageContext.request.contextPath}/SignosVitalesServlet" class="nav-link nl-nav-link active d-flex align-items-center gap-3 py-2 px-3">
-                    <i class="bi bi-activity"></i>Signos Vitales
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="${pageContext.request.contextPath}/GlasgowServlet" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-                    <i class="bi bi-clipboard2-data-fill"></i>Escala Glasgow
-                </a>
-            </li>
-        </ul>
+        <div class="overflow-hidden">
+          <div class="text-white small fw-semibold text-truncate"><%= nombreSesion %></div>
+          <div style="font-size:.7rem;" class="text-white-50"><%= tituloRol %></div>
+        </div>
+      </div>
+      <ul class="nav flex-column gap-1 p-0 small">
+        <li class="nav-item">
+          <a href="${pageContext.request.contextPath}/CambioContrasenaServlet" id="nav-cambiopass-m" class="nav-link text-white-50 p-1 d-flex align-items-center gap-2" style="font-size: 0.8rem;">
+            <i class="bi bi-key"></i> Cambiar contraseña
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="${pageContext.request.contextPath}/LogoutServlet" id="nav-logout-m" class="nav-link text-white-50 p-1 d-flex align-items-center gap-2" style="font-size: 0.8rem;">
+            <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+          </a>
+        </li>
+      </ul>
     </div>
+  </div>
 </div>
 
 <div class="container-fluid p-0">
     <div class="row g-0 min-vh-100">
 
-        <!-- SIDEBAR DESKTOP -->
+        <!-- ======================================================================= -->
+        <!-- 2. SIDEBAR – VISTA ESCRITORIO (PC)                                      -->
+        <!-- ======================================================================= -->
         <nav class="col-auto d-none d-lg-flex flex-column nl-sidebar text-white p-0" id="nl-sidebar" style="width:240px;min-height:100vh;position:sticky;top:0;height:100vh;overflow-y:auto;">
-            <a href="${pageContext.request.contextPath}/index.jsp" class="d-flex align-items-center gap-3 p-4 text-white text-decoration-none border-bottom border-white border-opacity-10">
-                <div class="rounded-3 bg-success p-2 flex-shrink-0">
-                    <i class="bi bi-heart-pulse-fill text-white fs-5"></i>
-                </div>
-                <div>
-                    <div class="fw-bold small text-white" style="letter-spacing:1px;">NURSELOGIC</div>
-                    <div style="font-size:.62rem;" class="text-white-50">Gestión Clínica</div>
-                </div>
+          <div class="p-4 border-bottom border-white border-opacity-10">
+            <a href="${pageContext.request.contextPath}/index.jsp" class="d-flex align-items-center gap-3 text-white text-decoration-none mb-3">
+              <div class="rounded-3 bg-success p-2 flex-shrink-0">
+                <i class="bi bi-heart-pulse-fill text-white fs-5"></i>
+              </div>
+              <div>
+                <div class="fw-bold small text-white" style="letter-spacing:1px;">NURSELOGIC</div>
+                <div style="font-size:.62rem;" class="text-white-50">Gestion Clinica · Ecuador</div>
+              </div>
             </a>
-            <div class="px-4 py-3">
-                <small class="fw-bold text-uppercase" style="color:rgba(255,255,255,.3);font-size:.65rem;letter-spacing:1px;">Navegación Principal</small>
+            <div class="rounded bg-white bg-opacity-10 py-1.5 px-3 text-center small text-white-50" style="font-size: 0.8rem; letter-spacing: 0.5px;">
+              <i class="bi bi-person-badge me-1"></i><%= tituloRol %>
             </div>
-            <ul class="nav flex-column px-2 flex-grow-1">
-                <li class="nav-item">
-                    <a href="${pageContext.request.contextPath}/index.jsp" id="nav-dashboard" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-                        <i class="bi bi-grid-1x2-fill"></i><span>Dashboard</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="${pageContext.request.contextPath}/PacientesServlet" id="nav-pacientes" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-                        <i class="bi bi-person-vcard-fill"></i><span>Pacientes</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="${pageContext.request.contextPath}/SignosVitalesServlet" id="nav-signos" class="nav-link nl-nav-link active d-flex align-items-center gap-3 py-2 px-3">
-                        <i class="bi bi-activity"></i><span>Signos Vitales</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="${pageContext.request.contextPath}/GlasgowServlet" id="nav-glasgow" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-                        <i class="bi bi-clipboard2-data-fill"></i><span>Escala Glasgow</span>
-                    </a>
-                </li>
+          </div>
+
+          <div class="px-4 py-3">
+            <small class="fw-bold text-uppercase" style="color:rgba(255,255,255,.3);font-size:.65rem;letter-spacing:1px;">MENU PRINCIPAL</small>
+          </div>
+
+          <ul class="nav flex-column px-2 flex-grow-1">
+            <li class="nav-item">
+              <a href="${pageContext.request.contextPath}/index.jsp" id="nav-dashboard" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+                <i class="bi bi-grid-1x2-fill"></i><span>Dashboard</span>
+              </a>
+            </li>
+            <% if (esAdmin) { %>
+            <li class="nav-item">
+              <a href="${pageContext.request.contextPath}/GestionarUsuariosServlet" id="nav-usuarios" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+                <i class="bi bi-people-fill"></i><span>Gestionar Usuarios</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="${pageContext.request.contextPath}/GestionarCatalogoServlet" id="nav-catalogo" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+                <i class="bi bi-journal-medical"></i><span>Catalogo Medicamentos</span>
+              </a>
+            </li>
+            <% } else { %>
+            <li class="nav-item">
+              <a href="${pageContext.request.contextPath}/PacientesServlet" id="nav-pacientes" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+                <i class="bi bi-person-badge"></i><span>Gestionar Pacientes</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="${pageContext.request.contextPath}/SignosVitalesServlet" id="nav-signos" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3 active">
+                <i class="bi bi-activity"></i><span>Signos Vitales</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="${pageContext.request.contextPath}/GlasgowServlet" id="nav-glasgow" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+                <i class="bi bi-file-earmark-bar-graph"></i><span>Escala Glasgow</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="${pageContext.request.contextPath}/DosificacionServlet" id="nav-dosificacion" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+                <i class="bi bi-droplet"></i><span>Calcular Dosis</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="${pageContext.request.contextPath}/AdministracionServlet" id="nav-admin" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+                <i class="bi bi-clipboard-check"></i><span>Administracion</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="${pageContext.request.contextPath}/ReportesServlet" id="nav-reportes" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+                <i class="bi bi-graph-up"></i><span>Reportes</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="${pageContext.request.contextPath}/calculadora.jsp" id="nav-imc" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+                <i class="bi bi-calculator"></i><span>Calculadora IMC</span>
+              </a>
+            </li>
+            <% } %>
+          </ul>
+
+          <div class="border-top border-white border-opacity-10 p-3 mt-auto">
+            <div class="d-flex align-items-center gap-2 mb-3">
+              <div class="rounded-circle bg-success d-flex align-items-center justify-content-center flex-shrink-0" style="width:36px;height:36px;">
+                <i class="bi bi-person-fill text-white small"></i>
+              </div>
+              <div class="overflow-hidden">
+                <div class="text-white small fw-semibold text-truncate"><%= nombreSesion %></div>
+                <div style="font-size:.7rem;" class="text-white-50"><%= tituloRol %></div>
+              </div>
+            </div>
+            <ul class="nav flex-column gap-1 p-0 small">
+              <li class="nav-item">
+                <a href="${pageContext.request.contextPath}/CambioContrasenaServlet" id="nav-cambiopass" class="nav-link text-white-50 p-1 d-flex align-items-center gap-2" style="font-size: 0.8rem;">
+                  <i class="bi bi-key"></i> Cambiar contraseña
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="${pageContext.request.contextPath}/LogoutServlet" id="nav-logout" class="nav-link text-white-50 p-1 d-flex align-items-center gap-2" style="font-size: 0.8rem;">
+                  <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+                </a>
+              </li>
             </ul>
+          </div>
         </nav>
 
-        <!-- CONTENIDO PRINCIPAL -->
+        <!-- ======================================================================= -->
+        <!-- 3. CONTENIDO PRINCIPAL Y TOPBARS                                        -->
+        <!-- ======================================================================= -->
         <div class="col nl-main-col">
+
             <!-- Topbar móvil -->
             <nav class="navbar navbar-dark bg-brand-gradient d-lg-none shadow-sm px-3">
-                <div class="container-fluid px-0">
-                    <button class="navbar-toggler border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMobile">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <span class="navbar-brand fw-bold mb-0">NURSELOGIC</span>
-                </div>
+              <div class="container-fluid px-0">
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMobile">
+                  <span class="navbar-toggler-icon"></span>
+                </button>
+                <span class="navbar-brand fw-bold mb-0">NURSELOGIC</span>
+              </div>
             </nav>
 
-            <!-- Topbar desktop -->
-            <header class="navbar navbar-dark bg-brand-gradient d-none d-lg-flex shadow-sm px-4" style="min-height:62px;">
-                <div class="small text-white-50 d-flex align-items-center gap-2">
-                    <i class="bi bi-house-fill"></i><span>/</span><span>Herramientas</span><span>/</span>
-                    <span class="text-white fw-semibold">Signos Vitales</span>
-                </div>
-                <div class="ms-auto d-flex align-items-center gap-2">
-                    <% if (cedulaParam != null && !cedulaParam.trim().isEmpty()) { %>
-                    <a href="${pageContext.request.contextPath}/PanelPacienteServlet?cedula=<%= cedulaParam %>" class="btn btn-outline-light btn-sm d-flex align-items-center gap-1">
-                        <i class="bi bi-arrow-left"></i> Volver al Panel del Paciente
-                    </a>
-                    <% } else { %>
-                    <% } %>
-                </div>
+            <!-- Topbar Escritorio -->
+            <header id="nl-topbar" class="navbar navbar-dark bg-brand-gradient d-none d-lg-flex shadow-sm px-4" style="min-height:62px;">
+              <span class="navbar-brand fw-semibold mb-0 d-flex align-items-center gap-2" style="font-size: 0.95rem;">
+                <i class="bi bi-activity"></i>
+                Gestión de Signos Vitales &middot; <%= tituloRol %>
+              </span>
+              <div class="d-flex align-items-center gap-3 ms-auto">
+                <span class="text-white-50 small d-flex align-items-center gap-1">
+                  <i class="bi bi-person-circle"></i><%= nombreSesion %>
+                </span>
+                <a href="${pageContext.request.contextPath}/LogoutServlet" id="btnLogoutTop" class="btn btn-outline-light btn-sm d-flex align-items-center gap-1">
+                  <i class="bi bi-box-arrow-right"></i>Salir
+                </a>
+              </div>
             </header>
 
             <main class="p-4">
-                <!-- ENCABEZADO -->
+                <!-- ENCABEZADO INTERNO -->
                 <div class="d-flex align-items-center justify-content-between mb-4">
                     <div>
                         <h1 class="h4 fw-bold mb-0 text-dark d-flex align-items-center gap-2">
@@ -171,7 +308,7 @@
                 </div>
 
                 <% if (!tienePaciente) { %>
-                <!-- ══════════ BUSCADOR POR CÉDULA (acceso directo, sin paciente) ══════════ -->
+                <!-- ══════════ BUSCADOR POR CÉDULA ══════════ -->
                 <div class="row justify-content-center">
                     <div class="col-lg-6 col-md-8">
                         <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
@@ -210,11 +347,8 @@
                 <% } else { %>
 
                 <div class="row g-4">
-
                     <!-- ══════════ COLUMNA IZQUIERDA: FORMULARIO ══════════ -->
                     <div class="col-lg-7">
-
-                        <!-- ALERTAS DE SISTEMA -->
                         <% if (errorMsg != null) { %>
                         <div class="alert alert-danger d-flex align-items-center gap-2" role="alert">
                             <i class="bi bi-exclamation-triangle-fill"></i><span><%= errorMsg %></span>
@@ -397,7 +531,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
                 <% } %>
             </main>
