@@ -96,7 +96,7 @@ CREATE TABLE IF NOT EXISTS antecedente (
 CREATE TABLE IF NOT EXISTS signovital (
     IdSignoVital INT AUTO_INCREMENT PRIMARY KEY,
     IdPaciente INT NOT NULL,
-    FechaHora DATETIME,
+    FechaHora DATETIME(0),
     Temperatura DECIMAL(4,2),
     PresionSistolica INT,
     PresionDiastolica INT,
@@ -106,7 +106,7 @@ CREATE TABLE IF NOT EXISTS signovital (
     Glicemia DECIMAL(5,1),
     AlertaGenerada CHAR(1),
     FOREIGN KEY (IdPaciente) REFERENCES paciente(IdPaciente)
-);
+    );
 
 -- 9. Tabla: escalaglasgow
 CREATE TABLE IF NOT EXISTS escalaglasgow (
