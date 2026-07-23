@@ -7,23 +7,19 @@
 <%@ page import="com.rrparedes.dao.PacienteDAO, com.rrparedes.model.Paciente" %>
 <%@ page import="com.rrparedes.model.EscalaGlasgow, java.util.List" %>
 <%
-    /* ── Variables de sesión y rol ── */
-    String rolSesion    = (session != null) ? (String) session.getAttribute("rol")           : "";
-    String usuarioSesion= (session != null) ? (String) session.getAttribute("usuario")        : "usuario";
-    String nombreSesion = (session != null) ? (String) session.getAttribute("nombreCompleto") : usuarioSesion;
-    if (nombreSesion == null) nombreSesion = usuarioSesion;
-    boolean esAdmin  = "ADMINISTRADOR".equals(rolSesion);
-    String tituloRol = esAdmin ? "Administrador" : "Enfermero/a";
+    String nombreSesion = (session != null) ? (String) session.getAttribute("nombreCompleto") : "";
+    if (nombreSesion == null) nombreSesion = (session != null) ? (String) session.getAttribute("usuario") : "";
 
-    /* ── Lógica de búsqueda de paciente ── */
     String cedulaParam  = request.getParameter("cedula");
     String nombreParam  = request.getParameter("Paciente");
+    Integer edadParam    = null;
 
-    if ((nombreParam == null || nombreParam.trim().isEmpty()) && cedulaParam != null && !cedulaParam.trim().isEmpty()) {
+    if (cedulaParam != null && !cedulaParam.trim().isEmpty()) {
         PacienteDAO pDao = new PacienteDAO();
         Paciente p = pDao.buscarPorCedula(cedulaParam.trim());
         if (p != null) {
             nombreParam = p.getNombres() + " " + p.getApellidos();
+            edadParam = p.getEdad();
         }
     }
 
@@ -43,7 +39,7 @@
         else if (nivel.equals("Grave")) nivelBadgeClass = "bg-danger";
     }
 
-    /* ── Historial de la escala ── */
+    // Historial de evaluaciones previas de Glasgow para este paciente
     List<EscalaGlasgow> historialGlasgow = (List<EscalaGlasgow>) request.getAttribute("historialGlasgow");
     boolean yaTienePrueba = (historialGlasgow != null && !historialGlasgow.isEmpty());
     EscalaGlasgow ultimaPrueba = yaTienePrueba ? historialGlasgow.get(0) : null;
@@ -75,262 +71,120 @@
 </head>
 <body class="bg-light" style="font-family:'Inter',sans-serif;">
 
-<!-- ======================================================================= -->
-<!-- 1. OFFCANVAS SIDEBAR – VISTA MÓVIL                                      -->
-<!-- ======================================================================= -->
+<!-- OFFCANVAS SIDEBAR (móvil) -->
 <div class="offcanvas offcanvas-start nl-sidebar text-white" id="sidebarMobile" style="width:240px;" tabindex="-1">
-  <div class="offcanvas-header border-bottom border-white border-opacity-10 py-3 flex-column align-items-start gap-2">
-    <div class="d-flex w-100 justify-content-between align-items-center">
-      <span class="fw-bold text-white">NURSELOGIC</span>
-      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+    <div class="offcanvas-header border-bottom border-white border-opacity-10 py-3">
+        <span class="fw-bold text-white">NURSELOGIC</span>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
     </div>
-    <div class="rounded bg-white bg-opacity-10 w-100 py-1.5 px-3 text-center small text-white-50" style="font-size: 0.8rem; letter-spacing: 0.5px;">
-      <i class="bi bi-person-badge me-1"></i><%= tituloRol %>
-    </div>
-  </div>
-  <div class="offcanvas-body d-flex flex-column p-0">
-    <div class="px-4 py-3">
-      <small class="fw-bold text-uppercase" style="color:rgba(255,255,255,.3);font-size:.65rem;letter-spacing:1px;">MENU PRINCIPAL</small>
-    </div>
-    <ul class="nav flex-column px-2 flex-grow-1">
-      <li class="nav-item">
-        <a href="${pageContext.request.contextPath}/index.jsp" id="nav-dashboard-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-          <i class="bi bi-grid-1x2-fill"></i>Dashboard
-        </a>
-      </li>
-      <% if (esAdmin) { %>
-      <li class="nav-item">
-        <a href="${pageContext.request.contextPath}/GestionarUsuariosServlet" id="nav-usuarios-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-          <i class="bi bi-people-fill"></i>Gestionar Usuarios
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="${pageContext.request.contextPath}/GestionarCatalogoServlet" id="nav-catalogo-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-          <i class="bi bi-journal-medical"></i>Catalogo Medicamentos
-        </a>
-      </li>
-      <% } else { %>
-      <li class="nav-item">
-        <a href="${pageContext.request.contextPath}/PacientesServlet" id="nav-pacientes-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-          <i class="bi bi-person-badge"></i>Gestionar Pacientes
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="${pageContext.request.contextPath}/SignosVitalesServlet" id="nav-signos-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-          <i class="bi bi-activity"></i>Signos Vitales
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="${pageContext.request.contextPath}/GlasgowServlet" id="nav-glasgow-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3 active">
-          <i class="bi bi-file-earmark-bar-graph"></i>Escala Glasgow
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="${pageContext.request.contextPath}/DosificacionServlet" id="nav-dosificacion-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-          <i class="bi bi-droplet"></i>Calcular Dosis
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="${pageContext.request.contextPath}/AdministracionServlet" id="nav-admin-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-          <i class="bi bi-clipboard-check"></i>Administracion
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="${pageContext.request.contextPath}/ReportesServlet" id="nav-reportes-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-          <i class="bi bi-graph-up"></i>Reportes
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="${pageContext.request.contextPath}/calculadora.jsp" id="nav-imc-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-          <i class="bi bi-calculator"></i>Calculadora IMC
-        </a>
-      </li>
-      <% } %>
-    </ul>
-    <div class="border-top border-white border-opacity-10 p-3 mt-auto">
-      <div class="d-flex align-items-center gap-2 mb-3">
-        <div class="rounded-circle bg-success d-flex align-items-center justify-content-center flex-shrink-0" style="width:36px;height:36px;">
-          <i class="bi bi-person-fill text-white small"></i>
+    <div class="offcanvas-body d-flex flex-column p-0">
+        <div class="px-4 py-3">
+            <small class="fw-bold text-uppercase" style="color:rgba(255,255,255,.3);font-size:.65rem;letter-spacing:1px;">Navegación Principal</small>
         </div>
-        <div class="overflow-hidden">
-          <div class="text-white small fw-semibold text-truncate"><%= nombreSesion %></div>
-          <div style="font-size:.7rem;" class="text-white-50"><%= tituloRol %></div>
-        </div>
-      </div>
-      <ul class="nav flex-column gap-1 p-0 small">
-        <li class="nav-item">
-          <a href="${pageContext.request.contextPath}/CambioContrasenaServlet" id="nav-cambiopass-m" class="nav-link text-white-50 p-1 d-flex align-items-center gap-2" style="font-size: 0.8rem;">
-            <i class="bi bi-key"></i> Cambiar contraseña
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="${pageContext.request.contextPath}/LogoutServlet" id="nav-logout-m" class="nav-link text-white-50 p-1 d-flex align-items-center gap-2" style="font-size: 0.8rem;">
-            <i class="bi bi-box-arrow-right"></i> Cerrar sesión
-          </a>
-        </li>
-      </ul>
+        <ul class="nav flex-column px-2 flex-grow-1">
+            <li class="nav-item">
+                <a href="${pageContext.request.contextPath}/index.jsp" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+                    <i class="bi bi-grid-1x2-fill"></i>Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="${pageContext.request.contextPath}/PacientesServlet" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+                    <i class="bi bi-person-vcard-fill"></i>Pacientes
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="${pageContext.request.contextPath}/SignosVitalesServlet" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+                    <i class="bi bi-activity"></i>Signos Vitales
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="${pageContext.request.contextPath}/GlasgowServlet" class="nav-link nl-nav-link active d-flex align-items-center gap-3 py-2 px-3">
+                    <i class="bi bi-clipboard2-data-fill"></i>Escala Glasgow
+                </a>
+            </li>
+        </ul>
     </div>
-  </div>
 </div>
 
 <div class="container-fluid p-0">
     <div class="row g-0 min-vh-100">
 
-        <!-- ======================================================================= -->
-        <!-- 2. SIDEBAR – VISTA ESCRITORIO (PC)                                      -->
-        <!-- ======================================================================= -->
+        <!-- SIDEBAR DESKTOP -->
         <nav class="col-auto d-none d-lg-flex flex-column nl-sidebar text-white p-0" id="nl-sidebar" style="width:240px;min-height:100vh;position:sticky;top:0;height:100vh;overflow-y:auto;">
-          <div class="p-4 border-bottom border-white border-opacity-10">
-            <a href="${pageContext.request.contextPath}/index.jsp" class="d-flex align-items-center gap-3 text-white text-decoration-none mb-3">
-              <div class="rounded-3 bg-success p-2 flex-shrink-0">
-                <i class="bi bi-heart-pulse-fill text-white fs-5"></i>
-              </div>
-              <div>
-                <div class="fw-bold small text-white" style="letter-spacing:1px;">NURSELOGIC</div>
-                <div style="font-size:.62rem;" class="text-white-50">Gestion Clinica · Ecuador</div>
-              </div>
+            <a href="${pageContext.request.contextPath}/index.jsp" class="d-flex align-items-center gap-3 p-4 text-white text-decoration-none border-bottom border-white border-opacity-10">
+                <div class="rounded-3 bg-success p-2 flex-shrink-0">
+                    <i class="bi bi-heart-pulse-fill text-white fs-5"></i>
+                </div>
+                <div>
+                    <div class="fw-bold small text-white" style="letter-spacing:1px;">NURSELOGIC</div>
+                    <div style="font-size:.62rem;" class="text-white-50">Gestión Clínica</div>
+                </div>
             </a>
-            <div class="rounded bg-white bg-opacity-10 py-1.5 px-3 text-center small text-white-50" style="font-size: 0.8rem; letter-spacing: 0.5px;">
-              <i class="bi bi-person-badge me-1"></i><%= tituloRol %>
+            <div class="px-4 py-3">
+                <small class="fw-bold text-uppercase" style="color:rgba(255,255,255,.3);font-size:.65rem;letter-spacing:1px;">Navegación Principal</small>
             </div>
-          </div>
-
-          <div class="px-4 py-3">
-            <small class="fw-bold text-uppercase" style="color:rgba(255,255,255,.3);font-size:.65rem;letter-spacing:1px;">MENU PRINCIPAL</small>
-          </div>
-
-          <ul class="nav flex-column px-2 flex-grow-1">
-            <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/index.jsp" id="nav-dashboard" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-                <i class="bi bi-grid-1x2-fill"></i><span>Dashboard</span>
-              </a>
-            </li>
-            <% if (esAdmin) { %>
-            <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/GestionarUsuariosServlet" id="nav-usuarios" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-                <i class="bi bi-people-fill"></i><span>Gestionar Usuarios</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/GestionarCatalogoServlet" id="nav-catalogo" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-                <i class="bi bi-journal-medical"></i><span>Catalogo Medicamentos</span>
-              </a>
-            </li>
-            <% } else { %>
-            <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/PacientesServlet" id="nav-pacientes" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-                <i class="bi bi-person-badge"></i><span>Gestionar Pacientes</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/SignosVitalesServlet" id="nav-signos" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-                <i class="bi bi-activity"></i><span>Signos Vitales</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/GlasgowServlet" id="nav-glasgow" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3 active">
-                <i class="bi bi-file-earmark-bar-graph"></i><span>Escala Glasgow</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/DosificacionServlet" id="nav-dosificacion" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-                <i class="bi bi-droplet"></i><span>Calcular Dosis</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/AdministracionServlet" id="nav-admin" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-                <i class="bi bi-clipboard-check"></i><span>Administracion</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/ReportesServlet" id="nav-reportes" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-                <i class="bi bi-graph-up"></i><span>Reportes</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/calculadora.jsp" id="nav-imc" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-                <i class="bi bi-calculator"></i><span>Calculadora IMC</span>
-              </a>
-            </li>
-            <% } %>
-          </ul>
-
-          <div class="border-top border-white border-opacity-10 p-3 mt-auto">
-            <div class="d-flex align-items-center gap-2 mb-3">
-              <div class="rounded-circle bg-success d-flex align-items-center justify-content-center flex-shrink-0" style="width:36px;height:36px;">
-                <i class="bi bi-person-fill text-white small"></i>
-              </div>
-              <div class="overflow-hidden">
-                <div class="text-white small fw-semibold text-truncate"><%= nombreSesion %></div>
-                <div style="font-size:.7rem;" class="text-white-50"><%= tituloRol %></div>
-              </div>
-            </div>
-            <ul class="nav flex-column gap-1 p-0 small">
-              <li class="nav-item">
-                <a href="${pageContext.request.contextPath}/CambioContrasenaServlet" id="nav-cambiopass" class="nav-link text-white-50 p-1 d-flex align-items-center gap-2" style="font-size: 0.8rem;">
-                  <i class="bi bi-key"></i> Cambiar contraseña
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="${pageContext.request.contextPath}/LogoutServlet" id="nav-logout" class="nav-link text-white-50 p-1 d-flex align-items-center gap-2" style="font-size: 0.8rem;">
-                  <i class="bi bi-box-arrow-right"></i> Cerrar sesión
-                </a>
-              </li>
+            <ul class="nav flex-column px-2 flex-grow-1">
+                <li class="nav-item">
+                    <a href="${pageContext.request.contextPath}/index.jsp" id="nav-dashboard" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+                        <i class="bi bi-grid-1x2-fill"></i><span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="${pageContext.request.contextPath}/PacientesServlet" id="nav-pacientes" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+                        <i class="bi bi-person-vcard-fill"></i><span>Pacientes</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="${pageContext.request.contextPath}/SignosVitalesServlet" id="nav-signos" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+                        <i class="bi bi-activity"></i><span>Signos Vitales</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="${pageContext.request.contextPath}/GlasgowServlet" id="nav-glasgow" class="nav-link nl-nav-link active d-flex align-items-center gap-3 py-2 px-3">
+                        <i class="bi bi-clipboard2-data-fill"></i><span>Escala Glasgow</span>
+                    </a>
+                </li>
             </ul>
-          </div>
         </nav>
 
         <!-- CONTENIDO PRINCIPAL -->
         <div class="col nl-main-col">
-            <!-- ======================================================================= -->
-            <!-- 3. TOPBARS – MÓVIL Y ESCRITORIO                                         -->
-            <!-- ======================================================================= -->
             <!-- Topbar móvil -->
             <nav class="navbar navbar-dark bg-brand-gradient d-lg-none shadow-sm px-3">
-              <div class="container-fluid px-0">
-                <button class="navbar-toggler border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMobile">
-                  <span class="navbar-toggler-icon"></span>
-                </button>
-                <span class="navbar-brand fw-bold mb-0">NURSELOGIC</span>
-              </div>
+                <div class="container-fluid px-0">
+                    <button class="navbar-toggler border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMobile">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <span class="navbar-brand fw-bold mb-0">NURSELOGIC</span>
+                </div>
             </nav>
 
-            <!-- Topbar Escritorio Estilo Plantilla Base -->
-            <header id="nl-topbar" class="navbar navbar-dark bg-brand-gradient d-none d-lg-flex shadow-sm px-4" style="min-height:62px;">
-              <span class="navbar-brand fw-semibold mb-0 d-flex align-items-center gap-2">
-                <i class="bi bi-file-earmark-bar-graph-fill"></i>
-                Escala de Glasgow &middot; <%= tituloRol %>
-              </span>
-              <div class="d-flex align-items-center gap-3 ms-auto">
-                <span class="text-white-50 small d-flex align-items-center gap-1">
-                  <i class="bi bi-person-circle"></i><%= nombreSesion %>
-                </span>
-                <a href="${pageContext.request.contextPath}/LogoutServlet" id="btnLogoutTop" class="btn btn-outline-light btn-sm d-flex align-items-center gap-1">
-                  <i class="bi bi-box-arrow-right"></i>Salir
-                </a>
-              </div>
+            <!-- Topbar desktop -->
+            <header class="navbar navbar-dark bg-brand-gradient d-none d-lg-flex shadow-sm px-4" style="min-height:62px;">
+                <div class="small text-white-50 d-flex align-items-center gap-2">
+                    <i class="bi bi-house-fill"></i><span>/</span><span>Herramientas</span><span>/</span>
+                    <span class="text-white fw-semibold">Escala de Glasgow</span>
+                </div>
+                <div class="ms-auto d-flex align-items-center gap-2">
+                    <% if (cedulaParam != null && !cedulaParam.trim().isEmpty()) { %>
+                    <a href="${pageContext.request.contextPath}/PanelPacienteServlet?cedula=<%= cedulaParam %>" class="btn btn-outline-light btn-sm d-flex align-items-center gap-1">
+                        <i class="bi bi-arrow-left"></i> Volver al Panel del Paciente
+                    </a>
+                    <% } else { %>
+                    <button type="button" onclick="history.back()" class="btn btn-outline-light btn-sm d-flex align-items-center gap-1">
+                        <i class="bi bi-arrow-left"></i> Volver
+                    </button>
+                    <% } %>
+                </div>
             </header>
 
             <main class="p-4" style="background:#f4f7f6;">
-                <!-- ENCABEZADO TÍTULO MÓDULO + BOTÓN VOLVER AL PANEL -->
-                <div class="d-flex align-items-center justify-content-between mb-4">
-                    <div>
-                        <h1 class="h4 fw-bold mb-0 text-dark d-flex align-items-center gap-2">
-                            <i class="bi bi-clipboard2-pulse-fill text-success"></i> Escala de Glasgow
-                        </h1>
-                        <p class="text-muted small mb-0">Valoración neurológica del paciente</p>
-                    </div>
-                    <div>
-                        <% if (cedulaParam != null && !cedulaParam.trim().isEmpty()) { %>
-                        <a href="${pageContext.request.contextPath}/PanelPacienteServlet?cedula=<%= cedulaParam.trim() %>" class="btn btn-white btn-sm shadow-sm border text-secondary d-flex align-items-center gap-2 px-3 py-2 rounded-3 fw-medium">
-                            <i class="bi bi-arrow-left-short fs-5 text-muted"></i> Volver al Panel
-                        </a>
-                        <% } else { %>
-                        <button type="button" onclick="history.back()" class="btn btn-white btn-sm shadow-sm border text-secondary d-flex align-items-center gap-2 px-3 py-2 rounded-3 fw-medium">
-                            <i class="bi bi-arrow-left-short fs-5 text-muted"></i> Volver
-                        </button>
-                        <% } %>
-                    </div>
+                <!-- ENCABEZADO -->
+                <div class="mb-4">
+                    <h1 class="h4 fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                        <i class="bi bi-clipboard2-pulse-fill text-success"></i> Escala de Glasgow
+                    </h1>
+                    <p class="text-muted small mb-0">Valoración neurológica</p>
                 </div>
 
                 <% if (!tienePaciente) { %>
@@ -369,13 +223,16 @@
 
                 <!-- BANNER PACIENTE -->
                 <div class="rounded-4 mb-4 p-4 text-white d-flex align-items-center gap-3 flex-wrap"
-                     style="background:linear-gradient(120deg,#0f5b4c,#159a7a 60%,#1fb88f); shadow-sm">
+                     style="background:linear-gradient(120deg,#0f5b4c,#159a7a 60%,#1fb88f);">
                     <div class="rounded-circle bg-white bg-opacity-25 d-flex align-items-center justify-content-center fw-bold fs-4 flex-shrink-0" style="width:56px;height:56px;">
                         <%= nombreParam.trim().substring(0,1).toUpperCase() %>
                     </div>
                     <div class="flex-grow-1">
                         <div class="fw-bold fs-5"><%= nombreParam %></div>
-                        <div class="text-white-50 small"><i class="bi bi-clipboard2-data me-1"></i>Evaluación de Escala de Glasgow</div>
+                        <div class="text-white-50 small d-flex align-items-center gap-3 flex-wrap">
+                            <span><i class="bi bi-person-vcard me-1"></i>C.I. <%= cedulaParam != null ? cedulaParam.trim() : "-" %></span>
+                            <span><i class="bi bi-calendar3 me-1"></i><%= edadParam != null ? edadParam + " años" : "Edad no registrada" %></span>
+                        </div>
                     </div>
                     <% if (yaTienePrueba) { %>
                     <div class="text-center px-3 border-start border-white border-opacity-25">
@@ -427,7 +284,7 @@
                                         <div class="flex-grow-1" style="min-width:200px;">
                                             <label class="form-label small fw-semibold text-uppercase text-muted" for="FechaHora">Fecha y Hora *</label>
                                             <input type="datetime-local" id="FechaHora" name="FechaHora" class="form-control form-control-lg" required/>
-                                            <div id="nivelTexto" class="small fw-semibold mt-2 text-muted">Complete los 3 componentes para ver el resultado</div>
+                                            <div id="nivelTexto" class="small fw-semibold mt-2 text-muted">Seleccione al menos un componente para ver el puntaje</div>
                                         </div>
                                     </div>
 
@@ -436,19 +293,19 @@
                                     <!-- RESPUESTA OCULAR -->
                                     <div class="mb-4">
                                         <label class="form-label small fw-semibold text-uppercase text-muted d-flex align-items-center gap-2">
-                                            <i class="bi bi-eye-fill"></i> Respuesta Ocular
+                                            <i class="bi bi-eye-fill"></i> Respuesta Ocular <span class="text-muted fw-normal">(1-4)</span>
                                         </label>
                                         <div class="btn-group w-100 nl-glasgow-group" role="group">
-                                            <input type="radio" class="btn-check nl-glasgow-input" name="Ocular" id="oc4" value="4" autocomplete="off">
+                                            <input type="radio" class="btn-check nl-glasgow-input" name="Ocular" id="oc4" value="4" autocomplete="off" data-label="Espontánea">
                                             <label class="btn btn-outline-success py-2" for="oc4">4<br><small>Espontánea</small></label>
 
-                                            <input type="radio" class="btn-check nl-glasgow-input" name="Ocular" id="oc3" value="3" autocomplete="off">
+                                            <input type="radio" class="btn-check nl-glasgow-input" name="Ocular" id="oc3" value="3" autocomplete="off" data-label="Al estímulo verbal">
                                             <label class="btn btn-outline-success py-2" for="oc3">3<br><small>Al hablarle</small></label>
 
-                                            <input type="radio" class="btn-check nl-glasgow-input" name="Ocular" id="oc2" value="2" autocomplete="off">
+                                            <input type="radio" class="btn-check nl-glasgow-input" name="Ocular" id="oc2" value="2" autocomplete="off" data-label="Al estímulo doloroso">
                                             <label class="btn btn-outline-success py-2" for="oc2">2<br><small>Al dolor</small></label>
 
-                                            <input type="radio" class="btn-check nl-glasgow-input" name="Ocular" id="oc1" value="1" autocomplete="off">
+                                            <input type="radio" class="btn-check nl-glasgow-input" name="Ocular" id="oc1" value="1" autocomplete="off" data-label="Ninguna">
                                             <label class="btn btn-outline-success py-2" for="oc1">1<br><small>Ninguna</small></label>
                                         </div>
                                     </div>
@@ -456,22 +313,22 @@
                                     <!-- RESPUESTA VERBAL -->
                                     <div class="mb-4">
                                         <label class="form-label small fw-semibold text-uppercase text-muted d-flex align-items-center gap-2">
-                                            <i class="bi bi-chat-dots-fill"></i> Respuesta Verbal
+                                            <i class="bi bi-chat-dots-fill"></i> Respuesta Verbal <span class="text-muted fw-normal">(1-5)</span>
                                         </label>
                                         <div class="btn-group w-100 nl-glasgow-group" role="group">
-                                            <input type="radio" class="btn-check nl-glasgow-input" name="Verbal" id="ve5" value="5" autocomplete="off">
+                                            <input type="radio" class="btn-check nl-glasgow-input" name="Verbal" id="ve5" value="5" autocomplete="off" data-label="Orientada">
                                             <label class="btn btn-outline-success py-2" for="ve5">5<br><small>Orientada</small></label>
 
-                                            <input type="radio" class="btn-check nl-glasgow-input" name="Verbal" id="ve4" value="4" autocomplete="off">
+                                            <input type="radio" class="btn-check nl-glasgow-input" name="Verbal" id="ve4" value="4" autocomplete="off" data-label="Confusa">
                                             <label class="btn btn-outline-success py-2" for="ve4">4<br><small>Confusa</small></label>
 
-                                            <input type="radio" class="btn-check nl-glasgow-input" name="Verbal" id="ve3" value="3" autocomplete="off">
+                                            <input type="radio" class="btn-check nl-glasgow-input" name="Verbal" id="ve3" value="3" autocomplete="off" data-label="Palabras inapropiadas">
                                             <label class="btn btn-outline-success py-2" for="ve3">3<br><small>Inapropiada</small></label>
 
-                                            <input type="radio" class="btn-check nl-glasgow-input" name="Verbal" id="ve2" value="2" autocomplete="off">
+                                            <input type="radio" class="btn-check nl-glasgow-input" name="Verbal" id="ve2" value="2" autocomplete="off" data-label="Sonidos incomprensibles">
                                             <label class="btn btn-outline-success py-2" for="ve2">2<br><small>Incompren.</small></label>
 
-                                            <input type="radio" class="btn-check nl-glasgow-input" name="Verbal" id="ve1" value="1" autocomplete="off">
+                                            <input type="radio" class="btn-check nl-glasgow-input" name="Verbal" id="ve1" value="1" autocomplete="off" data-label="Ninguna">
                                             <label class="btn btn-outline-success py-2" for="ve1">1<br><small>Ninguna</small></label>
                                         </div>
                                     </div>
@@ -479,25 +336,25 @@
                                     <!-- RESPUESTA MOTORA -->
                                     <div class="mb-4">
                                         <label class="form-label small fw-semibold text-uppercase text-muted d-flex align-items-center gap-2">
-                                            <i class="bi bi-hand-index-thumb-fill"></i> Respuesta Motor
+                                            <i class="bi bi-hand-index-thumb-fill"></i> Respuesta Motora <span class="text-muted fw-normal">(1-6)</span>
                                         </label>
                                         <div class="btn-group w-100 nl-glasgow-group flex-wrap" role="group">
-                                            <input type="radio" class="btn-check nl-glasgow-input" name="Motor" id="mo6" value="6" autocomplete="off">
+                                            <input type="radio" class="btn-check nl-glasgow-input" name="Motor" id="mo6" value="6" autocomplete="off" data-label="Obedece órdenes">
                                             <label class="btn btn-outline-success py-2" for="mo6">6<br><small>Obedece</small></label>
 
-                                            <input type="radio" class="btn-check nl-glasgow-input" name="Motor" id="mo5" value="5" autocomplete="off">
+                                            <input type="radio" class="btn-check nl-glasgow-input" name="Motor" id="mo5" value="5" autocomplete="off" data-label="Localiza el dolor">
                                             <label class="btn btn-outline-success py-2" for="mo5">5<br><small>Localiza</small></label>
 
-                                            <input type="radio" class="btn-check nl-glasgow-input" name="Motor" id="mo4" value="4" autocomplete="off">
+                                            <input type="radio" class="btn-check nl-glasgow-input" name="Motor" id="mo4" value="4" autocomplete="off" data-label="Retira ante el dolor">
                                             <label class="btn btn-outline-success py-2" for="mo4">4<br><small>Retira</small></label>
 
-                                            <input type="radio" class="btn-check nl-glasgow-input" name="Motor" id="mo3" value="3" autocomplete="off">
+                                            <input type="radio" class="btn-check nl-glasgow-input" name="Motor" id="mo3" value="3" autocomplete="off" data-label="Flexión anormal">
                                             <label class="btn btn-outline-success py-2" for="mo3">3<br><small>Flexión</small></label>
 
-                                            <input type="radio" class="btn-check nl-glasgow-input" name="Motor" id="mo2" value="2" autocomplete="off">
+                                            <input type="radio" class="btn-check nl-glasgow-input" name="Motor" id="mo2" value="2" autocomplete="off" data-label="Extensión anormal">
                                             <label class="btn btn-outline-success py-2" for="mo2">2<br><small>Extensión</small></label>
 
-                                            <input type="radio" class="btn-check nl-glasgow-input" name="Motor" id="mo1" value="1" autocomplete="off">
+                                            <input type="radio" class="btn-check nl-glasgow-input" name="Motor" id="mo1" value="1" autocomplete="off" data-label="Ninguna">
                                             <label class="btn btn-outline-success py-2" for="mo1">1<br><small>Ninguna</small></label>
                                         </div>
                                     </div>
@@ -531,15 +388,20 @@
                                     </p>
                                 </div>
                             </div>
-                            <div class="card-body p-4" style="max-height:720px;overflow-y:auto;">
+                            <div class="card-body p-4">
                                 <% if (!yaTienePrueba) { %>
                                 <div class="text-center text-muted py-5">
                                     <i class="bi bi-inbox fs-1 d-block mb-2 opacity-50"></i>
                                     <span class="small">Este paciente no tiene evaluaciones de Glasgow registradas todavía.</span>
                                 </div>
-                                <% } else { %>
+                                <% } else {
+                                    int totalRegistros = historialGlasgow.size();
+                                    int limiteReciente = Math.min(3, totalRegistros);
+                                %>
                                 <div class="nl-timeline">
-                                    <% for (EscalaGlasgow registro : historialGlasgow) {
+                                    <!-- 3 más recientes, siempre visibles -->
+                                    <% for (int i = 0; i < limiteReciente; i++) {
+                                        EscalaGlasgow registro = historialGlasgow.get(i);
                                         String nivelReg = registro.getNivelSeveridad();
                                         if (nivelReg == null && registro.getPuntajeTotal() != null) {
                                             int t = registro.getPuntajeTotal();
@@ -555,9 +417,9 @@
                                         <span class="nl-timeline-dot" style="background:<%= dotColor %>;"></span>
                                         <div class="nl-timeline-content">
                                             <div class="d-flex justify-content-between align-items-start gap-2 mb-1">
-                                                <span class="small fw-semibold text-dark">
-                                                  <%= registro.getFechaHora() != null ? registro.getFechaHora().toString().replace("T", " ") : "-" %>
-                                                </span>
+                            <span class="small fw-semibold text-dark">
+                              <%= registro.getFechaHora() != null ? registro.getFechaHora().toString().replace("T", " ") : "-" %>
+                            </span>
                                                 <span class="badge <%= badgeReg %> rounded-pill px-2 py-1"><%= nivelReg %></span>
                                             </div>
                                             <div class="d-flex align-items-center justify-content-between">
@@ -577,6 +439,77 @@
                                     </div>
                                     <% } %>
                                 </div>
+
+                                <!-- Registros restantes: colapsables, con scroll propio -->
+                                <% if (totalRegistros > 3) { %>
+                                <button class="btn btn-outline-secondary btn-sm w-100 d-flex align-items-center justify-content-center gap-2 mt-2"
+                                        type="button" id="btnVerTodoHistorialV2">
+                                    <i class="bi bi-chevron-down"></i>
+                                    <span>Ver los <%= totalRegistros - 3 %> registro<%= (totalRegistros - 3) != 1 ? "s" : "" %> restante<%= (totalRegistros - 3) != 1 ? "s" : "" %></span>
+                                </button>
+
+                                <div class="nl-collapse mt-2" id="historialRestanteV2">
+                                    <div style="max-height:320px;overflow-y:auto;" class="pe-1">
+                                        <div class="nl-timeline">
+                                            <% for (int i = 3; i < totalRegistros; i++) {
+                                                EscalaGlasgow registro = historialGlasgow.get(i);
+                                                String nivelReg = registro.getNivelSeveridad();
+                                                if (nivelReg == null && registro.getPuntajeTotal() != null) {
+                                                    int t = registro.getPuntajeTotal();
+                                                    nivelReg = t >= 13 ? "Leve" : t >= 9 ? "Moderado" : "Grave";
+                                                }
+                                                String dotColor = "#6c757d";
+                                                String badgeReg = "bg-secondary";
+                                                if ("Leve".equals(nivelReg)) { dotColor = "#198754"; badgeReg = "bg-success"; }
+                                                else if ("Moderado".equals(nivelReg)) { dotColor = "#ffc107"; badgeReg = "bg-warning text-dark"; }
+                                                else if ("Grave".equals(nivelReg)) { dotColor = "#dc3545"; badgeReg = "bg-danger"; }
+                                            %>
+                                            <div class="nl-timeline-item">
+                                                <span class="nl-timeline-dot" style="background:<%= dotColor %>;"></span>
+                                                <div class="nl-timeline-content">
+                                                    <div class="d-flex justify-content-between align-items-start gap-2 mb-1">
+                                  <span class="small fw-semibold text-dark">
+                                    <%= registro.getFechaHora() != null ? registro.getFechaHora().toString().replace("T", " ") : "-" %>
+                                  </span>
+                                                        <span class="badge <%= badgeReg %> rounded-pill px-2 py-1"><%= nivelReg %></span>
+                                                    </div>
+                                                    <div class="d-flex align-items-center justify-content-between">
+                                                        <div class="small text-muted">
+                                                            O:<b class="text-dark"><%= registro.getRespuestaOcular() %></b>
+                                                            &nbsp;V:<b class="text-dark"><%= registro.getRespuestaVerbal() %></b>
+                                                            &nbsp;M:<b class="text-dark"><%= registro.getRespuestaMotora() %></b>
+                                                        </div>
+                                                        <div class="fw-bold text-dark"><%= registro.getPuntajeTotal() %><span class="text-muted fw-normal">/15</span></div>
+                                                    </div>
+                                                    <% if (registro.getObservacion() != null && !registro.getObservacion().trim().isEmpty()) { %>
+                                                    <div class="small text-muted fst-italic mt-1" style="font-size:.75rem;">
+                                                        <i class="bi bi-chat-left-quote me-1"></i><%= registro.getObservacion() %>
+                                                    </div>
+                                                    <% } %>
+                                                </div>
+                                            </div>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <script>
+                                    (function () {
+                                        var btn = document.getElementById('btnVerTodoHistorialV2');
+                                        var panel = document.getElementById('historialRestanteV2');
+                                        if (!btn || !panel) return;
+
+                                        var textoCerrado = 'Ver los <%= totalRegistros - 3 %> registro<%= (totalRegistros - 3) != 1 ? "s" : "" %> restante<%= (totalRegistros - 3) != 1 ? "s" : "" %>';
+                                        var textoAbierto = 'Ocultar registros anteriores';
+
+                                        btn.addEventListener('click', function () {
+                                            var abierto = panel.classList.toggle('nl-collapse-open');
+                                            btn.querySelector('span').textContent = abierto ? textoAbierto : textoCerrado;
+                                            btn.querySelector('i').className = abierto ? 'bi bi-chevron-up' : 'bi bi-chevron-down';
+                                        });
+                                    })();
+                                </script>
+                                <% } %>
                                 <% } %>
                             </div>
                         </div>
@@ -606,15 +539,11 @@
     .nl-timeline-content {
         background:#f8f9fa; border-radius:.75rem; padding:.85rem 1rem;
     }
-    .btn-white {
-        background-color: #fff;
-        color: #6c757d;
-        border-color: #dee2e6;
+    .nl-collapse {
+        display:none;
     }
-    .btn-white:hover {
-        background-color: #f8f9fa;
-        color: #495057;
-        border-color: #cde2e6;
+    .nl-collapse.nl-collapse-open {
+        display:block;
     }
 </style>
 
@@ -627,43 +556,48 @@
         var nivelTexto = document.getElementById('nivelTexto');
         var CIRCUNFERENCIA = 295.3; // 2 * PI * 47
 
-        // Preseleccionar fecha y hora actual local por defecto si está vacío
-        var dtInput = document.getElementById('FechaHora');
-        if (dtInput && !dtInput.value) {
-            var ahora = new Date();
-            var offset = ahora.getTimezoneOffset() * 60000;
-            var localISOTime = (new Date(ahora - offset)).toISOString().slice(0, 16);
-            dtInput.value = localISOTime;
-        }
-
         function actualizar() {
             var ocular = document.querySelector('input[name="Ocular"]:checked');
             var verbal = document.querySelector('input[name="Verbal"]:checked');
             var motor  = document.querySelector('input[name="Motor"]:checked');
 
-            if (ocular && verbal && motor) {
-                var total = parseInt(ocular.value, 10) + parseInt(verbal.value, 10) + parseInt(motor.value, 10);
-                var nivel = total >= 13 ? 'Leve' : total >= 9 ? 'Moderado' : 'Grave';
-                var color = nivel === 'Leve' ? '#198754' : nivel === 'Moderado' ? '#ffc107' : '#dc3545';
+            var seleccionados = [ocular, verbal, motor].filter(Boolean).length;
 
-                scoreNumber.textContent = total;
-                nivelTexto.textContent = 'Puntaje total: ' + total + '/15 — ' + nivel;
-                nivelTexto.style.color = color;
-
-                var offset = CIRCUNFERENCIA - (total / 15) * CIRCUNFERENCIA;
-                ring.style.strokeDashoffset = offset;
-                ring.style.stroke = color;
-            } else {
+            if (seleccionados === 0) {
                 scoreNumber.textContent = '--';
-                nivelTexto.textContent = 'Complete los 3 componentes para ver el resultado';
+                nivelTexto.textContent = 'Seleccione al menos un componente para ver el puntaje';
                 nivelTexto.style.color = '';
                 ring.style.strokeDashoffset = CIRCUNFERENCIA;
                 ring.style.stroke = '#adb5bd';
+                return;
+            }
+
+            var parcial = (ocular ? parseInt(ocular.value, 10) : 0)
+                + (verbal ? parseInt(verbal.value, 10) : 0)
+                + (motor ? parseInt(motor.value, 10) : 0);
+
+            scoreNumber.textContent = parcial;
+
+            var offset = CIRCUNFERENCIA - (parcial / 15) * CIRCUNFERENCIA;
+            ring.style.strokeDashoffset = offset;
+
+            if (seleccionados < 3) {
+                // Puntaje parcial: aún faltan componentes por seleccionar
+                nivelTexto.textContent = 'Puntaje parcial: ' + parcial + '/15 (faltan ' + (3 - seleccionados) + ' componente' + ((3 - seleccionados) !== 1 ? 's' : '') + ')';
+                nivelTexto.style.color = '#6c757d';
+                ring.style.stroke = '#6c9bd1';
+            } else {
+                // Los 3 componentes seleccionados: puntaje final y nivel de severidad
+                var nivel = parcial >= 13 ? 'Leve' : parcial >= 9 ? 'Moderado' : 'Grave';
+                var color = nivel === 'Leve' ? '#198754' : nivel === 'Moderado' ? '#ffc107' : '#dc3545';
+
+                nivelTexto.textContent = 'Puntaje total: ' + parcial + '/15 — ' + nivel;
+                nivelTexto.style.color = color;
+                ring.style.stroke = color;
             }
         }
 
         inputs.forEach(function (el) { el.addEventListener('change', actualizar); });
-        actualizar();
     })();
 </script>
 </body>
