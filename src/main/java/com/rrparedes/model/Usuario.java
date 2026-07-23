@@ -30,7 +30,7 @@ public class Usuario implements Serializable {
     @Column(name = "Estado", length = 1)
     private String estado; // "A" = Activo, "B" = Bloqueado
 
-    @Transient
+    @Column(name = "Email", length = 100)
     private String email;
 
     // Constructor por defecto (requerido por JPA)

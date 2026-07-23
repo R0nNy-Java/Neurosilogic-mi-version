@@ -1,5 +1,6 @@
 package com.rrparedes.model;
 
+import com.rrparedes.config.PasswordUtil;
 import com.rrparedes.dao.UsuarioDAO;
 import java.util.Collection;
 import java.util.HashMap;
@@ -34,7 +35,7 @@ public class UserStore {
     }
 
     private static void agregarSemilla(String user, String pass, String rol, String nombre, String email) {
-        Usuario u = new Usuario(user.toLowerCase(), pass, rol, nombre, email, false);
+        Usuario u = new Usuario(user.toLowerCase(), PasswordUtil.hash(pass), rol, nombre, email, false);
         try {
             usuarioDAO.guardar(u);
             USUARIOS_CACHE.put(user.toLowerCase(), u);
@@ -60,7 +61,7 @@ public class UserStore {
 
     public static boolean validarCredenciales(String nombreUsuario, String contrasena) {
         Usuario u = buscarPorUsuario(nombreUsuario);
-        return u != null && u.getContrasena().equals(contrasena);
+        return u != null && PasswordUtil.verificar(contrasena, u.getContrasenaHash());
     }
 
     public static boolean agregarUsuario(Usuario u) {
@@ -69,6 +70,11 @@ public class UserStore {
 
         if (buscarPorUsuario(clave) != null) {
             return false;
+        }
+
+        // Encriptar la contraseña (viene en texto plano desde el formulario)
+        if (!PasswordUtil.estaEncriptada(u.getContrasenaHash())) {
+            u.setContrasena(PasswordUtil.hash(u.getContrasenaHash()));
         }
 
         try {
@@ -84,7 +90,7 @@ public class UserStore {
     public static boolean cambiarContrasena(String nombreUsuario, String nuevaContrasena) {
         Usuario u = buscarPorUsuario(nombreUsuario);
         if (u == null) return false;
-        u.setContrasena(nuevaContrasena);
+        u.setContrasena(PasswordUtil.hash(nuevaContrasena));
         try {
             usuarioDAO.guardar(u);
             return true;

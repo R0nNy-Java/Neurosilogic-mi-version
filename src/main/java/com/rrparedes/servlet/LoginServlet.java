@@ -1,5 +1,6 @@
 package com.rrparedes.servlet;
 
+import com.rrparedes.config.PasswordUtil;
 import com.rrparedes.model.UserStore;
 import com.rrparedes.model.Usuario;
 import jakarta.servlet.ServletException;
@@ -45,7 +46,7 @@ public class LoginServlet extends HttpServlet {
         // 2. Campos vacíos
         if (estaVacio(nombreUsuario) || estaVacio(contrasena)) {
             reenviarConError(request, response,
-                "⚠ Ingrese su nombre de usuario y contraseña.", null);
+                    "⚠ Ingrese su nombre de usuario y contraseña.", null);
             return;
         }
 
@@ -55,8 +56,8 @@ public class LoginServlet extends HttpServlet {
         if (estaBloqueadoTemporalmente(usuario)) {
             long min = minutosRestantes(usuario);
             reenviarConError(request, response,
-                "🔒 Cuenta bloqueada temporalmente. Intente nuevamente en "
-                + min + " minuto(s).", "BLOQUEADO_TEMP");
+                    "🔒 Cuenta bloqueada temporalmente. Intente nuevamente en "
+                            + min + " minuto(s).", "BLOQUEADO_TEMP");
             return;
         }
 
@@ -66,13 +67,13 @@ public class LoginServlet extends HttpServlet {
         // 5. Bloqueo permanente por administrador
         if (u != null && u.isBloqueado()) {
             reenviarConError(request, response,
-                "🚫 Su cuenta ha sido deshabilitada. Contacte al administrador del sistema.",
-                "BLOQUEADO_PERM");
+                    "🚫 Su cuenta ha sido deshabilitada. Contacte al administrador del sistema.",
+                    "BLOQUEADO_PERM");
             return;
         }
 
         // 6. Validar credenciales (usuario + contraseña)
-        boolean credencialesOk = u != null && u.getContrasena().equals(contrasena);
+        boolean credencialesOk = u != null && PasswordUtil.verificar(contrasena, u.getContrasenaHash());
 
         if (credencialesOk) {
 
@@ -80,8 +81,8 @@ public class LoginServlet extends HttpServlet {
             String rol = u.getRol();
             if (estaVacio(rol) || "PENDIENTE".equalsIgnoreCase(rol.trim()) || "AUN NO ASIGNADO".equalsIgnoreCase(rol.trim())) {
                 reenviarConError(request, response,
-                    "⏳ Usuario Aún no asignado. Su cuenta está pendiente de asignación de rol por un Administrador.",
-                    "SIN_ROL");
+                        "⏳ Usuario Aún no asignado. Su cuenta está pendiente de asignación de rol por un Administrador.",
+                        "SIN_ROL");
                 return;
             }
 

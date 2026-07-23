@@ -339,7 +339,7 @@
                     <i class="bi bi-person-exclamation fs-4"></i>
                   </div>
                   <div>
-                    <div class="fw-bold lh-1 fs-3">1</div>
+                    <div class="fw-bold lh-1 fs-3"><%= request.getAttribute("pendientesRol") != null ? request.getAttribute("pendientesRol") : 0 %></div>
                     <div class="text-muted small mt-1">Pendientes de Rol</div>
                   </div>
                 </div>

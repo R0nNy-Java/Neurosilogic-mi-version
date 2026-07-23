@@ -1,5 +1,6 @@
 package com.rrparedes.servlet;
 
+import com.rrparedes.model.UserStore;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -27,6 +28,10 @@ public class DashboardServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/login.jsp");
             return;
         }
+        long pendientesRol = UserStore.getTodos().stream()
+                .filter(u -> u.getRol() == null || u.getRol().trim().isEmpty() || "PENDIENTE".equalsIgnoreCase(u.getRol().trim()))
+                .count();
+        request.setAttribute("pendientesRol", pendientesRol);
         request.getRequestDispatcher("/index.jsp").forward(request, response);
     }
 

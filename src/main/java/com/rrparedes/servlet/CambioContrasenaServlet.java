@@ -1,5 +1,6 @@
 package com.rrparedes.servlet;
 
+import com.rrparedes.config.PasswordUtil;
 import com.rrparedes.model.UserStore;
 import com.rrparedes.model.Usuario;
 import jakarta.servlet.ServletException;
@@ -36,7 +37,7 @@ public class CambioContrasenaServlet extends HttpServlet {
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("usuario") == null) {
             response.sendRedirect(request.getContextPath()
-                + "/login.jsp?msg=Debe+iniciar+sesion+para+cambiar+su+contrasena.");
+                    + "/login.jsp?msg=Debe+iniciar+sesion+para+cambiar+su+contrasena.");
             return;
         }
 
@@ -56,7 +57,7 @@ public class CambioContrasenaServlet extends HttpServlet {
 
         // 4. Verificar contraseña actual
         Usuario u = UserStore.buscarPorUsuario(usuarioSesion);
-        if (u == null || !u.getContrasena().equals(contrasenaActual)) {
+        if (u == null || !PasswordUtil.verificar(contrasenaActual, u.getContrasenaHash())) {
             request.setAttribute("errorMsg", "❌ La contraseña actual es incorrecta.");
             reenviar(request, response);
             return;
@@ -65,7 +66,7 @@ public class CambioContrasenaServlet extends HttpServlet {
         // 5. Nueva contraseña != actual
         if (nuevaContrasena.equals(contrasenaActual)) {
             request.setAttribute("errorMsg",
-                "⚠ La nueva contraseña no puede ser igual a la contraseña actual.");
+                    "⚠ La nueva contraseña no puede ser igual a la contraseña actual.");
             reenviar(request, response);
             return;
         }
@@ -73,7 +74,7 @@ public class CambioContrasenaServlet extends HttpServlet {
         // 6. Longitud mínima
         if (nuevaContrasena.length() < 6) {
             request.setAttribute("errorMsg",
-                "⚠ La nueva contraseña debe tener al menos 6 caracteres.");
+                    "⚠ La nueva contraseña debe tener al menos 6 caracteres.");
             reenviar(request, response);
             return;
         }
@@ -81,7 +82,7 @@ public class CambioContrasenaServlet extends HttpServlet {
         // 7. Confirmación coincide
         if (!nuevaContrasena.equals(confirmar)) {
             request.setAttribute("errorMsg",
-                "⚠ La nueva contraseña y su confirmación no coinciden.");
+                    "⚠ La nueva contraseña y su confirmación no coinciden.");
             reenviar(request, response);
             return;
         }
@@ -93,7 +94,7 @@ public class CambioContrasenaServlet extends HttpServlet {
         session.invalidate();
 
         response.sendRedirect(request.getContextPath()
-            + "/login.jsp?msg=Contrasena+actualizada+exitosamente.+Inicie+sesion+nuevamente.");
+                + "/login.jsp?msg=Contrasena+actualizada+exitosamente.+Inicie+sesion+nuevamente.");
     }
 
     /** GET: mostrar formulario (solo si hay sesión activa). */
