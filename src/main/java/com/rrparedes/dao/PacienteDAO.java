@@ -61,17 +61,39 @@ public class PacienteDAO {
     }
 
     public Paciente buscarPorCedula(String cedula) {
-        if (cedula == null) return null;
-        EntityManager em = JPAUtil.getEntityManager();
+        if (cedula == null || cedula.trim().isEmpty()) return null;
+        String cLimpia = cedula.trim();
         try {
-            List<Paciente> resultados = em.createQuery(
-                "SELECT p FROM Paciente p WHERE p.cedula = :cedula", Paciente.class)
-                .setParameter("cedula", cedula.trim())
-                .getResultList();
-            return resultados.isEmpty() ? null : resultados.get(0);
-        } finally {
-            em.close();
+            EntityManager em = JPAUtil.getEntityManager();
+            try {
+                List<Paciente> resultados = em.createQuery(
+                                "SELECT p FROM Paciente p WHERE p.cedula = :cedula", Paciente.class)
+                        .setParameter("cedula", cLimpia)
+                        .getResultList();
+                if (resultados != null && !resultados.isEmpty()) {
+                    return resultados.get(0);
+                }
+            } finally {
+                em.close();
+            }
+        } catch (Exception e) {
+            System.err.println("Notice: Excepción en query JPA por cédula: " + e.getMessage());
         }
+
+        // Fallback robusto iterando la lista completa
+        try {
+            List<Paciente> todos = listarTodos();
+            if (todos != null) {
+                for (Paciente p : todos) {
+                    if (p.getCedula() != null && cLimpia.equals(p.getCedula().trim())) {
+                        return p;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Notice: Excepción en fallback listarTodos por cédula: " + e.getMessage());
+        }
+        return null;
     }
 
     public List<Paciente> listarTodos() {

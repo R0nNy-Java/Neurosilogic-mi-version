@@ -17,19 +17,33 @@ public class Antecedente implements Serializable {
     @JoinColumn(name = "IdPaciente", nullable = false)
     private Paciente paciente;
 
-    @Column(name = "Enfermedad", length = 50)
-    private String enfermedad;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "IdEnfermedad")
+    private Enfermedad enfermedadObj;
+
+    @Column(name = "Alergias", length = 255)
+    private String alergias;
+
+    @Column(name = "MedicamentosActuales", length = 255)
+    private String medicamentosActuales;
+
+    @Column(name = "Observacion", columnDefinition = "TEXT")
+    private String observacion;
 
     @Column(name = "FechaRegistro")
     private LocalDateTime fechaRegistro;
 
     public Antecedente() {
+        this.fechaRegistro = LocalDateTime.now();
     }
 
-    public Antecedente(Paciente paciente, String enfermedad, LocalDateTime fechaRegistro) {
+    public Antecedente(Paciente paciente, Enfermedad enfermedadObj, String alergias, String medicamentosActuales, String observacion) {
         this.paciente = paciente;
-        this.enfermedad = enfermedad;
-        this.fechaRegistro = fechaRegistro;
+        this.enfermedadObj = enfermedadObj;
+        this.alergias = alergias;
+        this.medicamentosActuales = medicamentosActuales;
+        this.observacion = observacion;
+        this.fechaRegistro = LocalDateTime.now();
     }
 
     public Long getIdAntecedente() {
@@ -48,12 +62,40 @@ public class Antecedente implements Serializable {
         this.paciente = paciente;
     }
 
-    public String getEnfermedad() {
-        return enfermedad;
+    public Enfermedad getEnfermedadObj() {
+        return enfermedadObj;
     }
 
-    public void setEnfermedad(String enfermedad) {
-        this.enfermedad = enfermedad;
+    public void setEnfermedadObj(Enfermedad enfermedadObj) {
+        this.enfermedadObj = enfermedadObj;
+    }
+
+    public String getNombreEnfermedad() {
+        return enfermedadObj != null ? enfermedadObj.getNombreEnfermedad() : "Ninguna / No especificada";
+    }
+
+    public String getAlergias() {
+        return alergias != null ? alergias : "Ninguna";
+    }
+
+    public void setAlergias(String alergias) {
+        this.alergias = alergias;
+    }
+
+    public String getMedicamentosActuales() {
+        return medicamentosActuales != null ? medicamentosActuales : "Ninguno";
+    }
+
+    public void setMedicamentosActuales(String medicamentosActuales) {
+        this.medicamentosActuales = medicamentosActuales;
+    }
+
+    public String getObservacion() {
+        return observacion;
+    }
+
+    public void setObservacion(String observacion) {
+        this.observacion = observacion;
     }
 
     public LocalDateTime getFechaRegistro() {

@@ -16,6 +16,7 @@
     <class>com.rrparedes.model.Antecedente</class>
     <class>com.rrparedes.model.SignoVital</class>
     <class>com.rrparedes.model.EscalaGlasgow</class>
+    <class>com.rrparedes.model.Enfermedad</class>
 
     <properties>
       <!-- Configuración de Conexión MySQL -->
