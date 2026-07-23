@@ -206,13 +206,18 @@
             </a>
           </li>
           <li class="nav-item">
-            <a href="${pageContext.request.contextPath}/DosificacionServlet" id="nav-dosificacion" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-              <i class="bi bi-droplet"></i><span>Calcular Dosis</span>
+            <a href="${pageContext.request.contextPath}/DosificacionServlet?modo=libre" id="nav-dosificacion-libre" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+              <i class="bi bi-calculator"></i><span>Calcular Dosis</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="${pageContext.request.contextPath}/DosificacionServlet?modo=paciente" id="nav-dosificacion-paciente" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+              <i class="bi bi-droplet"></i><span>Administración de Dosis</span>
             </a>
           </li>
           <li class="nav-item">
             <a href="${pageContext.request.contextPath}/AdministracionServlet" id="nav-admin" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-              <i class="bi bi-clipboard-check"></i><span>Administracion</span>
+              <i class="bi bi-clipboard-check"></i><span>Administración</span>
             </a>
           </li>
           <li class="nav-item">
@@ -221,8 +226,8 @@
             </a>
           </li>
           <li class="nav-item">
-            <a href="${pageContext.request.contextPath}/calculadora.jsp" id="nav-imc" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-              <i class="bi bi-calculator"></i><span>Calculadora IMC</span>
+            <a href="${pageContext.request.contextPath}/IMCServlet" id="nav-imc" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+              <i class="bi bi-calculator"></i><span>IMC</span>
             </a>
           </li>
           <% } %>
@@ -339,7 +344,7 @@
                     <i class="bi bi-person-exclamation fs-4"></i>
                   </div>
                   <div>
-                    <div class="fw-bold lh-1 fs-3"><%= request.getAttribute("pendientesRol") != null ? request.getAttribute("pendientesRol") : 0 %></div>
+                    <div class="fw-bold lh-1 fs-3">1</div>
                     <div class="text-muted small mt-1">Pendientes de Rol</div>
                   </div>
                 </div>

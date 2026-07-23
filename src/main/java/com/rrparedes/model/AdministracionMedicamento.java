@@ -25,7 +25,7 @@ public class AdministracionMedicamento implements Serializable {
     @Column(name = "DosisCalculada", precision = 10, scale = 2)
     private BigDecimal dosisCalculada;
 
-    @Column(name = "UnidadResultado", length = 10)
+    @Column(name = "UnidadResultado", length = 255)
     private String unidadResultado;
 
     @Column(name = "HoraAdministracion")

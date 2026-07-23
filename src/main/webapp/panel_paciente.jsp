@@ -68,7 +68,7 @@
         </li>
         <li class="nav-item">
           <a href="${pageContext.request.contextPath}/DosificacionServlet" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-            <i class="bi bi-droplet"></i>Calcular Dosis
+            <i class="bi bi-droplet"></i>Administración de Dosis
           </a>
         </li>
         <li class="nav-item">
@@ -82,8 +82,8 @@
           </a>
         </li>
         <li class="nav-item">
-          <a href="${pageContext.request.contextPath}/calculadora.jsp" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-            <i class="bi bi-calculator"></i>Calculadora IMC
+          <a href="${pageContext.request.contextPath}/IMCServlet" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+            <i class="bi bi-calculator"></i>IMC
           </a>
         </li>
       </ul>
@@ -147,8 +147,13 @@
             </a>
           </li>
           <li class="nav-item">
-            <a href="${pageContext.request.contextPath}/DosificacionServlet" id="nav-dosificacion" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-              <i class="bi bi-droplet"></i><span>Calcular Dosis</span>
+            <a href="${pageContext.request.contextPath}/DosificacionServlet?modo=libre" id="nav-dosificacion-libre" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+              <i class="bi bi-calculator"></i><span>Calcular Dosis</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="${pageContext.request.contextPath}/DosificacionServlet?cedula=<%= p.getCedula() %>&modo=paciente" id="nav-dosificacion-paciente" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+              <i class="bi bi-droplet"></i><span>Administración de Dosis</span>
             </a>
           </li>
           <li class="nav-item">
@@ -162,8 +167,8 @@
             </a>
           </li>
           <li class="nav-item">
-            <a href="${pageContext.request.contextPath}/calculadora.jsp" id="nav-imc" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-              <i class="bi bi-calculator"></i><span>Calculadora IMC</span>
+            <a href="${pageContext.request.contextPath}/IMCServlet" id="nav-imc" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+              <i class="bi bi-calculator"></i><span>IMC</span>
             </a>
           </li>
         </ul>
@@ -319,9 +324,9 @@
                 <div class="rounded-3 d-flex align-items-center justify-content-center bg-success bg-opacity-10 flex-shrink-0" style="width:46px;height:46px;">
                   <i class="bi bi-droplet-fill text-success fs-5"></i>
                 </div>
-                <div class="fw-bold text-dark small">Calcular Dosis</div>
+                <div class="fw-bold text-dark small">Administración de Dosis</div>
                 <div class="text-muted" style="font-size:.78rem;">Regla de tres con conversión de unidades (g/mg/mcg y L/mL)</div>
-                <div class="text-muted small d-flex align-items-center gap-1 mt-auto"><i class="bi bi-arrow-right-circle"></i>Calcular</div>
+                <div class="text-muted small d-flex align-items-center gap-1 mt-auto"><i class="bi bi-arrow-right-circle"></i>Administrar</div>
               </a>
             </div>
 
@@ -337,15 +342,15 @@
               </a>
             </div>
 
-            <!-- 5. MÓDULO CALCULADORA IMC -->
+            <!-- 5. MÓDULO EVALUACIÓN IMC -->
             <div class="col">
-              <a href="${pageContext.request.contextPath}/calculadora.jsp?nombre=<%= p.getNombres() + " " + p.getApellidos() %>" id="card-imc-paciente" class="card border rounded-3 text-decoration-none h-100 p-3 d-flex flex-column gap-2">
+              <a href="${pageContext.request.contextPath}/IMCServlet?cedula=<%= p.getCedula() %>" id="card-imc-paciente" class="card border rounded-3 text-decoration-none h-100 p-3 d-flex flex-column gap-2">
                 <div class="rounded-3 d-flex align-items-center justify-content-center bg-success bg-opacity-10 flex-shrink-0" style="width:46px;height:46px;">
                   <i class="bi bi-calculator-fill text-success fs-5"></i>
                 </div>
-                <div class="fw-bold text-dark small">Calculadora IMC</div>
-                <div class="text-muted" style="font-size:.78rem;">IMC = peso(kg) / estatura(m)² con clasificación cromática</div>
-                <div class="text-muted small d-flex align-items-center gap-1 mt-auto"><i class="bi bi-arrow-right-circle"></i>Calcular</div>
+                <div class="fw-bold text-dark small">IMC</div>
+                <div class="text-muted" style="font-size:.78rem;">IMC = peso(kg) / estatura(m)² con tabla de alertas clínicas</div>
+                <div class="text-muted small d-flex align-items-center gap-1 mt-auto"><i class="bi bi-arrow-right-circle"></i>Evaluar</div>
               </a>
             </div>
 
@@ -360,11 +365,14 @@
                 </span>
               </div>
               <p class="text-muted small mb-3">¿Finalizó la atención del paciente? Cierre la ficha clínica para regresar al listado general.</p>
-              <a href="${pageContext.request.contextPath}/PacientesServlet" id="btn-cerrar-ficha-clinica" class="btn-cerrar-ficha btn btn-outline-danger py-3 px-5 fw-semibold d-inline-flex align-items-center justify-content-center gap-2 shadow-sm rounded-3">
-                <i class="bi bi-box-arrow-left fs-5"></i>
-                <span>Cerrar Ficha Clínica</span>
-                <span class="ms-1 border-start border-danger border-opacity-50 ps-2 fw-normal small" id="nl-panel-clock-btn"></span>
-              </a>
+              <form action="${pageContext.request.contextPath}/CerrarFichaServlet" method="POST" class="d-inline">
+                <input type="hidden" name="cedula" value="<%= p.getCedula() %>">
+                <button type="submit" id="btn-cerrar-ficha-clinica" class="btn-cerrar-ficha btn btn-danger py-3 px-5 fw-semibold d-inline-flex align-items-center justify-content-center gap-2 shadow rounded-3">
+                  <i class="bi bi-box-arrow-left fs-5"></i>
+                  <span>Cerrar Ficha Clínica</span>
+                  <span class="ms-1 border-start border-white border-opacity-50 ps-2 fw-normal small" id="nl-panel-clock-btn"></span>
+                </button>
+              </form>
             </div>
           </div>
 

@@ -17,6 +17,9 @@
     <class>com.rrparedes.model.SignoVital</class>
     <class>com.rrparedes.model.EscalaGlasgow</class>
     <class>com.rrparedes.model.Enfermedad</class>
+    <class>com.rrparedes.model.AlertaClinica</class>
+    <class>com.rrparedes.model.EvaluacionIMC</class>
+    <class>com.rrparedes.model.CierreFicha</class>
 
     <properties>
       <!-- Configuración de Conexión MySQL -->

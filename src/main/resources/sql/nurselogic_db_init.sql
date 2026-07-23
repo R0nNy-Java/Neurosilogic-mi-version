@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS administracionmedicamento (
     IdPrescripcion INT,
     IdPaciente INT NOT NULL,
     DosisCalculada DECIMAL(10,2),
-    UnidadResultado VARCHAR(10),
+    UnidadResultado VARCHAR(255),
     HoraAdministracion DATETIME,
     IdEnfermero INT,
     FOREIGN KEY (IdPrescripcion) REFERENCES prescripcionmedica(IdPrescripcion),
@@ -139,6 +139,48 @@ CREATE TABLE IF NOT EXISTS escalaglasgow (
     FOREIGN KEY (IdPaciente) REFERENCES paciente(IdPaciente)
 );
 
+CREATE TABLE IF NOT EXISTS alerta_clinica (
+                                              IdAlerta       INT AUTO_INCREMENT PRIMARY KEY,
+                                              Modulo         VARCHAR(50) NOT NULL,                 -- IMC, SIGNOS_VITALES, GLASGOW
+    NivelAlerta    VARCHAR(50) NOT NULL,                 -- BAJO_PESO, NORMAL, SOBREPESO, OBESIDAD
+    MensajeAlerta  VARCHAR(255) NOT NULL,
+    ColorCodigo    VARCHAR(20) DEFAULT 'secondary'        -- success, warning, danger, info
+    );
+-- ============================================================
+-- TABLA: evaluacionimc (Evaluaciones IMC por Paciente)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS evaluacionimc (
+                                             IdIMC          INT AUTO_INCREMENT PRIMARY KEY,
+                                             IdPaciente     INT NOT NULL,
+                                             Peso           DECIMAL(5,2) NOT NULL,
+    Estatura       DECIMAL(4,2) NOT NULL,
+    ValorIMC       DECIMAL(4,2) NOT NULL,
+    Clasificacion  VARCHAR(50),
+    IdAlerta       INT NULL,
+    FechaRegistro  DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (IdPaciente) REFERENCES paciente(IdPaciente),
+    FOREIGN KEY (IdAlerta)   REFERENCES alerta_clinica(IdAlerta)
+    );
+
+
+-- ============================================================
+-- 12. TABLA: cierre_ficha
+--     Relación Paciente - Enfermero con snapshot consolidado al cerrar ficha
+-- ============================================================
+CREATE TABLE IF NOT EXISTS cierre_ficha (
+                                            IdCierre             INT AUTO_INCREMENT PRIMARY KEY,
+                                            IdPaciente           INT NOT NULL,
+                                            IdEnfermero          INT NULL,
+                                            NombreEnfermero      VARCHAR(150),
+    FechaCierre          DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UltimosSignosVitales VARCHAR(500),
+    UltimoGlasgow        VARCHAR(500),
+    UltimoIMC            VARCHAR(500),
+    UltimosAntecedentes  VARCHAR(500),
+    UltimaDosis          VARCHAR(500),
+    FOREIGN KEY (IdPaciente)  REFERENCES paciente(IdPaciente),
+    FOREIGN KEY (IdEnfermero) REFERENCES usuario(IdUsuario)
+    );
 -- Columna Email para la tabla usuario (creada automáticamente por Hibernate,
 -- se agrega aquí por si el script se corre contra una BD ya existente)
 ALTER TABLE usuario ADD COLUMN IF NOT EXISTS Email VARCHAR(100) AFTER Rol;
