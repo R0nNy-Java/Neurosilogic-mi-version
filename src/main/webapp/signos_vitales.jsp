@@ -355,7 +355,7 @@
                     <div class="col-lg-7">
                         <% if (errorMsg != null) { %>
                         <div class="alert alert-danger d-flex align-items-center gap-2" role="alert">
-                            <i class="bi bi-exclamation-triangle-fill"></i><span><%= errorMsg %></span>
+                            <span><%= errorMsg %></span>
                         </div>
                         <% } %>
                         <% if (successMsg != null) { %>
@@ -365,26 +365,71 @@
                         <% } %>
 
                         <!-- RESULTADO: ALERTAS CLÍNICAS -->
-                        <% if (alertas.length > 0) { %>
+                        <% if (alertas.length > 0) {
+                            int totalAlertas = 0, rojas = 0, azules = 0;
+                            for (String a : alertas) {
+                                if (a == null || a.trim().isEmpty()) continue;
+                                totalAlertas++;
+                                if (a.contains("[ROJO]")) rojas++;
+                                else if (a.contains("[AZUL]")) azules++;
+                            }
+                            int totalParametros = 7; // Temp, Sistólica, Diastólica, FC, FR, SpO2, Glicemia
+                            int pctFueraRango = (int) Math.round((totalAlertas * 100.0) / totalParametros);
+                        %>
                         <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
                             <div class="card-body p-4">
-                                <div class="d-flex align-items-center justify-content-between mb-3">
+                                <div class="d-flex align-items-center justify-content-between mb-2">
                                     <span class="text-uppercase text-muted small fw-semibold">Alertas Detectadas</span>
-                                    <span class="badge bg-dark rounded-pill px-3 py-2"><%= numAlertas != null ? numAlertas : alertas.length %></span>
+                                    <span class="badge bg-dark rounded-pill px-3 py-2"><%= numAlertas != null ? numAlertas : totalAlertas %></span>
+                                </div>
+
+                                <!-- RESUMEN VISUAL: barra de parámetros fuera de rango -->
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="text-muted" style="font-size:.72rem;"><%= totalAlertas %> de <%= totalParametros %> parámetros fuera de rango</span>
+                                        <span class="fw-semibold" style="font-size:.72rem;"><%= pctFueraRango %>%</span>
+                                    </div>
+                                    <div class="progress" style="height:8px;">
+                                        <% if (rojas > 0) { %>
+                                        <div class="progress-bar bg-danger" style="width:<%= Math.round((rojas * 100.0) / totalParametros) %>%"></div>
+                                        <% } %>
+                                        <% if (azules > 0) { %>
+                                        <div class="progress-bar bg-primary" style="width:<%= Math.round((azules * 100.0) / totalParametros) %>%"></div>
+                                        <% } %>
+                                    </div>
+                                </div>
+
+                                <%
+                                    // ── Bloque de alertas CRÍTICAS (ROJO) ──
+                                    if (rojas > 0) {
+                                %>
+                                <div class="small fw-bold text-danger text-uppercase mb-2" style="font-size:.68rem;letter-spacing:.5px;">
+                                    Críticas
                                 </div>
                                 <% for (String a : alertas) {
-                                    if (a == null || a.trim().isEmpty()) continue;
-                                    boolean esRoja = a.contains("[ROJO]");
-                                    boolean esAzul = a.contains("[AZUL]");
-                                    String texto = a.replace("[ROJO]", "").replace("[AZUL]", "").trim();
-                                    String badgeClass = esRoja ? "bg-danger" : (esAzul ? "bg-primary" : "bg-secondary");
-                                    String icono = esRoja ? "bi-arrow-up-circle-fill" : (esAzul ? "bi-arrow-down-circle-fill" : "bi-info-circle-fill");
+                                    if (a == null || a.trim().isEmpty() || !a.contains("[ROJO]")) continue;
+                                    String texto = a.replace("[ROJO]", "").trim();
                                 %>
-                                <div class="d-flex align-items-center gap-2 mb-2">
-                                    <span class="badge <%= badgeClass %> rounded-pill p-2"><i class="bi <%= icono %>"></i></span>
-                                    <span class="small text-dark"><%= texto %></span>
+                                <div class="p-2 mb-2 rounded-3 nl-alert-row" style="background:rgba(220,53,69,.08); border-left:4px solid #dc3545;">
+                                    <span class="small text-dark fw-semibold"><%= texto %></span>
                                 </div>
-                                <% } %>
+                                <% } } %>
+
+                                <%
+                                    // ── Bloque de alertas de ADVERTENCIA (AZUL) ──
+                                    if (azules > 0) {
+                                %>
+                                <div class="small fw-bold text-primary text-uppercase mb-2 mt-3" style="font-size:.68rem;letter-spacing:.5px;">
+                                    Advertencias
+                                </div>
+                                <% for (String a : alertas) {
+                                    if (a == null || a.trim().isEmpty() || !a.contains("[AZUL]")) continue;
+                                    String texto = a.replace("[AZUL]", "").trim();
+                                %>
+                                <div class="p-2 mb-2 rounded-3 nl-alert-row" style="background:rgba(13,110,253,.08); border-left:4px solid #0d6efd;">
+                                    <span class="small text-dark fw-semibold"><%= texto %></span>
+                                </div>
+                                <% } } %>
                             </div>
                         </div>
                         <% } %>
@@ -430,7 +475,7 @@
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label small fw-semibold text-uppercase text-muted" for="Temperatura">Temperatura (°C) *</label>
-                                            <input type="number" step="0.1" min="0" id="Temperatura" name="Temperatura" class="form-control py-2" placeholder="36.5" required/>
+                                            <input type="number" step="0.1" min="30" max="43" id="Temperatura" name="Temperatura" class="form-control py-2" placeholder="36.5" required/>
                                             <div class="form-text" style="font-size:.7rem;">Rango normal: 36.0 – 37.5 °C</div>
                                         </div>
                                     </div>
@@ -438,12 +483,12 @@
                                     <div class="row g-3 mb-3">
                                         <div class="col-md-6">
                                             <label class="form-label small fw-semibold text-uppercase text-muted" for="Sistolica">Presión Sistólica (mmHg) *</label>
-                                            <input type="number" min="0" id="Sistolica" name="Sistolica" class="form-control py-2" placeholder="120" required/>
+                                            <input type="number" min="40" max="250" id="Sistolica" name="Sistolica" class="form-control py-2" placeholder="120" required/>
                                             <div class="form-text" style="font-size:.7rem;">Rango normal: 90 – 139 mmHg</div>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label small fw-semibold text-uppercase text-muted" for="Diastolica">Presión Diastólica (mmHg) *</label>
-                                            <input type="number" min="0" id="Diastolica" name="Diastolica" class="form-control py-2" placeholder="80" required/>
+                                            <input type="number" min="20" max="150" id="Diastolica" name="Diastolica" class="form-control py-2" placeholder="80" required/>
                                             <div class="form-text" style="font-size:.7rem;">Rango normal: 60 – 89 mmHg</div>
                                         </div>
                                     </div>
@@ -451,12 +496,12 @@
                                     <div class="row g-3 mb-3">
                                         <div class="col-md-6">
                                             <label class="form-label small fw-semibold text-uppercase text-muted" for="FrecCardiaca">Frecuencia Cardiaca (lpm) *</label>
-                                            <input type="number" min="0" id="FrecCardiaca" name="FrecCardiaca" class="form-control py-2" placeholder="75" required/>
+                                            <input type="number" min="20" max="220" id="FrecCardiaca" name="FrecCardiaca" class="form-control py-2" placeholder="75" required/>
                                             <div class="form-text" style="font-size:.7rem;">Rango normal: 60 – 100 lpm</div>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label small fw-semibold text-uppercase text-muted" for="FrecRespiratoria">Frecuencia Respiratoria (rpm) *</label>
-                                            <input type="number" min="0" id="FrecRespiratoria" name="FrecRespiratoria" class="form-control py-2" placeholder="16" required/>
+                                            <input type="number" min="4" max="60" id="FrecRespiratoria" name="FrecRespiratoria" class="form-control py-2" placeholder="16" required/>
                                             <div class="form-text" style="font-size:.7rem;">Rango normal: 12 – 20 rpm</div>
                                         </div>
                                     </div>
@@ -464,12 +509,12 @@
                                     <div class="row g-3 mb-4">
                                         <div class="col-md-6">
                                             <label class="form-label small fw-semibold text-uppercase text-muted" for="SaturacionO2">Saturación O₂ (%) *</label>
-                                            <input type="number" min="0" id="SaturacionO2" name="SaturacionO2" class="form-control py-2" placeholder="98" required/>
+                                            <input type="number" min="0" max="100" id="SaturacionO2" name="SaturacionO2" class="form-control py-2" placeholder="98" required/>
                                             <div class="form-text" style="font-size:.7rem;">Rango normal: 95 – 100 %</div>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label small fw-semibold text-uppercase text-muted" for="Glicemia">Glicemia (mg/dL)</label>
-                                            <input type="number" min="0" id="Glicemia" name="Glicemia" class="form-control py-2" placeholder="90"/>
+                                            <input type="number" min="10" max="600" id="Glicemia" name="Glicemia" class="form-control py-2" placeholder="90"/>
                                             <div class="form-text" style="font-size:.7rem;">Rango normal: 70 – 100 mg/dL</div>
                                         </div>
                                     </div>
@@ -508,7 +553,7 @@
                                         String badgeClass = "R".equals(alerta) ? "bg-danger" : ("A".equals(alerta) ? "bg-primary" : "bg-success");
                                         String badgeTxt   = "R".equals(alerta) ? "Alerta alta" : ("A".equals(alerta) ? "Alerta baja" : "Normal");
                                 %>
-                                <div class="border rounded-3 p-3 mb-2">
+                                <div class="border rounded-3 p-3 mb-2 nl-historial-item">
                                     <div class="d-flex align-items-center justify-content-between mb-2">
                                         <span class="small fw-semibold text-dark">
                                             <i class="bi bi-calendar3 me-1"></i><%= sv.getFechaHora() %>
@@ -537,5 +582,40 @@
 </div>
 
 <script src="${pageContext.request.contextPath}/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Bloquea letras, signos (+, -) y notación científica (e, E) en los campos numéricos
+    document.querySelectorAll('input[type="number"]').forEach(function (input) {
+        input.addEventListener('keydown', function (e) {
+            if (['e', 'E', '+', '-'].includes(e.key)) {
+                e.preventDefault();
+            }
+        });
+        input.addEventListener('paste', function (e) {
+            var texto = (e.clipboardData || window.clipboardData).getData('text');
+            if (!/^\d*\.?\d*$/.test(texto)) {
+                e.preventDefault();
+            }
+        });
+    });
+
+    // No permite enviar el formulario si faltan campos obligatorios: muestra alerta y detiene el envío
+    var formSignos = document.querySelector('form[action$="SignosVitalesServlet"][method="POST"]');
+    if (formSignos) {
+        formSignos.addEventListener('submit', function (e) {
+            var camposFaltantes = [];
+            formSignos.querySelectorAll('[required]').forEach(function (campo) {
+                var valor = (campo.value || '').trim();
+                if (!valor) {
+                    var label = formSignos.querySelector('label[for="' + campo.id + '"]');
+                    camposFaltantes.push(label ? label.textContent.replace('*', '').trim() : campo.name);
+                }
+            });
+            if (camposFaltantes.length > 0) {
+                e.preventDefault();
+                alert('Complete los siguientes campos antes de registrar:\n\n- ' + camposFaltantes.join('\n- '));
+            }
+        });
+    }
+</script>
 </body>
 </html>
