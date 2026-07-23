@@ -5,6 +5,7 @@
 --%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="com.rrparedes.dao.PacienteDAO, com.rrparedes.model.Paciente" %>
+<%@ page import="com.rrparedes.model.SignoVital, java.util.List" %>
 <%
     String nombreSesion = (session != null) ? (String) session.getAttribute("nombreCompleto") : "";
     if (nombreSesion == null) nombreSesion = (session != null) ? (String) session.getAttribute("usuario") : "";
@@ -36,6 +37,9 @@
 
     String[] alertas = (alertasGeneradas != null && !alertasGeneradas.trim().isEmpty())
             ? alertasGeneradas.split("\\|") : new String[0];
+
+    @SuppressWarnings("unchecked")
+    List<SignoVital> historialSignos = (List<SignoVital>) request.getAttribute("historialSignos");
 %>
 <!DOCTYPE html>
 <html lang="es">
@@ -55,98 +59,98 @@
 <!-- 1. OFFCANVAS SIDEBAR – VISTA MÓVIL                                      -->
 <!-- ======================================================================= -->
 <div class="offcanvas offcanvas-start nl-sidebar text-white" id="sidebarMobile" style="width:240px;" tabindex="-1">
-  <div class="offcanvas-header border-bottom border-white border-opacity-10 py-3 flex-column align-items-start gap-2">
-    <div class="d-flex w-100 justify-content-between align-items-center">
-      <span class="fw-bold text-white">NURSELOGIC</span>
-      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
-    </div>
-    <div class="rounded bg-white bg-opacity-10 w-100 py-1.5 px-3 text-center small text-white-50" style="font-size: 0.8rem; letter-spacing: 0.5px;">
-      <i class="bi bi-person-badge me-1"></i><%= tituloRol %>
-    </div>
-  </div>
-  <div class="offcanvas-body d-flex flex-column p-0">
-    <div class="px-4 py-3">
-      <small class="fw-bold text-uppercase" style="color:rgba(255,255,255,.3);font-size:.65rem;letter-spacing:1px;">MENU PRINCIPAL</small>
-    </div>
-    <ul class="nav flex-column px-2 flex-grow-1">
-      <li class="nav-item">
-        <a href="${pageContext.request.contextPath}/index.jsp" id="nav-dashboard-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-          <i class="bi bi-grid-1x2-fill"></i>Dashboard
-        </a>
-      </li>
-      <% if (esAdmin) { %>
-      <li class="nav-item">
-        <a href="${pageContext.request.contextPath}/GestionarUsuariosServlet" id="nav-usuarios-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-          <i class="bi bi-people-fill"></i>Gestionar Usuarios
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="${pageContext.request.contextPath}/GestionarCatalogoServlet" id="nav-catalogo-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-          <i class="bi bi-journal-medical"></i>Catalogo Medicamentos
-        </a>
-      </li>
-      <% } else { %>
-      <li class="nav-item">
-        <a href="${pageContext.request.contextPath}/PacientesServlet" id="nav-pacientes-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-          <i class="bi bi-person-badge"></i>Gestionar Pacientes
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="${pageContext.request.contextPath}/SignosVitalesServlet" id="nav-signos-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3 active">
-          <i class="bi bi-activity"></i>Signos Vitales
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="${pageContext.request.contextPath}/GlasgowServlet" id="nav-glasgow-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-          <i class="bi bi-file-earmark-bar-graph"></i>Escala Glasgow
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="${pageContext.request.contextPath}/DosificacionServlet" id="nav-dosificacion-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-          <i class="bi bi-droplet"></i>Calcular Dosis
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="${pageContext.request.contextPath}/AdministracionServlet" id="nav-admin-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-          <i class="bi bi-clipboard-check"></i>Administracion
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="${pageContext.request.contextPath}/ReportesServlet" id="nav-reportes-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-          <i class="bi bi-graph-up"></i>Reportes
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="${pageContext.request.contextPath}/calculadora.jsp" id="nav-imc-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-          <i class="bi bi-calculator"></i>Calculadora IMC
-        </a>
-      </li>
-      <% } %>
-    </ul>
-    <div class="border-top border-white border-opacity-10 p-3 mt-auto">
-      <div class="d-flex align-items-center gap-2 mb-3">
-        <div class="rounded-circle bg-success d-flex align-items-center justify-content-center flex-shrink-0" style="width:36px;height:36px;">
-          <i class="bi bi-person-fill text-white small"></i>
+    <div class="offcanvas-header border-bottom border-white border-opacity-10 py-3 flex-column align-items-start gap-2">
+        <div class="d-flex w-100 justify-content-between align-items-center">
+            <span class="fw-bold text-white">NURSELOGIC</span>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
         </div>
-        <div class="overflow-hidden">
-          <div class="text-white small fw-semibold text-truncate"><%= nombreSesion %></div>
-          <div style="font-size:.7rem;" class="text-white-50"><%= tituloRol %></div>
+        <div class="rounded bg-white bg-opacity-10 w-100 py-1.5 px-3 text-center small text-white-50" style="font-size: 0.8rem; letter-spacing: 0.5px;">
+            <i class="bi bi-person-badge me-1"></i><%= tituloRol %>
         </div>
-      </div>
-      <ul class="nav flex-column gap-1 p-0 small">
-        <li class="nav-item">
-          <a href="${pageContext.request.contextPath}/CambioContrasenaServlet" id="nav-cambiopass-m" class="nav-link text-white-50 p-1 d-flex align-items-center gap-2" style="font-size: 0.8rem;">
-            <i class="bi bi-key"></i> Cambiar contraseña
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="${pageContext.request.contextPath}/LogoutServlet" id="nav-logout-m" class="nav-link text-white-50 p-1 d-flex align-items-center gap-2" style="font-size: 0.8rem;">
-            <i class="bi bi-box-arrow-right"></i> Cerrar sesión
-          </a>
-        </li>
-      </ul>
     </div>
-  </div>
+    <div class="offcanvas-body d-flex flex-column p-0">
+        <div class="px-4 py-3">
+            <small class="fw-bold text-uppercase" style="color:rgba(255,255,255,.3);font-size:.65rem;letter-spacing:1px;">MENU PRINCIPAL</small>
+        </div>
+        <ul class="nav flex-column px-2 flex-grow-1">
+            <li class="nav-item">
+                <a href="${pageContext.request.contextPath}/index.jsp" id="nav-dashboard-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+                    <i class="bi bi-grid-1x2-fill"></i>Dashboard
+                </a>
+            </li>
+            <% if (esAdmin) { %>
+            <li class="nav-item">
+                <a href="${pageContext.request.contextPath}/GestionarUsuariosServlet" id="nav-usuarios-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+                    <i class="bi bi-people-fill"></i>Gestionar Usuarios
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="${pageContext.request.contextPath}/GestionarCatalogoServlet" id="nav-catalogo-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+                    <i class="bi bi-journal-medical"></i>Catalogo Medicamentos
+                </a>
+            </li>
+            <% } else { %>
+            <li class="nav-item">
+                <a href="${pageContext.request.contextPath}/PacientesServlet" id="nav-pacientes-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+                    <i class="bi bi-person-badge"></i>Gestionar Pacientes
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="${pageContext.request.contextPath}/SignosVitalesServlet" id="nav-signos-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3 active">
+                    <i class="bi bi-activity"></i>Signos Vitales
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="${pageContext.request.contextPath}/GlasgowServlet" id="nav-glasgow-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+                    <i class="bi bi-file-earmark-bar-graph"></i>Escala Glasgow
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="${pageContext.request.contextPath}/DosificacionServlet" id="nav-dosificacion-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+                    <i class="bi bi-droplet"></i>Calcular Dosis
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="${pageContext.request.contextPath}/AdministracionServlet" id="nav-admin-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+                    <i class="bi bi-clipboard-check"></i>Administracion
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="${pageContext.request.contextPath}/ReportesServlet" id="nav-reportes-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+                    <i class="bi bi-graph-up"></i>Reportes
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="${pageContext.request.contextPath}/calculadora.jsp" id="nav-imc-m" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+                    <i class="bi bi-calculator"></i>Calculadora IMC
+                </a>
+            </li>
+            <% } %>
+        </ul>
+        <div class="border-top border-white border-opacity-10 p-3 mt-auto">
+            <div class="d-flex align-items-center gap-2 mb-3">
+                <div class="rounded-circle bg-success d-flex align-items-center justify-content-center flex-shrink-0" style="width:36px;height:36px;">
+                    <i class="bi bi-person-fill text-white small"></i>
+                </div>
+                <div class="overflow-hidden">
+                    <div class="text-white small fw-semibold text-truncate"><%= nombreSesion %></div>
+                    <div style="font-size:.7rem;" class="text-white-50"><%= tituloRol %></div>
+                </div>
+            </div>
+            <ul class="nav flex-column gap-1 p-0 small">
+                <li class="nav-item">
+                    <a href="${pageContext.request.contextPath}/CambioContrasenaServlet" id="nav-cambiopass-m" class="nav-link text-white-50 p-1 d-flex align-items-center gap-2" style="font-size: 0.8rem;">
+                        <i class="bi bi-key"></i> Cambiar contraseña
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="${pageContext.request.contextPath}/LogoutServlet" id="nav-logout-m" class="nav-link text-white-50 p-1 d-flex align-items-center gap-2" style="font-size: 0.8rem;">
+                        <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
 </div>
 
 <div class="container-fluid p-0">
@@ -156,104 +160,104 @@
         <!-- 2. SIDEBAR – VISTA ESCRITORIO (PC)                                      -->
         <!-- ======================================================================= -->
         <nav class="col-auto d-none d-lg-flex flex-column nl-sidebar text-white p-0" id="nl-sidebar" style="width:240px;min-height:100vh;position:sticky;top:0;height:100vh;overflow-y:auto;">
-          <div class="p-4 border-bottom border-white border-opacity-10">
-            <a href="${pageContext.request.contextPath}/index.jsp" class="d-flex align-items-center gap-3 text-white text-decoration-none mb-3">
-              <div class="rounded-3 bg-success p-2 flex-shrink-0">
-                <i class="bi bi-heart-pulse-fill text-white fs-5"></i>
-              </div>
-              <div>
-                <div class="fw-bold small text-white" style="letter-spacing:1px;">NURSELOGIC</div>
-                <div style="font-size:.62rem;" class="text-white-50">Gestion Clinica · Ecuador</div>
-              </div>
-            </a>
-            <div class="rounded bg-white bg-opacity-10 py-1.5 px-3 text-center small text-white-50" style="font-size: 0.8rem; letter-spacing: 0.5px;">
-              <i class="bi bi-person-badge me-1"></i><%= tituloRol %>
-            </div>
-          </div>
-
-          <div class="px-4 py-3">
-            <small class="fw-bold text-uppercase" style="color:rgba(255,255,255,.3);font-size:.65rem;letter-spacing:1px;">MENU PRINCIPAL</small>
-          </div>
-
-          <ul class="nav flex-column px-2 flex-grow-1">
-            <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/index.jsp" id="nav-dashboard" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-                <i class="bi bi-grid-1x2-fill"></i><span>Dashboard</span>
-              </a>
-            </li>
-            <% if (esAdmin) { %>
-            <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/GestionarUsuariosServlet" id="nav-usuarios" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-                <i class="bi bi-people-fill"></i><span>Gestionar Usuarios</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/GestionarCatalogoServlet" id="nav-catalogo" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-                <i class="bi bi-journal-medical"></i><span>Catalogo Medicamentos</span>
-              </a>
-            </li>
-            <% } else { %>
-            <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/PacientesServlet" id="nav-pacientes" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-                <i class="bi bi-person-badge"></i><span>Gestionar Pacientes</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/SignosVitalesServlet" id="nav-signos" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3 active">
-                <i class="bi bi-activity"></i><span>Signos Vitales</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/GlasgowServlet" id="nav-glasgow" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-                <i class="bi bi-file-earmark-bar-graph"></i><span>Escala Glasgow</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/DosificacionServlet" id="nav-dosificacion" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-                <i class="bi bi-droplet"></i><span>Calcular Dosis</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/AdministracionServlet" id="nav-admin" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-                <i class="bi bi-clipboard-check"></i><span>Administracion</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/ReportesServlet" id="nav-reportes" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-                <i class="bi bi-graph-up"></i><span>Reportes</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="${pageContext.request.contextPath}/calculadora.jsp" id="nav-imc" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
-                <i class="bi bi-calculator"></i><span>Calculadora IMC</span>
-              </a>
-            </li>
-            <% } %>
-          </ul>
-
-          <div class="border-top border-white border-opacity-10 p-3 mt-auto">
-            <div class="d-flex align-items-center gap-2 mb-3">
-              <div class="rounded-circle bg-success d-flex align-items-center justify-content-center flex-shrink-0" style="width:36px;height:36px;">
-                <i class="bi bi-person-fill text-white small"></i>
-              </div>
-              <div class="overflow-hidden">
-                <div class="text-white small fw-semibold text-truncate"><%= nombreSesion %></div>
-                <div style="font-size:.7rem;" class="text-white-50"><%= tituloRol %></div>
-              </div>
-            </div>
-            <ul class="nav flex-column gap-1 p-0 small">
-              <li class="nav-item">
-                <a href="${pageContext.request.contextPath}/CambioContrasenaServlet" id="nav-cambiopass" class="nav-link text-white-50 p-1 d-flex align-items-center gap-2" style="font-size: 0.8rem;">
-                  <i class="bi bi-key"></i> Cambiar contraseña
+            <div class="p-4 border-bottom border-white border-opacity-10">
+                <a href="${pageContext.request.contextPath}/index.jsp" class="d-flex align-items-center gap-3 text-white text-decoration-none mb-3">
+                    <div class="rounded-3 bg-success p-2 flex-shrink-0">
+                        <i class="bi bi-heart-pulse-fill text-white fs-5"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold small text-white" style="letter-spacing:1px;">NURSELOGIC</div>
+                        <div style="font-size:.62rem;" class="text-white-50">Gestion Clinica · Ecuador</div>
+                    </div>
                 </a>
-              </li>
-              <li class="nav-item">
-                <a href="${pageContext.request.contextPath}/LogoutServlet" id="nav-logout" class="nav-link text-white-50 p-1 d-flex align-items-center gap-2" style="font-size: 0.8rem;">
-                  <i class="bi bi-box-arrow-right"></i> Cerrar sesión
-                </a>
-              </li>
+                <div class="rounded bg-white bg-opacity-10 py-1.5 px-3 text-center small text-white-50" style="font-size: 0.8rem; letter-spacing: 0.5px;">
+                    <i class="bi bi-person-badge me-1"></i><%= tituloRol %>
+                </div>
+            </div>
+
+            <div class="px-4 py-3">
+                <small class="fw-bold text-uppercase" style="color:rgba(255,255,255,.3);font-size:.65rem;letter-spacing:1px;">MENU PRINCIPAL</small>
+            </div>
+
+            <ul class="nav flex-column px-2 flex-grow-1">
+                <li class="nav-item">
+                    <a href="${pageContext.request.contextPath}/index.jsp" id="nav-dashboard" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+                        <i class="bi bi-grid-1x2-fill"></i><span>Dashboard</span>
+                    </a>
+                </li>
+                <% if (esAdmin) { %>
+                <li class="nav-item">
+                    <a href="${pageContext.request.contextPath}/GestionarUsuariosServlet" id="nav-usuarios" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+                        <i class="bi bi-people-fill"></i><span>Gestionar Usuarios</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="${pageContext.request.contextPath}/GestionarCatalogoServlet" id="nav-catalogo" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+                        <i class="bi bi-journal-medical"></i><span>Catalogo Medicamentos</span>
+                    </a>
+                </li>
+                <% } else { %>
+                <li class="nav-item">
+                    <a href="${pageContext.request.contextPath}/PacientesServlet" id="nav-pacientes" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+                        <i class="bi bi-person-badge"></i><span>Gestionar Pacientes</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="${pageContext.request.contextPath}/SignosVitalesServlet" id="nav-signos" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3 active">
+                        <i class="bi bi-activity"></i><span>Signos Vitales</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="${pageContext.request.contextPath}/GlasgowServlet" id="nav-glasgow" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+                        <i class="bi bi-file-earmark-bar-graph"></i><span>Escala Glasgow</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="${pageContext.request.contextPath}/DosificacionServlet" id="nav-dosificacion" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+                        <i class="bi bi-droplet"></i><span>Calcular Dosis</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="${pageContext.request.contextPath}/AdministracionServlet" id="nav-admin" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+                        <i class="bi bi-clipboard-check"></i><span>Administracion</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="${pageContext.request.contextPath}/ReportesServlet" id="nav-reportes" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+                        <i class="bi bi-graph-up"></i><span>Reportes</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="${pageContext.request.contextPath}/calculadora.jsp" id="nav-imc" class="nav-link nl-nav-link d-flex align-items-center gap-3 py-2 px-3">
+                        <i class="bi bi-calculator"></i><span>Calculadora IMC</span>
+                    </a>
+                </li>
+                <% } %>
             </ul>
-          </div>
+
+            <div class="border-top border-white border-opacity-10 p-3 mt-auto">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <div class="rounded-circle bg-success d-flex align-items-center justify-content-center flex-shrink-0" style="width:36px;height:36px;">
+                        <i class="bi bi-person-fill text-white small"></i>
+                    </div>
+                    <div class="overflow-hidden">
+                        <div class="text-white small fw-semibold text-truncate"><%= nombreSesion %></div>
+                        <div style="font-size:.7rem;" class="text-white-50"><%= tituloRol %></div>
+                    </div>
+                </div>
+                <ul class="nav flex-column gap-1 p-0 small">
+                    <li class="nav-item">
+                        <a href="${pageContext.request.contextPath}/CambioContrasenaServlet" id="nav-cambiopass" class="nav-link text-white-50 p-1 d-flex align-items-center gap-2" style="font-size: 0.8rem;">
+                            <i class="bi bi-key"></i> Cambiar contraseña
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="${pageContext.request.contextPath}/LogoutServlet" id="nav-logout" class="nav-link text-white-50 p-1 d-flex align-items-center gap-2" style="font-size: 0.8rem;">
+                            <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </nav>
 
         <!-- ======================================================================= -->
@@ -263,12 +267,12 @@
 
             <!-- Topbar móvil -->
             <nav class="navbar navbar-dark bg-brand-gradient d-lg-none shadow-sm px-3">
-              <div class="container-fluid px-0">
-                <button class="navbar-toggler border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMobile">
-                  <span class="navbar-toggler-icon"></span>
-                </button>
-                <span class="navbar-brand fw-bold mb-0">NURSELOGIC</span>
-              </div>
+                <div class="container-fluid px-0">
+                    <button class="navbar-toggler border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMobile">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <span class="navbar-brand fw-bold mb-0">NURSELOGIC</span>
+                </div>
             </nav>
 
             <!-- Topbar Escritorio -->
@@ -277,14 +281,14 @@
                 <i class="bi bi-activity"></i>
                 Gestión de Signos Vitales &middot; <%= tituloRol %>
               </span>
-              <div class="d-flex align-items-center gap-3 ms-auto">
+                <div class="d-flex align-items-center gap-3 ms-auto">
                 <span class="text-white-50 small d-flex align-items-center gap-1">
                   <i class="bi bi-person-circle"></i><%= nombreSesion %>
                 </span>
-                <a href="${pageContext.request.contextPath}/LogoutServlet" id="btnLogoutTop" class="btn btn-outline-light btn-sm d-flex align-items-center gap-1">
-                  <i class="bi bi-box-arrow-right"></i>Salir
-                </a>
-              </div>
+                    <a href="${pageContext.request.contextPath}/LogoutServlet" id="btnLogoutTop" class="btn btn-outline-light btn-sm d-flex align-items-center gap-1">
+                        <i class="bi bi-box-arrow-right"></i>Salir
+                    </a>
+                </div>
             </header>
 
             <main class="p-4">
@@ -426,7 +430,7 @@
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label small fw-semibold text-uppercase text-muted" for="Temperatura">Temperatura (°C) *</label>
-                                            <input type="number" step="0.1" id="Temperatura" name="Temperatura" class="form-control py-2" placeholder="36.5" required/>
+                                            <input type="number" step="0.1" min="0" id="Temperatura" name="Temperatura" class="form-control py-2" placeholder="36.5" required/>
                                             <div class="form-text" style="font-size:.7rem;">Rango normal: 36.0 – 37.5 °C</div>
                                         </div>
                                     </div>
@@ -434,12 +438,12 @@
                                     <div class="row g-3 mb-3">
                                         <div class="col-md-6">
                                             <label class="form-label small fw-semibold text-uppercase text-muted" for="Sistolica">Presión Sistólica (mmHg) *</label>
-                                            <input type="number" id="Sistolica" name="Sistolica" class="form-control py-2" placeholder="120" required/>
+                                            <input type="number" min="0" id="Sistolica" name="Sistolica" class="form-control py-2" placeholder="120" required/>
                                             <div class="form-text" style="font-size:.7rem;">Rango normal: 90 – 139 mmHg</div>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label small fw-semibold text-uppercase text-muted" for="Diastolica">Presión Diastólica (mmHg) *</label>
-                                            <input type="number" id="Diastolica" name="Diastolica" class="form-control py-2" placeholder="80" required/>
+                                            <input type="number" min="0" id="Diastolica" name="Diastolica" class="form-control py-2" placeholder="80" required/>
                                             <div class="form-text" style="font-size:.7rem;">Rango normal: 60 – 89 mmHg</div>
                                         </div>
                                     </div>
@@ -447,12 +451,12 @@
                                     <div class="row g-3 mb-3">
                                         <div class="col-md-6">
                                             <label class="form-label small fw-semibold text-uppercase text-muted" for="FrecCardiaca">Frecuencia Cardiaca (lpm) *</label>
-                                            <input type="number" id="FrecCardiaca" name="FrecCardiaca" class="form-control py-2" placeholder="75" required/>
+                                            <input type="number" min="0" id="FrecCardiaca" name="FrecCardiaca" class="form-control py-2" placeholder="75" required/>
                                             <div class="form-text" style="font-size:.7rem;">Rango normal: 60 – 100 lpm</div>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label small fw-semibold text-uppercase text-muted" for="FrecRespiratoria">Frecuencia Respiratoria (rpm) *</label>
-                                            <input type="number" id="FrecRespiratoria" name="FrecRespiratoria" class="form-control py-2" placeholder="16" required/>
+                                            <input type="number" min="0" id="FrecRespiratoria" name="FrecRespiratoria" class="form-control py-2" placeholder="16" required/>
                                             <div class="form-text" style="font-size:.7rem;">Rango normal: 12 – 20 rpm</div>
                                         </div>
                                     </div>
@@ -460,12 +464,12 @@
                                     <div class="row g-3 mb-4">
                                         <div class="col-md-6">
                                             <label class="form-label small fw-semibold text-uppercase text-muted" for="SaturacionO2">Saturación O₂ (%) *</label>
-                                            <input type="number" id="SaturacionO2" name="SaturacionO2" class="form-control py-2" placeholder="98" required/>
+                                            <input type="number" min="0" id="SaturacionO2" name="SaturacionO2" class="form-control py-2" placeholder="98" required/>
                                             <div class="form-text" style="font-size:.7rem;">Rango normal: 95 – 100 %</div>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label small fw-semibold text-uppercase text-muted" for="Glicemia">Glicemia (mg/dL)</label>
-                                            <input type="number" id="Glicemia" name="Glicemia" class="form-control py-2" placeholder="90"/>
+                                            <input type="number" min="0" id="Glicemia" name="Glicemia" class="form-control py-2" placeholder="90"/>
                                             <div class="form-text" style="font-size:.7rem;">Rango normal: 70 – 100 mg/dL</div>
                                         </div>
                                     </div>
@@ -478,56 +482,49 @@
                         </div>
                     </div>
 
-                    <!-- ══════════ COLUMNA DERECHA: REFERENCIA DE RANGOS ══════════ -->
+                    <!-- ══════════ COLUMNA DERECHA: HISTORIAL DE SIGNOS VITALES ══════════ -->
                     <div class="col-lg-5">
+
+                        <!-- HISTORIAL DE SIGNOS VITALES DEL PACIENTE ACTUAL -->
                         <div class="card border-0 shadow-sm rounded-4 overflow-hidden" style="position:sticky; top:1rem;">
                             <div class="card-header bg-white p-3 d-flex align-items-center gap-2 border-bottom">
                                 <div class="rounded-3 bg-success bg-opacity-10 p-2 d-flex align-items-center justify-content-center" style="width:38px;height:38px;">
-                                    <i class="bi bi-info-circle-fill text-success fs-5"></i>
+                                    <i class="bi bi-clock-history text-success fs-5"></i>
                                 </div>
                                 <div>
-                                    <h2 class="h6 fw-bold mb-0 text-dark">Rangos de Referencia</h2>
-                                    <p class="text-muted mb-0" style="font-size:.72rem;">Adultos 19 – 60 años</p>
+                                    <h2 class="h6 fw-bold mb-0 text-dark">Historial de Signos Vitales</h2>
+                                    <p class="text-muted mb-0" style="font-size:.72rem;"><%= nombreParam %></p>
                                 </div>
                             </div>
-                            <div class="card-body p-3">
-                                <div class="d-flex align-items-center justify-content-between border-bottom py-2">
-                                    <span class="small text-muted"><i class="bi bi-thermometer-half me-2 text-danger"></i>Temperatura</span>
-                                    <span class="small fw-semibold text-dark">36.0 – 37.5 °C</span>
+                            <div class="card-body p-3" style="max-height:420px; overflow-y:auto;">
+                                <% if (historialSignos == null || historialSignos.isEmpty()) { %>
+                                <div class="text-center text-muted py-4">
+                                    <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                                    <span class="small">Este paciente aún no tiene registros de signos vitales.</span>
                                 </div>
-                                <div class="d-flex align-items-center justify-content-between border-bottom py-2">
-                                    <span class="small text-muted"><i class="bi bi-heart-pulse me-2 text-danger"></i>Presión Sistólica</span>
-                                    <span class="small fw-semibold text-dark">90 – 139 mmHg</span>
+                                <% } else {
+                                    for (SignoVital sv : historialSignos) {
+                                        String alerta = sv.getAlertaGenerada();
+                                        String badgeClass = "R".equals(alerta) ? "bg-danger" : ("A".equals(alerta) ? "bg-primary" : "bg-success");
+                                        String badgeTxt   = "R".equals(alerta) ? "Alerta alta" : ("A".equals(alerta) ? "Alerta baja" : "Normal");
+                                %>
+                                <div class="border rounded-3 p-3 mb-2">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <span class="small fw-semibold text-dark">
+                                            <i class="bi bi-calendar3 me-1"></i><%= sv.getFechaHora() %>
+                                        </span>
+                                        <span class="badge <%= badgeClass %> rounded-pill"><%= badgeTxt %></span>
+                                    </div>
+                                    <div class="row row-cols-2 g-1" style="font-size:.75rem;">
+                                        <div class="text-muted">Temp: <b class="text-dark"><%= sv.getTemperatura() != null ? sv.getTemperatura() + "°C" : "-" %></b></div>
+                                        <div class="text-muted">PA: <b class="text-dark"><%= (sv.getPresionSistolica() != null ? sv.getPresionSistolica() : "-") %>/<%= (sv.getPresionDiastolica() != null ? sv.getPresionDiastolica() : "-") %></b></div>
+                                        <div class="text-muted">FC: <b class="text-dark"><%= sv.getFrecuenciaCardiaca() != null ? sv.getFrecuenciaCardiaca() + " lpm" : "-" %></b></div>
+                                        <div class="text-muted">FR: <b class="text-dark"><%= sv.getFrecuenciaRespiratoria() != null ? sv.getFrecuenciaRespiratoria() + " rpm" : "-" %></b></div>
+                                        <div class="text-muted">SpO₂: <b class="text-dark"><%= sv.getSaturacionO2() != null ? sv.getSaturacionO2() + "%" : "-" %></b></div>
+                                        <div class="text-muted">Glic: <b class="text-dark"><%= sv.getGlicemia() != null ? sv.getGlicemia() + " mg/dL" : "-" %></b></div>
+                                    </div>
                                 </div>
-                                <div class="d-flex align-items-center justify-content-between border-bottom py-2">
-                                    <span class="small text-muted"><i class="bi bi-heart-pulse me-2 text-danger"></i>Presión Diastólica</span>
-                                    <span class="small fw-semibold text-dark">60 – 89 mmHg</span>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-between border-bottom py-2">
-                                    <span class="small text-muted"><i class="bi bi-activity me-2 text-danger"></i>Frec. Cardiaca</span>
-                                    <span class="small fw-semibold text-dark">60 – 100 lpm</span>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-between border-bottom py-2">
-                                    <span class="small text-muted"><i class="bi bi-lungs-fill me-2 text-danger"></i>Frec. Respiratoria</span>
-                                    <span class="small fw-semibold text-dark">12 – 20 rpm</span>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-between border-bottom py-2">
-                                    <span class="small text-muted"><i class="bi bi-droplet-half me-2 text-danger"></i>Saturación O₂</span>
-                                    <span class="small fw-semibold text-dark">95 – 100 %</span>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-between py-2">
-                                    <span class="small text-muted"><i class="bi bi-droplet-fill me-2 text-danger"></i>Glicemia</span>
-                                    <span class="small fw-semibold text-dark">70 – 100 mg/dL</span>
-                                </div>
-                                <hr class="my-3"/>
-                                <div class="d-flex align-items-center gap-2 mb-2">
-                                    <span class="badge bg-danger rounded-pill p-2"><i class="bi bi-arrow-up-circle-fill"></i></span>
-                                    <span class="small text-muted">Rojo: valor sobre lo normal</span>
-                                </div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <span class="badge bg-primary rounded-pill p-2"><i class="bi bi-arrow-down-circle-fill"></i></span>
-                                    <span class="small text-muted">Azul: valor bajo lo normal</span>
-                                </div>
+                                <% } } %>
                             </div>
                         </div>
                     </div>
