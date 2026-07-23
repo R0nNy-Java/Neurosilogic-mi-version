@@ -338,7 +338,7 @@
                           <a href="${pageContext.request.contextPath}/PanelPacienteServlet?cedula=<%= p.getCedula() %>" class="btn btn-sm btn-success d-inline-flex align-items-center gap-1 py-1 px-3">
                             <i class="bi bi-grid-3x3-gap-fill"></i> Panel Paciente
                           </a>
-                          <button type="button" class="btn btn-sm btn-outline-info d-inline-flex align-items-center gap-1 py-1 px-3" onclick="verDetalles('<%= p.getNombres() + " " + p.getApellidos() %>', '<%= p.getCedula() %>', '<%= p.getEdad() %>', '<%= p.getSexo() %>', '<%= p.getSintomasActuales() != null ? p.getSintomasActuales().replace("'", "\\'") : "" %>', '<%= p.getAlergias() != null ? p.getAlergias().replace("'", "\\'") : "" %>', '<%= p.getDispositivosMedicos() != null ? p.getDispositivosMedicos().replace("'", "\\'") : "" %>')">
+                          <button type="button" class="btn btn-sm btn-outline-info d-inline-flex align-items-center gap-1 py-1 px-3" onclick="verDetalles('<%= p.getNombres() + " " + p.getApellidos() %>', '<%= p.getCedula() %>', '<%= p.getEdad() %>', '<%= p.getSexo() %>')">
                             <i class="bi bi-eye-fill"></i> Ver Ficha
                           </button>
                         </div>
@@ -403,20 +403,7 @@
               </div>
             </div>
           </div>
-          <div class="mb-3">
-            <small class="fw-semibold text-uppercase text-muted d-block mb-1">Síntomas Actuales</small>
-            <div class="p-3 bg-light rounded-3 border text-dark" id="mSintomas">-</div>
-          </div>
-          <div class="row g-3">
-            <div class="col-md-6">
-              <small class="fw-semibold text-uppercase text-muted d-block mb-1">Alergias Conocidas</small>
-              <div class="p-3 bg-light rounded-3 border text-danger fw-semibold" id="mAlergias">-</div>
-            </div>
-            <div class="col-md-6">
-              <small class="fw-semibold text-uppercase text-muted d-block mb-1">Dispositivos Médicos</small>
-              <div class="p-3 bg-light rounded-3 border text-dark" id="mDispositivos">-</div>
-            </div>
-          </div>
+
         </div>
         <div class="modal-footer bg-light border-0 p-3">
           <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cerrar</button>
@@ -436,14 +423,10 @@
       });
     });
 
-    function verDetalles(nombre, cedula, edad, sexo, sintomas, alergias, dispositivos) {
+    function verDetalles(nombre, cedula, edad) {
       document.getElementById('mNombre').textContent = nombre;
       document.getElementById('mCedula').textContent = 'Cédula: ' + cedula;
       document.getElementById('mEdadSexo').textContent = edad + ' años (' + (sexo === 'M' ? 'Masculino' : 'Femenino') + ')';
-      document.getElementById('mSintomas').textContent = sintomas || 'Sin síntomas registrados';
-      document.getElementById('mAlergias').textContent = alergias || 'Ninguna alergia conocida';
-      document.getElementById('mDispositivos').textContent = dispositivos || 'Ninguno';
-
       const modal = new bootstrap.Modal(document.getElementById('modalFicha'));
       modal.show();
     }

@@ -10,16 +10,21 @@ COLLATE utf8mb4_unicode_ci;
 USE nurselogic_db;
 
 -- 1. Tabla: usuario
-CREATE TABLE IF NOT EXISTS usuario (
-    IdUsuario INT AUTO_INCREMENT PRIMARY KEY,
-    NombreUsuario VARCHAR(30) NOT NULL UNIQUE,
-    ContrasenaHash VARCHAR(255) NOT NULL,
-    Nombres VARCHAR(50),
-    Apellidos VARCHAR(50),
-    Rol VARCHAR(20),
+CREATE TABLE IF NOT EXISTS paciente (
+                                        IdPaciente INT AUTO_INCREMENT PRIMARY KEY,
+                                        Cedula VARCHAR(10) NOT NULL UNIQUE,
+    Nombres VARCHAR(50) NOT NULL,
+    Apellidos VARCHAR(50) NOT NULL,
+    Edad INT NOT NULL,
+    Sexo CHAR(1) NOT NULL, -- 'M' o 'F'
     Estado CHAR(1) DEFAULT 'A'
-);
-
+    );
+--tabla enfermedad
+CREATE TABLE IF NOT EXISTS enfermedad (
+                                          IdEnfermedad INT AUTO_INCREMENT PRIMARY KEY,
+                                          NombreEnfermedad VARCHAR(100) NOT NULL UNIQUE,
+    Categoria VARCHAR(50) -- 'CARDIOVASCULAR', 'METABOLICA', etc.
+    );
 -- 2. Tabla: paciente
 CREATE TABLE IF NOT EXISTS paciente (
     IdPaciente INT AUTO_INCREMENT PRIMARY KEY,
@@ -85,13 +90,15 @@ CREATE TABLE IF NOT EXISTS auditoriaacceso (
 
 -- 7. Tabla: antecedente
 CREATE TABLE IF NOT EXISTS antecedente (
-    IdAntecedente INT AUTO_INCREMENT PRIMARY KEY,
-    IdPaciente INT NOT NULL,
-    Enfermedad VARCHAR(100),
-    FechaRegistro DATETIME,
-    FOREIGN KEY (IdPaciente) REFERENCES paciente(IdPaciente)
-);
-
+                                           IdAntecedente INT AUTO_INCREMENT PRIMARY KEY,
+                                           IdPaciente INT NOT NULL,
+                                           IdEnfermedad INT NULL, -- Clave Foránea al catálogo de enfermedades
+                                           TipoAntecedente VARCHAR(30) NOT NULL, -- 'ENFERMEDAD', 'ALERGIA', 'DISPOSITIVO', 'SINTOMA'
+    Descripcion TEXT,
+    FechaRegistro DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (IdPaciente) REFERENCES paciente(IdPaciente) ON DELETE CASCADE,
+    FOREIGN KEY (IdEnfermedad) REFERENCES enfermedad(IdEnfermedad) ON DELETE SET NULL
+    );
 -- 8. Tabla: signovital
 CREATE TABLE IF NOT EXISTS signovital (
     IdSignoVital INT AUTO_INCREMENT PRIMARY KEY,
